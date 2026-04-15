@@ -190,24 +190,24 @@ async function parseWordPressXml(xmlPath) {
       continue; // Skip these completely
     }
 
-    const hasTeamCat = categories.some(c => c.toLowerCase().includes('team'));
-    const isEventCat = categories.some(c => c.toLowerCase() === 'vsechny-akce' || c.toLowerCase().includes('camp'));
+    const catLower = categories.map(c => c.toLowerCase());
 
-    if (postType === 'team' || hasTeamCat) {
+    // Team: dedicated 'team' post type, OR post with 'Team' category but without 'Novinka'
+    // (old-style team profiles published as regular posts, before WP got custom post type)
+    const isTeamType = postType === 'team';
+    const isTeamPost = postType === 'post' && catLower.includes('team') && !catLower.includes('novinka');
+
+    // Events: category 'akce' OR known event post types OR title keywords
+    const isEventCat = catLower.includes('akce') || catLower.includes('vsechny-akce');
+    const isEventType = ['udesly_evt', 'events', 'tribe_events', 'akce'].includes(postType);
+    const isEventTitle = /exhibic|camp|workshop|příměstský tábor|příměstský camp|kurz/i.test(title);
+
+    if (isTeamType || isTeamPost) {
       teamMembers.push(parsedItem);
-    } else if (postType === 'post') {
-      if (isEventCat) {
-        events.push(parsedItem);
-      } else {
-        posts.push(parsedItem);
-      }
-    } else if (
-      postType === 'udesly_evt' ||
-      postType === 'events' ||
-      postType === 'tribe_events' ||
-      postType === 'akce'
-    ) {
+    } else if (isEventType || (postType === 'post' && (isEventCat || isEventTitle))) {
       events.push(parsedItem);
+    } else if (postType === 'post') {
+      posts.push(parsedItem);
     } else {
       // Unknown post type
       console.log(`  ℹ️ Skipping unknown post type "${postType}": ${title}`);
@@ -234,7 +234,18 @@ async function parseWordPressXml(xmlPath) {
     }
   }
 
-  return { posts, events, teamMembers, pages, attachments: Object.values(attachmentMap) };
+  // Deduplicate team members by normalized name — prefer dedicated 'team' post type over old 'post' profiles
+  const teamMap = new Map();
+  for (const member of teamMembers) {
+    const key = generateSlug(member.title); // normalize for comparison
+    const existing = teamMap.get(key);
+    if (!existing || member.postType === 'team') {
+      teamMap.set(key, member);
+    }
+  }
+  const dedupedTeam = Array.from(teamMap.values());
+
+  return { posts, events, teamMembers: dedupedTeam, pages, attachments: Object.values(attachmentMap) };
 }
 
 // ============================================================
