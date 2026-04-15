@@ -1,0 +1,2272 @@
+[
+  {
+    "source": "/",
+    "destination": "/blog/url_field_instagram_xwx2/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/url_field_facebook_xrjm/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/url_field_youtube_5jr4/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/image_field_fotografie-1_jwvy/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/image_field_fotografie-2_h10i/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/image_field_fotografie-3_fciv/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/image_field_fotografie-4_toit/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/oembed_field_video-1_sytr/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/oembed_field_video-3_esyh/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/oembed_field_video-2_wqdh/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/text_field_typ-akce_xa65/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/text_field_datum_gnqf/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/text_field_price_ykfx/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/text_field_doba-trvani_g2ee/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/text_field_riders-number_kw8c/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/text_field_akce-level_atd8/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/image_field_akce-more-img_qjp7/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/oembed_field_akce-video_i5l5/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/field_608025e4b608a/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/field_608025fb030ea/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/group_field_team/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/group_field_akce/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/bikeskills/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/megasleva-e-13/",
+    "type": 301
+  },
+  {
+    "source": "/coursector/",
+    "destination": "/blog/coursector/",
+    "type": 301
+  },
+  {
+    "source": "/multy-webflow-to-wordpress-d9ef15-2/",
+    "destination": "/blog/multy-webflow-to-wordpress-d9ef15-2/",
+    "type": 301
+  },
+  {
+    "source": "/multy-webflow-to-wordpres-41f35a91a5e26-2/",
+    "destination": "/blog/multy-webflow-to-wordpres-41f35a91a5e26-2/",
+    "type": 301
+  },
+  {
+    "source": "/multy-webflow-to-wordpres-a2bac1040f1b7/",
+    "destination": "/blog/multy-webflow-to-wordpres-a2bac1040f1b7/",
+    "type": 301
+  },
+  {
+    "source": "/multy-webflow-to-wordpres-ea5f0e3d27991/",
+    "destination": "/blog/multy-webflow-to-wordpres-ea5f0e3d27991/",
+    "type": 301
+  },
+  {
+    "source": "/courses/",
+    "destination": "/blog/courses/",
+    "type": 301
+  },
+  {
+    "source": "/sign-up-login/",
+    "destination": "/blog/sign-up-login/",
+    "type": 301
+  },
+  {
+    "source": "/2488/",
+    "destination": "/blog/2488/",
+    "type": 301
+  },
+  {
+    "source": "/2530/",
+    "destination": "/blog/2530/",
+    "type": 301
+  },
+  {
+    "source": "/my-account/",
+    "destination": "/blog/my-account/",
+    "type": 301
+  },
+  {
+    "source": "/objednavky/",
+    "destination": "/blog/objednavky/",
+    "type": 301
+  },
+  {
+    "source": "/detaily-uctu/",
+    "destination": "/blog/detaily-uctu/",
+    "type": 301
+  },
+  {
+    "source": "/zapomenute-heslo/",
+    "destination": "/blog/zapomenute-heslo/",
+    "type": 301
+  },
+  {
+    "source": "/96149/",
+    "destination": "/blog/96149/",
+    "type": 301
+  },
+  {
+    "source": "/individualni-kurzy/",
+    "destination": "/blog/individualni-kurzy/",
+    "type": 301
+  },
+  {
+    "source": "/campy/",
+    "destination": "/blog/campy/",
+    "type": 301
+  },
+  {
+    "source": "/workshopy/",
+    "destination": "/blog/workshopy/",
+    "type": 301
+  },
+  {
+    "source": "/specialni-projekty/",
+    "destination": "/blog/specialni-projekty/",
+    "type": 301
+  },
+  {
+    "source": "/kurzy-a-campy/",
+    "destination": "/blog/kurzy-a-campy/",
+    "type": 301
+  },
+  {
+    "source": "/blog/",
+    "destination": "/blog/blog/",
+    "type": 301
+  },
+  {
+    "source": "/katarina-tothova/",
+    "destination": "/blog/katarina-tothova/",
+    "type": 301
+  },
+  {
+    "source": "/projekt-startuje/",
+    "destination": "/blog/projekt-startuje/",
+    "type": 301
+  },
+  {
+    "source": "/simon/",
+    "destination": "/blog/simon/",
+    "type": 301
+  },
+  {
+    "source": "/lukas-valny/",
+    "destination": "/blog/lukas-valny/",
+    "type": 301
+  },
+  {
+    "source": "/mara/",
+    "destination": "/blog/mara/",
+    "type": 301
+  },
+  {
+    "source": "/vlasta/",
+    "destination": "/blog/vlasta/",
+    "type": 301
+  },
+  {
+    "source": "/nas-obchod/",
+    "destination": "/blog/nas-obchod/",
+    "type": 301
+  },
+  {
+    "source": "/organizujeme/",
+    "destination": "/blog/organizujeme/",
+    "type": 301
+  },
+  {
+    "source": "/camp-na-mtb-trilogy/",
+    "destination": "/blog/camp-na-mtb-trilogy/",
+    "type": 301
+  },
+  {
+    "source": "/vibrocore-test/",
+    "destination": "/blog/vibrocore-test/",
+    "type": 301
+  },
+  {
+    "source": "/vyukova-lekce-pro-klub/",
+    "destination": "/blog/vyukova-lekce-pro-klub/",
+    "type": 301
+  },
+  {
+    "source": "/levelsportkoncept-testing-by-bikeskills/",
+    "destination": "/blog/levelsportkoncept-testing-by-bikeskills/",
+    "type": 301
+  },
+  {
+    "source": "/dvo-testovani-na-spicaku/",
+    "destination": "/blog/dvo-testovani-na-spicaku/",
+    "type": 301
+  },
+  {
+    "source": "/je-libo-traily/",
+    "destination": "/blog/je-libo-traily/",
+    "type": 301
+  },
+  {
+    "source": "/kdyz-sjezd-vyhraje-trialista/",
+    "destination": "/blog/kdyz-sjezd-vyhraje-trialista/",
+    "type": 301
+  },
+  {
+    "source": "/milada-run-2020/",
+    "destination": "/blog/milada-run-2020/",
+    "type": 301
+  },
+  {
+    "source": "/holky-ladi-bikeskills-camp-report/",
+    "destination": "/blog/holky-ladi-bikeskills-camp-report/",
+    "type": 301
+  },
+  {
+    "source": "/exhibice-kluku-z-bikeskills-na-zavode-kolem-republiky/",
+    "destination": "/blog/exhibice-kluku-z-bikeskills-na-zavode-kolem-republiky/",
+    "type": 301
+  },
+  {
+    "source": "/exhibicni-maraton-kluku-z-bikeskills/",
+    "destination": "/blog/exhibicni-maraton-kluku-z-bikeskills/",
+    "type": 301
+  },
+  {
+    "source": "/holky-ladi-bikeskills-vol-2/",
+    "destination": "/blog/holky-ladi-bikeskills-vol-2/",
+    "type": 301
+  },
+  {
+    "source": "/spolupracujeme-s-cdst/",
+    "destination": "/blog/spolupracujeme-s-cdst/",
+    "type": 301
+  },
+  {
+    "source": "/daruj-skill-kurz-na-vanoce/",
+    "destination": "/blog/daruj-skill-kurz-na-vanoce/",
+    "type": 301
+  },
+  {
+    "source": "/nove-moznosti-platby-na-nasem-e-shopu/",
+    "destination": "/blog/nove-moznosti-platby-na-nasem-e-shopu/",
+    "type": 301
+  },
+  {
+    "source": "/terminy-akci-2021/",
+    "destination": "/blog/terminy-akci-2021/",
+    "type": 301
+  },
+  {
+    "source": "/podporte-katarinu-a-jeji-knihu/",
+    "destination": "/blog/podporte-katarinu-a-jeji-knihu/",
+    "type": 301
+  },
+  {
+    "source": "/prvni-camp-za-nami/",
+    "destination": "/blog/prvni-camp-za-nami/",
+    "type": 301
+  },
+  {
+    "source": "/chlapy-na-campu-si-uzili-dest-i-slunicko/",
+    "destination": "/blog/chlapy-na-campu-si-uzili-dest-i-slunicko/",
+    "type": 301
+  },
+  {
+    "source": "/holky-ladi-bikeskills-semberske-stezky/",
+    "destination": "/blog/holky-ladi-bikeskills-semberske-stezky/",
+    "type": 301
+  },
+  {
+    "source": "/ricanske-slapacky-2021/",
+    "destination": "/blog/ricanske-slapacky-2021/",
+    "type": 301
+  },
+  {
+    "source": "/akce-v-cervenci-jsou-za-nami/",
+    "destination": "/blog/akce-v-cervenci-jsou-za-nami/",
+    "type": 301
+  },
+  {
+    "source": "/srpen-ve-znameni-kurzu-i-exhibic/",
+    "destination": "/blog/srpen-ve-znameni-kurzu-i-exhibic/",
+    "type": 301
+  },
+  {
+    "source": "/exhibice-video-treninky-report-21-22-8/",
+    "destination": "/blog/exhibice-video-treninky-report-21-22-8/",
+    "type": 301
+  },
+  {
+    "source": "/trojita-exhibicni-naloz-pankrac-doksy-letnany/",
+    "destination": "/blog/trojita-exhibicni-naloz-pankrac-doksy-letnany/",
+    "type": 301
+  },
+  {
+    "source": "/camp-holky-ladi-bikeskill-3-a-exhibice-ledenicke-bramborovani/",
+    "destination": "/blog/camp-holky-ladi-bikeskill-3-a-exhibice-ledenicke-bramborovani/",
+    "type": 301
+  },
+  {
+    "source": "/evropsky-den-bez-aut/",
+    "destination": "/blog/evropsky-den-bez-aut/",
+    "type": 301
+  },
+  {
+    "source": "/chlapi-ladi-bikeskills-no-2/",
+    "destination": "/blog/chlapi-ladi-bikeskills-no-2/",
+    "type": 301
+  },
+  {
+    "source": "/trenujeme-lvicata/",
+    "destination": "/blog/trenujeme-lvicata/",
+    "type": 301
+  },
+  {
+    "source": "/otevreni-cube-store-karlovy-vary/",
+    "destination": "/blog/otevreni-cube-store-karlovy-vary/",
+    "type": 301
+  },
+  {
+    "source": "/terminy-campu-pro-holky-i-chlapi-jsou-venku/",
+    "destination": "/blog/terminy-campu-pro-holky-i-chlapi-jsou-venku/",
+    "type": 301
+  },
+  {
+    "source": "/prvni-bikeskills-campy-hlasi-splneno/",
+    "destination": "/blog/prvni-bikeskills-campy-hlasi-splneno/",
+    "type": 301
+  },
+  {
+    "source": "/otevirali-jsme-pumptrack-v-brandyse/",
+    "destination": "/blog/otevirali-jsme-pumptrack-v-brandyse/",
+    "type": 301
+  },
+  {
+    "source": "/exhibice-sadska-aneb-cary-v-topu/",
+    "destination": "/blog/exhibice-sadska-aneb-cary-v-topu/",
+    "type": 301
+  },
+  {
+    "source": "/giro-ditalia-exhibice/",
+    "destination": "/blog/giro-ditalia-exhibice/",
+    "type": 301
+  },
+  {
+    "source": "/krteni-motorek-a-jilove-u-decina/",
+    "destination": "/blog/krteni-motorek-a-jilove-u-decina/",
+    "type": 301
+  },
+  {
+    "source": "/olympiada-skolek/",
+    "destination": "/blog/olympiada-skolek/",
+    "type": 301
+  },
+  {
+    "source": "/exhibice-prazske-sluzby/",
+    "destination": "/blog/exhibice-prazske-sluzby/",
+    "type": 301
+  },
+  {
+    "source": "/ricansky-busking-food-festival/",
+    "destination": "/blog/ricansky-busking-food-festival/",
+    "type": 301
+  },
+  {
+    "source": "/den-mestske-policie-most/",
+    "destination": "/blog/den-mestske-policie-most/",
+    "type": 301
+  },
+  {
+    "source": "/vikendove-campy-pro-holky-i-chlapy/",
+    "destination": "/blog/vikendove-campy-pro-holky-i-chlapy/",
+    "type": 301
+  },
+  {
+    "source": "/exhibice-hrusovany-pod-jevisovko-a-bikefestival/",
+    "destination": "/blog/exhibice-hrusovany-pod-jevisovko-a-bikefestival/",
+    "type": 301
+  },
+  {
+    "source": "/naloz-4-exhibic-napric-republikou/",
+    "destination": "/blog/naloz-4-exhibic-napric-republikou/",
+    "type": 301
+  },
+  {
+    "source": "/exhibice-na-mega-akcich-17-18-6/",
+    "destination": "/blog/exhibice-na-mega-akcich-17-18-6/",
+    "type": 301
+  },
+  {
+    "source": "/sraz-veteranu-horni-police-a-mestske-slavnosti-stare-krecany/",
+    "destination": "/blog/sraz-veteranu-horni-police-a-mestske-slavnosti-stare-krecany/",
+    "type": 301
+  },
+  {
+    "source": "/bikefestival-ricanske-slapacky-2022/",
+    "destination": "/blog/bikefestival-ricanske-slapacky-2022/",
+    "type": 301
+  },
+  {
+    "source": "/cervencova-sleva/",
+    "destination": "/blog/cervencova-sleva/",
+    "type": 301
+  },
+  {
+    "source": "/primestsky-tabor-no-1/",
+    "destination": "/blog/primestsky-tabor-no-1/",
+    "type": 301
+  },
+  {
+    "source": "/dva-tymy-a-dve-akce-zadverice-a-milikov/",
+    "destination": "/blog/dva-tymy-a-dve-akce-zadverice-a-milikov/",
+    "type": 301
+  },
+  {
+    "source": "/testovani-bikeparku-a-mensi-vikendove-exhibice/",
+    "destination": "/blog/testovani-bikeparku-a-mensi-vikendove-exhibice/",
+    "type": 301
+  },
+  {
+    "source": "/zdechovice-a-straz-u-tachova-exhibice/",
+    "destination": "/blog/zdechovice-a-straz-u-tachova-exhibice/",
+    "type": 301
+  },
+  {
+    "source": "/primestsky-tabor-no-2/",
+    "destination": "/blog/primestsky-tabor-no-2/",
+    "type": 301
+  },
+  {
+    "source": "/foceni-a-exhibice-o-destivem-vikendu/",
+    "destination": "/blog/foceni-a-exhibice-o-destivem-vikendu/",
+    "type": 301
+  },
+  {
+    "source": "/martin-simunek-v-milovicich-a-struharove/",
+    "destination": "/blog/martin-simunek-v-milovicich-a-struharove/",
+    "type": 301
+  },
+  {
+    "source": "/cestlicky-pumptrack-otevren/",
+    "destination": "/blog/cestlicky-pumptrack-otevren/",
+    "type": 301
+  },
+  {
+    "source": "/exhibicni-den-kunratice-skvorec-a-jablonec-nad-nisou/",
+    "destination": "/blog/exhibicni-den-kunratice-skvorec-a-jablonec-nad-nisou/",
+    "type": 301
+  },
+  {
+    "source": "/exhibice-padrtske-plane-modrany-a-vyuka/",
+    "destination": "/blog/exhibice-padrtske-plane-modrany-a-vyuka/",
+    "type": 301
+  },
+  {
+    "source": "/posledni-letosni-campy-bikeskills/",
+    "destination": "/blog/posledni-letosni-campy-bikeskills/",
+    "type": 301
+  },
+  {
+    "source": "/exhibice-a-workshop-svatomichelske-slavnosti-litvinov/",
+    "destination": "/blog/exhibice-a-workshop-svatomichelske-slavnosti-litvinov/",
+    "type": 301
+  },
+  {
+    "source": "/exhibice-sportovni-odpoledne-rohozna/",
+    "destination": "/blog/exhibice-sportovni-odpoledne-rohozna/",
+    "type": 301
+  },
+  {
+    "source": "/podzimni-den-mlada-boleslav/",
+    "destination": "/blog/podzimni-den-mlada-boleslav/",
+    "type": 301
+  },
+  {
+    "source": "/exhibice-na-otevreni-pumpu-v-caslavi/",
+    "destination": "/blog/exhibice-na-otevreni-pumpu-v-caslavi/",
+    "type": 301
+  },
+  {
+    "source": "/listopadova-sleva-bikeskills/",
+    "destination": "/blog/listopadova-sleva-bikeskills/",
+    "type": 301
+  },
+  {
+    "source": "/produkty-kine-max-na-nasem-shopu/",
+    "destination": "/blog/produkty-kine-max-na-nasem-shopu/",
+    "type": 301
+  },
+  {
+    "source": "/nove-u-nas-naleznete-znacku-ethirteen/",
+    "destination": "/blog/nove-u-nas-naleznete-znacku-ethirteen/",
+    "type": 301
+  },
+  {
+    "source": "/exhibicni-vystoupeni-bikes4life-sosnova/",
+    "destination": "/blog/exhibicni-vystoupeni-bikes4life-sosnova/",
+    "type": 301
+  },
+  {
+    "source": "/nataceni-tv-poradu-lvicata/",
+    "destination": "/blog/nataceni-tv-poradu-lvicata/",
+    "type": 301
+  },
+  {
+    "source": "/prvni-venkovni-exhibice-a-trial-kurz/",
+    "destination": "/blog/prvni-venkovni-exhibice-a-trial-kurz/",
+    "type": 301
+  },
+  {
+    "source": "/prihlasovani-na-dubnove-campy-spusteno/",
+    "destination": "/blog/prihlasovani-na-dubnove-campy-spusteno/",
+    "type": 301
+  },
+  {
+    "source": "/ples-zemedelske-university-v-praze/",
+    "destination": "/blog/ples-zemedelske-university-v-praze/",
+    "type": 301
+  },
+  {
+    "source": "/bikeskills-campy-a-exhibice/",
+    "destination": "/blog/bikeskills-campy-a-exhibice/",
+    "type": 301
+  },
+  {
+    "source": "/zehnani-kol-svatba-bikeru-a-dny-bezpecnosti/",
+    "destination": "/blog/zehnani-kol-svatba-bikeru-a-dny-bezpecnosti/",
+    "type": 301
+  },
+  {
+    "source": "/20-21-5-exhibice-prazske-sluzby-strupcice-a-on-semiconductor/",
+    "destination": "/blog/20-21-5-exhibice-prazske-sluzby-strupcice-a-on-semiconductor/",
+    "type": 301
+  },
+  {
+    "source": "/27-28-5-campy-bikeskills-a-exhibice-v-laznich/",
+    "destination": "/blog/27-28-5-campy-bikeskills-a-exhibice-v-laznich/",
+    "type": 301
+  },
+  {
+    "source": "/kulovy-blesk-1-pradedeckuv-traktor-a-pisek-u-jablunkova/",
+    "destination": "/blog/kulovy-blesk-1-pradedeckuv-traktor-a-pisek-u-jablunkova/",
+    "type": 301
+  },
+  {
+    "source": "/kulovy-blesk-2-caslav-bratronice-chotec-suchdol-bojkovice/",
+    "destination": "/blog/kulovy-blesk-2-caslav-bratronice-chotec-suchdol-bojkovice/",
+    "type": 301
+  },
+  {
+    "source": "/exhibice-travcice-a-pelhrimovske-rekordy/",
+    "destination": "/blog/exhibice-travcice-a-pelhrimovske-rekordy/",
+    "type": 301
+  },
+  {
+    "source": "/melnicky-festival-dny-lesu-v-ralsku-a-javornicky-den/",
+    "destination": "/blog/melnicky-festival-dny-lesu-v-ralsku-a-javornicky-den/",
+    "type": 301
+  },
+  {
+    "source": "/detsky-den-na-ladronce-a-cykloden-brezno/",
+    "destination": "/blog/detsky-den-na-ladronce-a-cykloden-brezno/",
+    "type": 301
+  },
+  {
+    "source": "/obecni-slavnosti-vchynice-a-individualni-kurzy/",
+    "destination": "/blog/obecni-slavnosti-vchynice-a-individualni-kurzy/",
+    "type": 301
+  },
+  {
+    "source": "/primestsky-tabor-a-exhibice-loucna-a-zulova/",
+    "destination": "/blog/primestsky-tabor-a-exhibice-loucna-a-zulova/",
+    "type": 301
+  },
+  {
+    "source": "/bikeskills-camp-mix/",
+    "destination": "/blog/bikeskills-camp-mix/",
+    "type": 301
+  },
+  {
+    "source": "/primestsky-camp-2/",
+    "destination": "/blog/primestsky-camp-2/",
+    "type": 301
+  },
+  {
+    "source": "/exhibice-obecni-slavnosti-dolni-rasnice/",
+    "destination": "/blog/exhibice-obecni-slavnosti-dolni-rasnice/",
+    "type": 301
+  },
+  {
+    "source": "/exhibicni-serie-na-zaver-prazdnin/",
+    "destination": "/blog/exhibicni-serie-na-zaver-prazdnin/",
+    "type": 301
+  },
+  {
+    "source": "/tour-de-zelenak/",
+    "destination": "/blog/tour-de-zelenak/",
+    "type": 301
+  },
+  {
+    "source": "/sedm-statecnych-napric-republikou/",
+    "destination": "/blog/sedm-statecnych-napric-republikou/",
+    "type": 301
+  },
+  {
+    "source": "/dva-vikendy-plne-exhibic-a-kurzu/",
+    "destination": "/blog/dva-vikendy-plne-exhibic-a-kurzu/",
+    "type": 301
+  },
+  {
+    "source": "/trocha-campu-zavodeni-i-exhibic/",
+    "destination": "/blog/trocha-campu-zavodeni-i-exhibic/",
+    "type": 301
+  },
+  {
+    "source": "/radeni-na-it-konferenci/",
+    "destination": "/blog/radeni-na-it-konferenci/",
+    "type": 301
+  },
+  {
+    "source": "/bikeskills-campy-no-1/",
+    "destination": "/blog/bikeskills-campy-no-1/",
+    "type": 301
+  },
+  {
+    "source": "/exhibice-galerie-ep1-umelecka-cyklovystava-trutnov/",
+    "destination": "/blog/exhibice-galerie-ep1-umelecka-cyklovystava-trutnov/",
+    "type": 301
+  },
+  {
+    "source": "/otevirani-loucovicke-cyklostezky-loucovice-u-lipna/",
+    "destination": "/blog/otevirani-loucovicke-cyklostezky-loucovice-u-lipna/",
+    "type": 301
+  },
+  {
+    "source": "/super-fast-camp/",
+    "destination": "/blog/super-fast-camp/",
+    "type": 301
+  },
+  {
+    "source": "/den-prazskych-sluzeb-a-cykloden/",
+    "destination": "/blog/den-prazskych-sluzeb-a-cykloden/",
+    "type": 301
+  },
+  {
+    "source": "/cyklisticky-zavod-skol-memorial-ferdinanda-busty/",
+    "destination": "/blog/cyklisticky-zavod-skol-memorial-ferdinanda-busty/",
+    "type": 301
+  },
+  {
+    "source": "/exhibice-zdikov-jirikovice-kovanice-kolovraty/",
+    "destination": "/blog/exhibice-zdikov-jirikovice-kovanice-kolovraty/",
+    "type": 301
+  },
+  {
+    "source": "/exhibice-pro-cement-hranice-chocenicky-festival-a-lesnicky-den/",
+    "destination": "/blog/exhibice-pro-cement-hranice-chocenicky-festival-a-lesnicky-den/",
+    "type": 301
+  },
+  {
+    "source": "/mcr-masters-v-cyklistice-prazske-sluzby-otovicke-slavnosti-a-slavnosti-v-prznu/",
+    "destination": "/blog/mcr-masters-v-cyklistice-prazske-sluzby-otovicke-slavnosti-a-slavnosti-v-prznu/",
+    "type": 301
+  },
+  {
+    "source": "/slavnosti-vysni-lhota/",
+    "destination": "/blog/slavnosti-vysni-lhota/",
+    "type": 301
+  },
+  {
+    "source": "/primestsky-tabor-na-kolech/",
+    "destination": "/blog/primestsky-tabor-na-kolech/",
+    "type": 301
+  },
+  {
+    "source": "/sraz-americkych-aut-a-motorek-na-zamku-pacov/",
+    "destination": "/blog/sraz-americkych-aut-a-motorek-na-zamku-pacov/",
+    "type": 301
+  },
+  {
+    "source": "/exhibice-na-stanovani-v-chvalovicich-s-workshopem-na-pumptracku/",
+    "destination": "/blog/exhibice-na-stanovani-v-chvalovicich-s-workshopem-na-pumptracku/",
+    "type": 301
+  },
+  {
+    "source": "/3-exhibice-v-jeden-den-na-festivalech-a-slavnostech/",
+    "destination": "/blog/3-exhibice-v-jeden-den-na-festivalech-a-slavnostech/",
+    "type": 301
+  },
+  {
+    "source": "/zaver-prazdnin-na-cestach/",
+    "destination": "/blog/zaver-prazdnin-na-cestach/",
+    "type": 301
+  },
+  {
+    "source": "/toyota-motors-tht-cz-a-zakupy-firemni-akce/",
+    "destination": "/blog/toyota-motors-tht-cz-a-zakupy-firemni-akce/",
+    "type": 301
+  },
+  {
+    "source": "/trial-a-pump-jam-tehov/",
+    "destination": "/blog/trial-a-pump-jam-tehov/",
+    "type": 301
+  },
+  {
+    "source": "/sidekick-od-e-13-novinka-pro-2025/",
+    "destination": "/blog/sidekick-od-e-13-novinka-pro-2025/",
+    "type": 301
+  },
+  {
+    "source": "/ples-spolku-obci-v-ceprovicich/",
+    "destination": "/blog/ples-spolku-obci-v-ceprovicich/",
+    "type": 301
+  },
+  {
+    "source": "/tradicni-sestrih-2024-by-vlasta/",
+    "destination": "/blog/tradicni-sestrih-2024-by-vlasta/",
+    "type": 301
+  },
+  {
+    "source": "/bikes4life-ples-exhibice-doksy/",
+    "destination": "/blog/bikes4life-ples-exhibice-doksy/",
+    "type": 301
+  },
+  {
+    "source": "/kalendar-bikeskills-2025/",
+    "destination": "/blog/kalendar-bikeskills-2025/",
+    "type": 301
+  },
+  {
+    "source": "/tj-sokol-dynamo-moravany-ples/",
+    "destination": "/blog/tj-sokol-dynamo-moravany-ples/",
+    "type": 301
+  },
+  {
+    "source": "/beneficni-ples-podnikatelu-bublava/",
+    "destination": "/blog/beneficni-ples-podnikatelu-bublava/",
+    "type": 301
+  },
+  {
+    "source": "/ples-motocyklistu-vysoka/",
+    "destination": "/blog/ples-motocyklistu-vysoka/",
+    "type": 301
+  },
+  {
+    "source": "/harfa-sport-zahajeni-bikove-sezony/",
+    "destination": "/blog/harfa-sport-zahajeni-bikove-sezony/",
+    "type": 301
+  },
+  {
+    "source": "/bikeskills-campy-no-1-2/",
+    "destination": "/blog/bikeskills-campy-no-1-2/",
+    "type": 301
+  },
+  {
+    "source": "/oteviracka-bikepark-jahodnice-praha/",
+    "destination": "/blog/oteviracka-bikepark-jahodnice-praha/",
+    "type": 301
+  },
+  {
+    "source": "/bikeskills-campy-2/",
+    "destination": "/blog/bikeskills-campy-2/",
+    "type": 301
+  },
+  {
+    "source": "/vlasta-vyskakal-199-schodu-na-rozhlednu/",
+    "destination": "/blog/vlasta-vyskakal-199-schodu-na-rozhlednu/",
+    "type": 301
+  },
+  {
+    "source": "/bikeskills-camp-mix-2/",
+    "destination": "/blog/bikeskills-camp-mix-2/",
+    "type": 301
+  },
+  {
+    "source": "/reporty-z-exhibic-a-workshopu-z-poslednich-dvou-vikendu/",
+    "destination": "/blog/reporty-z-exhibic-a-workshopu-z-poslednich-dvou-vikendu/",
+    "type": 301
+  },
+  {
+    "source": "/festival-rekordu-pelhrimov-a-firemni-akce/",
+    "destination": "/blog/festival-rekordu-pelhrimov-a-firemni-akce/",
+    "type": 301
+  },
+  {
+    "source": "/letape-vitani-leta-lesnicky-den-a-detsky-den/",
+    "destination": "/blog/letape-vitani-leta-lesnicky-den-a-detsky-den/",
+    "type": 301
+  },
+  {
+    "source": "/exhibice-a-workshop-bory/",
+    "destination": "/blog/exhibice-a-workshop-bory/",
+    "type": 301
+  },
+  {
+    "source": "/primestsky-tabor-tehov/",
+    "destination": "/blog/primestsky-tabor-tehov/",
+    "type": 301
+  },
+  {
+    "source": "/naplavka-dobrocinny-festival-kostelec-nad-orlici/",
+    "destination": "/blog/naplavka-dobrocinny-festival-kostelec-nad-orlici/",
+    "type": 301
+  },
+  {
+    "source": "/festival-houpacka-dobrocinna-exhibice-velesin/",
+    "destination": "/blog/festival-houpacka-dobrocinna-exhibice-velesin/",
+    "type": 301
+  },
+  {
+    "source": "/4-tydny-10-exhibic-ci-workshopu/",
+    "destination": "/blog/4-tydny-10-exhibic-ci-workshopu/",
+    "type": 301
+  },
+  {
+    "source": "/251062-2/",
+    "destination": "/blog/251062-2/",
+    "type": 301
+  },
+  {
+    "source": "/exhibicni-vystoupeni-lipova-u-chebu/",
+    "destination": "/blog/exhibicni-vystoupeni-lipova-u-chebu/",
+    "type": 301
+  },
+  {
+    "source": "/season-mix-2025-z-cihiho-telefonu/",
+    "destination": "/blog/season-mix-2025-z-cihiho-telefonu/",
+    "type": 301
+  },
+  {
+    "source": "/exhibice-ples-sportovnich-klubu-kralupy-nad-vltavou/",
+    "destination": "/blog/exhibice-ples-sportovnich-klubu-kralupy-nad-vltavou/",
+    "type": 301
+  },
+  {
+    "source": "/produkt/voucher-bikeskills/",
+    "destination": "/blog/voucher-bikeskills/",
+    "type": 301
+  },
+  {
+    "source": "/produkt/bikeskills-tricko-bile-unisex/",
+    "destination": "/blog/bikeskills-tricko-bile-unisex/",
+    "type": 301
+  },
+  {
+    "source": "/produkt/bikeskills-tricko-zlute-unisex/",
+    "destination": "/blog/bikeskills-tricko-zlute-unisex/",
+    "type": 301
+  },
+  {
+    "source": "/produkt/voucher-bikeskills-s-dopravou/",
+    "destination": "/blog/voucher-bikeskills-s-dopravou/",
+    "type": 301
+  },
+  {
+    "source": "/produkt/tilko-trecimem-top-moonless/",
+    "destination": "/blog/tilko-trecimem-top-moonless/",
+    "type": 301
+  },
+  {
+    "source": "/produkt/dres-ganesm-aop-1-2-glacier-milk-mountain-flowers-m/",
+    "destination": "/blog/dres-ganesm-aop-1-2-glacier-milk-mountain-flowers-m/",
+    "type": 301
+  },
+  {
+    "source": "/produkt/dres-ganesm-aop-1-2-midnight-mountain-flowers-m/",
+    "destination": "/blog/dres-ganesm-aop-1-2-midnight-mountain-flowers-m/",
+    "type": 301
+  },
+  {
+    "source": "/produkt/dres-similaunm-1-2-midnight-dot/",
+    "destination": "/blog/dres-similaunm-1-2-midnight-dot/",
+    "type": 301
+  },
+  {
+    "source": "/produkt/cyklisticke-kalhoty-ganesm-pants-1-2-moonless/",
+    "destination": "/blog/cyklisticke-kalhoty-ganesm-pants-1-2-moonless/",
+    "type": 301
+  },
+  {
+    "source": "/produkt/cyklisticke-kalhoty-ganesm-pants-1-2-midnight/",
+    "destination": "/blog/cyklisticke-kalhoty-ganesm-pants-1-2-midnight/",
+    "type": 301
+  },
+  {
+    "source": "/produkt/cyklisticke-kratasy-anemonam-moonless/",
+    "destination": "/blog/cyklisticke-kratasy-anemonam-moonless/",
+    "type": 301
+  },
+  {
+    "source": "/produkt/damske-kalhoty-mohnblumem-glacier-milk/",
+    "destination": "/blog/damske-kalhoty-mohnblumem-glacier-milk/",
+    "type": 301
+  },
+  {
+    "source": "/produkt/cyklisticke-kratasy-anemonam-rosewood/",
+    "destination": "/blog/cyklisticke-kratasy-anemonam-rosewood/",
+    "type": 301
+  },
+  {
+    "source": "/produkt/cyklisticke-kalhoty-similaunm-pants-1-2-midnight-dot/",
+    "destination": "/blog/cyklisticke-kalhoty-similaunm-pants-1-2-midnight-dot/",
+    "type": 301
+  },
+  {
+    "source": "/galavecer-bigmat/",
+    "destination": "/blog/galavecer-bigmat/",
+    "type": 301
+  },
+  {
+    "source": "/campy-pro-holky-a-chlapi-no-1/",
+    "destination": "/blog/campy-pro-holky-a-chlapi-no-1/",
+    "type": 301
+  },
+  {
+    "source": "/produkt/cyklisticka-kombineza-similaunm-racebody-midnight/",
+    "destination": "/blog/cyklisticka-kombineza-similaunm-racebody-midnight/",
+    "type": 301
+  },
+  {
+    "source": "/produkt/sukne-s-sortkami-germerm-moss-petite-fleur/",
+    "destination": "/blog/sukne-s-sortkami-germerm-moss-petite-fleur/",
+    "type": 301
+  },
+  {
+    "source": "/produkt/base-flat-pedal-composite-body-22-pins-black-2/",
+    "destination": "/blog/base-flat-pedal-composite-body-22-pins-black-2/",
+    "type": 301
+  },
+  {
+    "source": "/produkt/base-flat-pedal-composite-body-22-pins-blue-2/",
+    "destination": "/blog/base-flat-pedal-composite-body-22-pins-blue-2/",
+    "type": 301
+  },
+  {
+    "source": "/produkt/base-flat-pedal-composite-body-22-pins-red-2/",
+    "destination": "/blog/base-flat-pedal-composite-body-22-pins-red-2/",
+    "type": 301
+  },
+  {
+    "source": "/produkt/plus-flat-pedal-aluminum-body-22-pins-black-2/",
+    "destination": "/blog/plus-flat-pedal-aluminum-body-22-pins-black-2/",
+    "type": 301
+  },
+  {
+    "source": "/produkt/plus-flat-pedal-aluminum-body-22-pins-blue-2/",
+    "destination": "/blog/plus-flat-pedal-aluminum-body-22-pins-blue-2/",
+    "type": 301
+  },
+  {
+    "source": "/produkt/grappler-29-2-5-enduro-casing-mopocompound-stealth-black/",
+    "destination": "/blog/grappler-29-2-5-enduro-casing-mopocompound-stealth-black/",
+    "type": 301
+  },
+  {
+    "source": "/produkt/grappler-27-5-2-5-enduro-casing-mopocompound-stealth-black/",
+    "destination": "/blog/grappler-27-5-2-5-enduro-casing-mopocompound-stealth-black/",
+    "type": 301
+  },
+  {
+    "source": "/produkt/all-terrain-29-2-4-enduro-casing-mopocompound-stealth-black/",
+    "destination": "/blog/all-terrain-29-2-4-enduro-casing-mopocompound-stealth-black/",
+    "type": 301
+  },
+  {
+    "source": "/produkt/grappler-29-2-5-downhill-casing-mopocompound-stealth-black/",
+    "destination": "/blog/grappler-29-2-5-downhill-casing-mopocompound-stealth-black/",
+    "type": 301
+  },
+  {
+    "source": "/produkt/bezdusove-ventilky-16-24-bronze/",
+    "destination": "/blog/bezdusove-ventilky-16-24-bronze/",
+    "type": 301
+  },
+  {
+    "source": "/produkt/bezdusove-ventilky-quick-fill-tire-plasma-valves-23-31mm-rimdepth-2-kusy-black/",
+    "destination": "/blog/bezdusove-ventilky-quick-fill-tire-plasma-valves-23-31mm-rimdepth-2-kusy-black/",
+    "type": 301
+  },
+  {
+    "source": "/produkt/bezdusove-ventilky-quick-fill-tire-plasma-valves-23-31mm-rimdepth-2-kusy-eggplant-fialova/",
+    "destination": "/blog/bezdusove-ventilky-quick-fill-tire-plasma-valves-23-31mm-rimdepth-2-kusy-eggplant-fialova/",
+    "type": 301
+  },
+  {
+    "source": "/produkt/bezdusove-ventilky-quick-fill-tire-plasma-valves-16-24mm-rimdepth-2-kusy-naranja-oranzova/",
+    "destination": "/blog/bezdusove-ventilky-quick-fill-tire-plasma-valves-16-24mm-rimdepth-2-kusy-naranja-oranzova/",
+    "type": 301
+  },
+  {
+    "source": "/produkt/bezdusovy-tmel-mliko-sealant-s-injektorem-100ml/",
+    "destination": "/blog/bezdusovy-tmel-mliko-sealant-s-injektorem-100ml/",
+    "type": 301
+  },
+  {
+    "source": "/produkt/bikeskills-tricko-bile-unisex/",
+    "destination": "/blog/bikeskills-tricko-bile-unisex-l/",
+    "type": 301
+  },
+  {
+    "source": "/produkt/bikeskills-tricko-bile-unisex/",
+    "destination": "/blog/bikeskills-tricko-bile-unisex-m/",
+    "type": 301
+  },
+  {
+    "source": "/produkt/bikeskills-tricko-bile-unisex/",
+    "destination": "/blog/bikeskills-tricko-bile-unisex-s/",
+    "type": 301
+  },
+  {
+    "source": "/produkt/bikeskills-tricko-bile-unisex/",
+    "destination": "/blog/bikeskills-tricko-bile-unisex-xl/",
+    "type": 301
+  },
+  {
+    "source": "/produkt/bikeskills-tricko-bile-unisex/",
+    "destination": "/blog/bikeskills-tricko-bile-unisex-xs/",
+    "type": 301
+  },
+  {
+    "source": "/produkt/bikeskills-tricko-zlute-unisex/",
+    "destination": "/blog/bikeskills-tricko-bile-unisex-xl-2/",
+    "type": 301
+  },
+  {
+    "source": "/produkt/bikeskills-tricko-zlute-unisex/",
+    "destination": "/blog/bikeskills-tricko-bile-unisex-l-2/",
+    "type": 301
+  },
+  {
+    "source": "/produkt/bikeskills-tricko-zlute-unisex/",
+    "destination": "/blog/bikeskills-tricko-bile-unisex-m-2/",
+    "type": 301
+  },
+  {
+    "source": "/produkt/bikeskills-tricko-zlute-unisex/",
+    "destination": "/blog/bikeskills-tricko-bile-unisex-s-2/",
+    "type": 301
+  },
+  {
+    "source": "/produkt/bikeskills-tricko-zlute-unisex/",
+    "destination": "/blog/bikeskills-tricko-bile-unisex-xs-2/",
+    "type": 301
+  },
+  {
+    "source": "/produkt/voucher-bikeskills-s-dopravou/",
+    "destination": "/blog/voucher-bikeskills-s-dopravou-500/",
+    "type": 301
+  },
+  {
+    "source": "/produkt/voucher-bikeskills-s-dopravou/",
+    "destination": "/blog/voucher-bikeskills-s-dopravou-1000/",
+    "type": 301
+  },
+  {
+    "source": "/produkt/voucher-bikeskills-s-dopravou/",
+    "destination": "/blog/voucher-bikeskills-s-dopravou-1500/",
+    "type": 301
+  },
+  {
+    "source": "/produkt/voucher-bikeskills-s-dopravou/",
+    "destination": "/blog/voucher-bikeskills-s-dopravou-2000/",
+    "type": 301
+  },
+  {
+    "source": "/produkt/voucher-bikeskills-s-dopravou/",
+    "destination": "/blog/voucher-bikeskills-s-dopravou-2500/",
+    "type": 301
+  },
+  {
+    "source": "/produkt/voucher-bikeskills-s-dopravou/",
+    "destination": "/blog/voucher-bikeskills-s-dopravou-3000/",
+    "type": 301
+  },
+  {
+    "source": "/produkt/voucher-bikeskills-s-dopravou/",
+    "destination": "/blog/voucher-bikeskills-s-dopravou-4000/",
+    "type": 301
+  },
+  {
+    "source": "/produkt/voucher-bikeskills-s-dopravou/",
+    "destination": "/blog/voucher-bikeskills-s-dopravou-5000/",
+    "type": 301
+  },
+  {
+    "source": "/produkt/tilko-trecimem-top-moonless/",
+    "destination": "/blog/tilko-trecimem-top-moonless-m/",
+    "type": 301
+  },
+  {
+    "source": "/produkt/tilko-trecimem-top-moonless/",
+    "destination": "/blog/tilko-trecimem-top-moonless-s/",
+    "type": 301
+  },
+  {
+    "source": "/produkt/dres-ganesm-aop-1-2-glacier-milk-mountain-flowers-m/",
+    "destination": "/blog/dres-ganesm-aop-1-2-glacier-milk-mountain-flowers-m-m/",
+    "type": 301
+  },
+  {
+    "source": "/produkt/dres-ganesm-aop-1-2-glacier-milk-mountain-flowers-m/",
+    "destination": "/blog/dres-ganesm-aop-1-2-glacier-milk-mountain-flowers-m-s/",
+    "type": 301
+  },
+  {
+    "source": "/produkt/dres-ganesm-aop-1-2-midnight-mountain-flowers-m/",
+    "destination": "/blog/dres-ganesm-aop-1-2-midnight-mountain-flowers-m/",
+    "type": 301
+  },
+  {
+    "source": "/produkt/dres-ganesm-aop-1-2-midnight-mountain-flowers-m/",
+    "destination": "/blog/dres-ganesm-aop-1-2-midnight-mountain-flowers-m-2/",
+    "type": 301
+  },
+  {
+    "source": "/produkt/dres-similaunm-1-2-midnight-dot/",
+    "destination": "/blog/dres-similaunm-1-2-midnight-dot/",
+    "type": 301
+  },
+  {
+    "source": "/produkt/dres-similaunm-1-2-midnight-dot/",
+    "destination": "/blog/dres-similaunm-1-2-midnight-dot-2/",
+    "type": 301
+  },
+  {
+    "source": "/produkt/cyklisticke-kalhoty-ganesm-pants-1-2-moonless/",
+    "destination": "/blog/cyklisticke-kalhoty-ganesm-pants-1-2-moonless/",
+    "type": 301
+  },
+  {
+    "source": "/produkt/cyklisticke-kalhoty-ganesm-pants-1-2-moonless/",
+    "destination": "/blog/cyklisticke-kalhoty-ganesm-pants-1-2-moonless-2/",
+    "type": 301
+  },
+  {
+    "source": "/produkt/cyklisticke-kalhoty-ganesm-pants-1-2-midnight/",
+    "destination": "/blog/cyklisticke-kalhoty-ganesm-pants-1-2-midnight/",
+    "type": 301
+  },
+  {
+    "source": "/produkt/cyklisticke-kalhoty-ganesm-pants-1-2-midnight/",
+    "destination": "/blog/cyklisticke-kalhoty-ganesm-pants-1-2-midnight-2/",
+    "type": 301
+  },
+  {
+    "source": "/produkt/cyklisticke-kratasy-anemonam-moonless/",
+    "destination": "/blog/cyklisticke-kratasy-anemonam-moonless/",
+    "type": 301
+  },
+  {
+    "source": "/produkt/damske-kalhoty-mohnblumem-glacier-milk/",
+    "destination": "/blog/damske-kalhoty-mohnblumem-glacier-milk/",
+    "type": 301
+  },
+  {
+    "source": "/produkt/cyklisticke-kratasy-anemonam-rosewood/",
+    "destination": "/blog/cyklisticke-kratasy-anemonam-rosewood/",
+    "type": 301
+  },
+  {
+    "source": "/produkt/cyklisticke-kratasy-anemonam-rosewood/",
+    "destination": "/blog/cyklisticke-kratasy-anemonam-rosewood-2/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/cihikabel159428/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/bb6fss5y/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/gygbkvsq/",
+    "type": 301
+  },
+  {
+    "source": "/produkt/cyklisticke-kalhoty-similaunm-pants-1-2-midnight-dot/",
+    "destination": "/blog/cyklisticke-kalhoty-similaunm-pants-1-2-midnight-dot/",
+    "type": 301
+  },
+  {
+    "source": "/produkt/cyklisticke-kalhoty-similaunm-pants-1-2-midnight-dot/",
+    "destination": "/blog/cyklisticke-kalhoty-similaunm-pants-1-2-midnight-dot-2/",
+    "type": 301
+  },
+  {
+    "source": "/produkt/cyklisticka-kombineza-similaunm-racebody-midnight/",
+    "destination": "/blog/cyklisticka-kombineza-similaunm-racebody-midnight/",
+    "type": 301
+  },
+  {
+    "source": "/produkt/cyklisticka-kombineza-similaunm-racebody-midnight/",
+    "destination": "/blog/cyklisticka-kombineza-similaunm-racebody-midnight-2/",
+    "type": 301
+  },
+  {
+    "source": "/produkt/sukne-s-sortkami-germerm-moss-petite-fleur/",
+    "destination": "/blog/sukne-s-sortkami-germerm-moss-petite-fleur/",
+    "type": 301
+  },
+  {
+    "source": "/produkt/voucher-bikeskills/",
+    "destination": "/blog/voucher-bikeskills-pro-individualni-kurzy/",
+    "type": 301
+  },
+  {
+    "source": "/produkt/voucher-bikeskills/",
+    "destination": "/blog/voucher-bikeskills-pro-individualni-kurzy-2/",
+    "type": 301
+  },
+  {
+    "source": "/produkt/voucher-bikeskills/",
+    "destination": "/blog/voucher-bikeskills-pro-individualni-kurzy-3/",
+    "type": 301
+  },
+  {
+    "source": "/produkt/voucher-bikeskills/",
+    "destination": "/blog/voucher-bikeskills-pro-individualni-kurzy-4/",
+    "type": 301
+  },
+  {
+    "source": "/produkt/voucher-bikeskills/",
+    "destination": "/blog/voucher-bikeskills-pro-individualni-kurzy-5/",
+    "type": 301
+  },
+  {
+    "source": "/produkt/voucher-bikeskills/",
+    "destination": "/blog/voucher-bikeskills-pro-individualni-kurzy-6/",
+    "type": 301
+  },
+  {
+    "source": "/produkt/voucher-bikeskills/",
+    "destination": "/blog/voucher-bikeskills-pro-individualni-kurzy-7/",
+    "type": 301
+  },
+  {
+    "source": "/produkt/voucher-bikeskills/",
+    "destination": "/blog/voucher-bikeskills-pro-individualni-kurzy-8/",
+    "type": 301
+  },
+  {
+    "source": "/produkt/voucher-bikeskills/",
+    "destination": "/blog/voucher-bikeskills-pro-individualni-kurzy-9/",
+    "type": 301
+  },
+  {
+    "source": "/produkt/voucher-bikeskills/",
+    "destination": "/blog/voucher-bikeskills-pro-individualni-kurzy-10/",
+    "type": 301
+  },
+  {
+    "source": "/produkt/voucher-bikeskills/",
+    "destination": "/blog/voucher-bikeskills-pro-individualni-kurzy-11/",
+    "type": 301
+  },
+  {
+    "source": "/produkt/voucher-bikeskills/",
+    "destination": "/blog/voucher-bikeskills-pro-individualni-kurzy-12/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/mtbtrialtrenink8874/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/bielrob229/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/biellvr268/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/bielrvu662/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/bielrk471/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/biellvr263/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/kozuad22486/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/bielski0261/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/xyjt2bss/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/s29rxnd9/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/yckrz4vm/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/sg733ayf/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/funtownhhf/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/funtownjtn/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/funtowng7r/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/funtownvub/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/funtownt9k/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/funtowntzf/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/funtown8kg/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/funtownamb/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/funtown99y/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/funtownxuy/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/funtown2r9/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/funtownvy8/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/funtown93d/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/funtownxsb/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/t6xfuntown/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/funtownd6bx/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/funtownbcer/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/funtown4s55/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/funtownvw6y/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/funtownuxmx/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/qx79vh2s/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/158644/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/zern213/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/zernov23/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/zernov51/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/heipa241/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/160256/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/latpet5579/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/opapr281/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/mara2707/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/cer26jak/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/rozkeel47/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/svdav296/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/testkupon256/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/libch341/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/libch26/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/libch12/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/libcha987/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/libcha431/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/tabteh11/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/tabteh78/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/tabte293/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/tabte561/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/tabote222/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/teht113/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/ttor621/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/trobr132/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/tabte14/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/tehot181/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/trekto567/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/tehov1516/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/tabote201/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/rokota12/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/tabort971/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/taboteh6/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/tehta981/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/tehtab16/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/taborev99/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/borkon261/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/stma249/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/koto2687/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/vorman52/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/jan-kloucek/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/rovik261/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/votom631/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/kohda178/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/repam457/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/vlany229/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/spika4871/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/secrx266/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/campe559/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/campd762/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/campc228/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/campb125/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/campo768/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/campf148/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/campy834/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/campz1110/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/campw229/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/campg331/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/sorry789a/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/sorry5221b/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/sorry714d/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/vaant6673/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/hofvel5541/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/reiji257/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/sveda972/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/holkyladib3329/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/jaen219/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/fia26p2/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/tinb637/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/trybikeskills4582/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/holu998/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/holu751/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/gesl714/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/rluk112/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/nezji297/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/trore229/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/rasev007/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/grosba118/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/heu2379/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/palja23/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/dvokomplet9524/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/bikefestival/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/jadexkrivoj/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/petadamdop/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/aleszima271/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/8pseznam/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/zdenemc303/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/jansteglik56/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/camp28523/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/martcink222/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/onyxdh349/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/bikeskill24/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/bikeskillcamp264/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/kvasnicjan28/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/blog/bikeskillslevca32/",
+    "type": 301
+  },
+  {
+    "source": "/team/martin-simunek/",
+    "destination": "/blog/martin-simunek/",
+    "type": 301
+  },
+  {
+    "source": "/team/katarina-tothova/",
+    "destination": "/blog/katarina-tothova/",
+    "type": 301
+  },
+  {
+    "source": "/team/lukas-valny/",
+    "destination": "/blog/lukas-valny/",
+    "type": 301
+  },
+  {
+    "source": "/team/mara-tryner/",
+    "destination": "/blog/mara-tryner/",
+    "type": 301
+  },
+  {
+    "source": "/team/vlastislav-kabelac-cihacek/",
+    "destination": "/blog/vlastislav-kabelac-cihacek/",
+    "type": 301
+  },
+  {
+    "source": "/udesly_fe_data/401_udesly_fe_data/",
+    "destination": "/blog/401_udesly_fe_data/",
+    "type": 301
+  },
+  {
+    "source": "/udesly_fe_data/404_udesly_fe_data/",
+    "destination": "/blog/404_udesly_fe_data/",
+    "type": 301
+  },
+  {
+    "source": "/udesly_fe_data/access-denied_udesly_fe_data/",
+    "destination": "/blog/access-denied_udesly_fe_data/",
+    "type": 301
+  },
+  {
+    "source": "/udesly_fe_data/account_udesly_fe_data/",
+    "destination": "/blog/account_udesly_fe_data/",
+    "type": 301
+  },
+  {
+    "source": "/udesly_fe_data/akce-archive_udesly_fe_data/",
+    "destination": "/blog/akce-archive_udesly_fe_data/",
+    "type": 301
+  },
+  {
+    "source": "/udesly_fe_data/blog_udesly_fe_data/",
+    "destination": "/blog/blog_udesly_fe_data/",
+    "type": 301
+  },
+  {
+    "source": "/udesly_fe_data/campy_udesly_fe_data/",
+    "destination": "/blog/campy_udesly_fe_data/",
+    "type": 301
+  },
+  {
+    "source": "/udesly_fe_data/checkout_udesly_fe_data/",
+    "destination": "/blog/checkout_udesly_fe_data/",
+    "type": 301
+  },
+  {
+    "source": "/udesly_fe_data/detail_akce_udesly_fe_data/",
+    "destination": "/blog/detail_akce_udesly_fe_data/",
+    "type": 301
+  },
+  {
+    "source": "/udesly_fe_data/detail_archive-team_udesly_fe_data/",
+    "destination": "/blog/detail_archive-team_udesly_fe_data/",
+    "type": 301
+  },
+  {
+    "source": "/udesly_fe_data/detail_post_udesly_fe_data/",
+    "destination": "/blog/detail_post_udesly_fe_data/",
+    "type": 301
+  },
+  {
+    "source": "/udesly_fe_data/detail_product_udesly_fe_data/",
+    "destination": "/blog/detail_product_udesly_fe_data/",
+    "type": 301
+  },
+  {
+    "source": "/udesly_fe_data/dodaci-podminky_udesly_fe_data/",
+    "destination": "/blog/dodaci-podminky_udesly_fe_data/",
+    "type": 301
+  },
+  {
+    "source": "/udesly_fe_data/index_udesly_fe_data/",
+    "destination": "/blog/index_udesly_fe_data/",
+    "type": 301
+  },
+  {
+    "source": "/udesly_fe_data/individualni-kurzy_udesly_fe_data/",
+    "destination": "/blog/individualni-kurzy_udesly_fe_data/",
+    "type": 301
+  },
+  {
+    "source": "/udesly_fe_data/kompletni-cenik-servisnich-praci_udesly_fe_data/",
+    "destination": "/blog/kompletni-cenik-servisnich-praci_udesly_fe_data/",
+    "type": 301
+  },
+  {
+    "source": "/udesly_fe_data/kompletni-servis-full_udesly_fe_data/",
+    "destination": "/blog/kompletni-servis-full_udesly_fe_data/",
+    "type": 301
+  },
+  {
+    "source": "/udesly_fe_data/kompletni-servis-hardtail_udesly_fe_data/",
+    "destination": "/blog/kompletni-servis-hardtail_udesly_fe_data/",
+    "type": 301
+  },
+  {
+    "source": "/udesly_fe_data/kontakt_udesly_fe_data/",
+    "destination": "/blog/kontakt_udesly_fe_data/",
+    "type": 301
+  },
+  {
+    "source": "/udesly_fe_data/kosik_udesly_fe_data/",
+    "destination": "/blog/kosik_udesly_fe_data/",
+    "type": 301
+  },
+  {
+    "source": "/udesly_fe_data/log-in_udesly_fe_data/",
+    "destination": "/blog/log-in_udesly_fe_data/",
+    "type": 301
+  },
+  {
+    "source": "/udesly_fe_data/login_udesly_fe_data/",
+    "destination": "/blog/login_udesly_fe_data/",
+    "type": 301
+  },
+  {
+    "source": "/udesly_fe_data/obchodni-podminky_udesly_fe_data/",
+    "destination": "/blog/obchodni-podminky_udesly_fe_data/",
+    "type": 301
+  },
+  {
+    "source": "/udesly_fe_data/order-confirmation_udesly_fe_data/",
+    "destination": "/blog/order-confirmation_udesly_fe_data/",
+    "type": 301
+  },
+  {
+    "source": "/udesly_fe_data/password-reset_udesly_fe_data/",
+    "destination": "/blog/password-reset_udesly_fe_data/",
+    "type": 301
+  },
+  {
+    "source": "/udesly_posts_query/recent-posts/",
+    "destination": "/blog/recent-posts/",
+    "type": 301
+  },
+  {
+    "source": "/udesly_posts_query/akce/",
+    "destination": "/blog/akce/",
+    "type": 301
+  },
+  {
+    "source": "/udesly_posts_query/related-posts/",
+    "destination": "/blog/related-posts/",
+    "type": 301
+  },
+  {
+    "source": "/udesly_fe_data/paypal-checkout_udesly_fe_data/",
+    "destination": "/blog/paypal-checkout_udesly_fe_data/",
+    "type": 301
+  },
+  {
+    "source": "/udesly_fe_data/pojisteni-bikeplan_udesly_fe_data/",
+    "destination": "/blog/pojisteni-bikeplan_udesly_fe_data/",
+    "type": 301
+  },
+  {
+    "source": "/udesly_fe_data/pujcovna_udesly_fe_data/",
+    "destination": "/blog/pujcovna_udesly_fe_data/",
+    "type": 301
+  },
+  {
+    "source": "/udesly_fe_data/register_udesly_fe_data/",
+    "destination": "/blog/register_udesly_fe_data/",
+    "type": 301
+  },
+  {
+    "source": "/udesly_fe_data/reset-password_udesly_fe_data/",
+    "destination": "/blog/reset-password_udesly_fe_data/",
+    "type": 301
+  },
+  {
+    "source": "/udesly_fe_data/search_udesly_fe_data/",
+    "destination": "/blog/search_udesly_fe_data/",
+    "type": 301
+  },
+  {
+    "source": "/udesly_fe_data/servis_udesly_fe_data/",
+    "destination": "/blog/servis_udesly_fe_data/",
+    "type": 301
+  },
+  {
+    "source": "/udesly_fe_data/setup-guide_udesly_fe_data/",
+    "destination": "/blog/setup-guide_udesly_fe_data/",
+    "type": 301
+  },
+  {
+    "source": "/udesly_fe_data/shop_udesly_fe_data/",
+    "destination": "/blog/shop_udesly_fe_data/",
+    "type": 301
+  },
+  {
+    "source": "/udesly_fe_data/sign-up_udesly_fe_data/",
+    "destination": "/blog/sign-up_udesly_fe_data/",
+    "type": 301
+  },
+  {
+    "source": "/udesly_fe_data/specialni-akce_udesly_fe_data/",
+    "destination": "/blog/specialni-akce_udesly_fe_data/",
+    "type": 301
+  },
+  {
+    "source": "/udesly_fe_data/standartni-servis-kol_udesly_fe_data/",
+    "destination": "/blog/standartni-servis-kol_udesly_fe_data/",
+    "type": 301
+  },
+  {
+    "source": "/udesly_fe_data/style-guide_udesly_fe_data/",
+    "destination": "/blog/style-guide_udesly_fe_data/",
+    "type": 301
+  },
+  {
+    "source": "/udesly_fe_data/team_udesly_fe_data/",
+    "destination": "/blog/team_udesly_fe_data/",
+    "type": 301
+  },
+  {
+    "source": "/udesly_fe_data/update-password_udesly_fe_data/",
+    "destination": "/blog/update-password_udesly_fe_data/",
+    "type": 301
+  },
+  {
+    "source": "/udesly_fe_data/user-account_udesly_fe_data/",
+    "destination": "/blog/user-account_udesly_fe_data/",
+    "type": 301
+  },
+  {
+    "source": "/udesly_fe_data/zasady-ochrany-osobnich-udaju_udesly_fe_data/",
+    "destination": "/blog/zasady-ochrany-osobnich-udaju_udesly_fe_data/",
+    "type": 301
+  },
+  {
+    "source": "/wp-global-styles-multy-webflow-to-wordpres-a2bac1040f1b7/",
+    "destination": "/blog/wp-global-styles-multy-webflow-to-wordpres-a2bac1040f1b7/",
+    "type": 301
+  },
+  {
+    "source": "/wp-global-styles-multy-webflow-to-wordpres-a2bac1040f1b7-1/",
+    "destination": "/blog/wp-global-styles-multy-webflow-to-wordpres-a2bac1040f1b7-1/",
+    "type": 301
+  },
+  {
+    "source": "/yith_wcan_preset/default-preset/",
+    "destination": "/blog/default-preset/",
+    "type": 301
+  },
+  {
+    "source": "/yith_wcan_preset/aktivni-razeni/",
+    "destination": "/blog/aktivni-razeni/",
+    "type": 301
+  }
+]

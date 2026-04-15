@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bikeskills Admin</title>
+  <meta name="robots" content="noindex, nofollow">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Quill.js WYSIWYG Editor -->
+  <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet">
+
+  <!-- Admin Styles -->
+  <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body>
+
+  <!-- ===== LOGIN SCREEN ===== -->
+  <div id="login-screen" class="login-screen">
+    <div class="login-card">
+      <div class="login-logo">
+        <img src="/images/bikeskills-logo.svg" alt="Bikeskills" class="login-logo-img" onerror="this.style.display='none'">
+        <h1>BIKESKILLS</h1>
+        <p class="login-subtitle">Administrace</p>
+      </div>
+      <form id="login-form" class="login-form">
+        <div class="form-group">
+          <label for="login-email">E-mail</label>
+          <input type="email" id="login-email" placeholder="admin@bikeskills.cz" required autocomplete="email">
+        </div>
+        <div class="form-group">
+          <label for="login-password">Heslo</label>
+          <input type="password" id="login-password" placeholder="••••••••" required autocomplete="current-password">
+        </div>
+        <button type="submit" id="login-btn" class="btn btn-primary btn-full">Přihlásit se</button>
+        <p id="login-error" class="login-error"></p>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===== ADMIN DASHBOARD ===== -->
+  <div id="admin-dashboard" class="admin-dashboard" style="display: none;">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h2>BIKESKILLS</h2>
+        <span class="sidebar-badge">Admin</span>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="#" class="nav-item active" data-section="akce">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          Akce
+        </a>
+        <a href="#" class="nav-item" data-section="clanky">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+          Články
+        </a>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="user-info">
+          <span id="user-email" class="user-email"></span>
+        </div>
+        <button id="logout-btn" class="btn btn-ghost btn-sm">Odhlásit se</button>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+
+      <!-- ===== AKCE SECTION ===== -->
+      <section id="section-akce" class="content-section">
+        <div class="section-header">
+          <h1>Správa akcí</h1>
+          <button id="btn-new-akce" class="btn btn-primary">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Nová akce
+          </button>
+        </div>
+
+        <!-- Akce Table -->
+        <div class="table-container">
+          <table class="data-table" id="akce-table">
+            <thead>
+              <tr>
+                <th>Název</th>
+                <th>Datum</th>
+                <th>Kategorie</th>
+                <th>Cena</th>
+                <th>Stav</th>
+                <th class="th-actions">Akce</th>
+              </tr>
+            </thead>
+            <tbody id="akce-tbody">
+              <tr class="loading-row">
+                <td colspan="6">Načítání...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Akce Edit Modal -->
+        <div id="modal-akce" class="modal" style="display: none;">
+          <div class="modal-overlay"></div>
+          <div class="modal-content">
+            <div class="modal-header">
+              <h2 id="modal-akce-title">Nová akce</h2>
+              <button class="modal-close" data-modal="modal-akce">&times;</button>
+            </div>
+            <form id="form-akce" class="modal-form">
+              <input type="hidden" id="akce-id">
+              
+              <div class="form-row">
+                <div class="form-group form-group-wide">
+                  <label for="akce-nazev">Název akce *</label>
+                  <input type="text" id="akce-nazev" required placeholder="např. Chlapi ladí Bikeskills #1">
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="akce-datum">Datum</label>
+                  <input type="text" id="akce-datum" placeholder="např. 12.04.2026 nebo duben 2026">
+                </div>
+                <div class="form-group">
+                  <label for="akce-datum-sort">Datum řazení</label>
+                  <input type="date" id="akce-datum-sort">
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="akce-kategorie">Kategorie</label>
+                  <select id="akce-kategorie">
+                    <option value="camp">Camp</option>
+                    <option value="kurz">Kurz</option>
+                    <option value="trialovy">Trialový kurz</option>
+                    <option value="workshop">Workshop</option>
+                    <option value="jine">Jiné</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="akce-uroven">Úroveň</label>
+                  <input type="text" id="akce-uroven" placeholder="např. zač. - středně pokročilí">
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="akce-cena">Cena (CZK)</label>
+                  <input type="number" id="akce-cena" placeholder="3250">
+                </div>
+                <div class="form-group">
+                  <label for="akce-stav">Stav</label>
+                  <select id="akce-stav">
+                    <option value="otevreno">Otevřeno</option>
+                    <option value="prihlasujte">Přihlašujte se</option>
+                    <option value="obsazeno">Obsazeno</option>
+                    <option value="odjeto">Odjeto</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="akce-popis">Popis</label>
+                <textarea id="akce-popis" rows="5" placeholder="Popis akce..."></textarea>
+              </div>
+
+              <div class="form-group">
+                <label for="akce-image">Obrázek</label>
+                <div class="image-upload-area">
+                  <input type="file" id="akce-image-file" accept="image/*" class="file-input">
+                  <label for="akce-image-file" class="file-label">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                    <span>Nahrát obrázek</span>
+                  </label>
+                  <input type="text" id="akce-image-url" placeholder="nebo zadejte URL obrázku" class="image-url-input">
+                  <div id="akce-image-preview" class="image-preview"></div>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="akce-slug">Slug (URL)</label>
+                  <input type="text" id="akce-slug" placeholder="chlapi-ladi-bikeskills-1">
+                </div>
+                <div class="form-group">
+                  <label class="checkbox-label">
+                    <input type="checkbox" id="akce-aktivni" checked>
+                    <span>Aktivní (zobrazit na webu)</span>
+                  </label>
+                </div>
+              </div>
+
+              <div class="modal-actions">
+                <button type="button" class="btn btn-ghost" data-modal="modal-akce">Zrušit</button>
+                <button type="submit" class="btn btn-primary" id="btn-save-akce">Uložit akci</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== ČLÁNKY SECTION ===== -->
+      <section id="section-clanky" class="content-section" style="display: none;">
+        <div class="section-header">
+          <h1>Správa článků</h1>
+          <button id="btn-new-clanek" class="btn btn-primary">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Nový článek
+          </button>
+        </div>
+
+        <!-- Články Table -->
+        <div class="table-container">
+          <table class="data-table" id="clanky-table">
+            <thead>
+              <tr>
+                <th>Titulek</th>
+                <th>Datum</th>
+                <th>Autor</th>
+                <th>Stav</th>
+                <th class="th-actions">Akce</th>
+              </tr>
+            </thead>
+            <tbody id="clanky-tbody">
+              <tr class="loading-row">
+                <td colspan="5">Načítání...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Článek Edit Modal -->
+        <div id="modal-clanek" class="modal" style="display: none;">
+          <div class="modal-overlay"></div>
+          <div class="modal-content modal-content-wide">
+            <div class="modal-header">
+              <h2 id="modal-clanek-title">Nový článek</h2>
+              <button class="modal-close" data-modal="modal-clanek">&times;</button>
+            </div>
+            <form id="form-clanek" class="modal-form">
+              <input type="hidden" id="clanek-id">
+
+              <div class="form-group">
+                <label for="clanek-titulek">Titulek *</label>
+                <input type="text" id="clanek-titulek" required placeholder="Název článku">
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="clanek-datum">Datum</label>
+                  <input type="date" id="clanek-datum">
+                </div>
+                <div class="form-group">
+                  <label for="clanek-autor">Autor</label>
+                  <input type="text" id="clanek-autor" placeholder="Bikeskills tým" value="Bikeskills tým">
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="clanek-perex">Perex</label>
+                <textarea id="clanek-perex" rows="2" placeholder="Krátký úvod článku..."></textarea>
+              </div>
+
+              <div class="form-group">
+                <label>Obsah článku</label>
+                <div id="clanek-editor" class="quill-editor"></div>
+              </div>
+
+              <div class="form-group">
+                <label for="clanek-image">Hlavní obrázek</label>
+                <div class="image-upload-area">
+                  <input type="file" id="clanek-image-file" accept="image/*" class="file-input">
+                  <label for="clanek-image-file" class="file-label">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                    <span>Nahrát obrázek</span>
+                  </label>
+                  <input type="text" id="clanek-image-url" placeholder="nebo zadejte URL obrázku" class="image-url-input">
+                  <div id="clanek-image-preview" class="image-preview"></div>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="clanek-slug">Slug (URL)</label>
+                  <input type="text" id="clanek-slug" placeholder="nazev-clanku">
+                </div>
+                <div class="form-group">
+                  <label class="checkbox-label">
+                    <input type="checkbox" id="clanek-publikovano" checked>
+                    <span>Publikováno</span>
+                  </label>
+                </div>
+              </div>
+
+              <div class="modal-actions">
+                <button type="button" class="btn btn-ghost" data-modal="modal-clanek">Zrušit</button>
+                <button type="submit" class="btn btn-primary" id="btn-save-clanek">Uložit článek</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div id="modal-delete" class="modal" style="display: none;">
+    <div class="modal-overlay"></div>
+    <div class="modal-content modal-content-sm">
+      <div class="modal-header">
+        <h2>Smazat položku</h2>
+        <button class="modal-close" data-modal="modal-delete">&times;</button>
+      </div>
+      <p class="delete-message">Opravdu chcete smazat <strong id="delete-item-name"></strong>? Tuto akci nelze vrátit zpět.</p>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" data-modal="modal-delete">Zrušit</button>
+        <button type="button" class="btn btn-danger" id="btn-confirm-delete">Smazat</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="toast" style="display: none;">
+    <span id="toast-message"></span>
+  </div>
+
+  <!-- Firebase SDK (compat) -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
+
+  <!-- Quill.js -->
+  <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
+
+  <!-- Admin Script -->
+  <script src="/js/admin.js"></script>
+
+</body>
+</html>
