@@ -120,6 +120,7 @@ async function parseWordPressXml(xmlPath) {
 
   const posts = [];
   const events = [];
+  const teamMembers = [];
   const pages = [];
 
   for (const item of items) {
@@ -178,24 +179,38 @@ async function parseWordPressXml(xmlPath) {
     };
 
     // Categorize by post type
-    // Udesly typically uses custom post types like 'udesly_evt', 'events', etc.
-    if (postType === 'post') {
-      posts.push(parsedItem);
+    const ignoredTypes = [
+      'product', 'shop_coupon', 'shop_order', 'shop_order_refund', 'udesly_fe_data',
+      'attachment', 'nav_menu_item', 'acf-field', 'acf-field-group',
+      'wp_global_styles', 'yith_wcan_preset', 'page', 'custom_css',
+      'adt_product_feed', 'product_variation', 'udesly_posts_query'
+    ];
+
+    if (ignoredTypes.includes(postType)) {
+      continue; // Skip these completely
+    }
+
+    const hasTeamCat = categories.some(c => c.toLowerCase().includes('team'));
+    const isEventCat = categories.some(c => c.toLowerCase() === 'vsechny-akce' || c.toLowerCase().includes('camp'));
+
+    if (postType === 'team' || hasTeamCat) {
+      teamMembers.push(parsedItem);
+    } else if (postType === 'post') {
+      if (isEventCat) {
+        events.push(parsedItem);
+      } else {
+        posts.push(parsedItem);
+      }
     } else if (
       postType === 'udesly_evt' ||
       postType === 'events' ||
       postType === 'tribe_events' ||
-      postType === 'akce' ||
-      categories.some(c => c.toLowerCase().includes('akce') || c.toLowerCase().includes('event'))
+      postType === 'akce'
     ) {
       events.push(parsedItem);
-    } else if (postType === 'page') {
-      pages.push(parsedItem);
     } else {
-      // Unknown post type - log it for review
-      console.log(`  ℹ️ Unknown post type "${postType}": ${title}`);
-      // Treat as post by default
-      posts.push(parsedItem);
+      // Unknown post type
+      console.log(`  ℹ️ Skipping unknown post type "${postType}": ${title}`);
     }
   }
 
@@ -211,7 +226,7 @@ async function parseWordPressXml(xmlPath) {
   }
 
   // Replace thumbnail IDs with actual URLs
-  for (const item of [...posts, ...events]) {
+  for (const item of [...posts, ...events, ...teamMembers]) {
     if (item.imageUrl && attachmentMap[item.imageUrl]) {
       item.imageUrl = attachmentMap[item.imageUrl];
     } else if (item.imageUrl && !item.imageUrl.startsWith('http')) {
@@ -219,19 +234,20 @@ async function parseWordPressXml(xmlPath) {
     }
   }
 
-  return { posts, events, pages, attachments: Object.values(attachmentMap) };
+  return { posts, events, teamMembers, pages, attachments: Object.values(attachmentMap) };
 }
 
 // ============================================================
 // IMPORT TO FIRESTORE
 // ============================================================
 async function importToFirestore(data) {
-  const { posts, events, pages } = data;
+  const { posts, events, teamMembers, pages } = data;
 
   console.log(`\n📥 Importing to Firestore...`);
   console.log(`   Články (posts): ${posts.length}`);
   console.log(`   Akce (events): ${events.length}`);
-  console.log(`   Stránky (pages): ${pages.length} (skipped - static HTML)`);
+  console.log(`   Team: ${teamMembers.length}`);
+  console.log(`   Stránky (pages): ${pages.length} (skipped)`);
 
   // Import articles (posts → clanky collection)
   console.log('\n📝 Importing články...');
@@ -291,6 +307,29 @@ async function importToFirestore(data) {
       console.log(`   ✅ ${event.title}`);
     } catch (error) {
       console.error(`   ❌ ${event.title}: ${error.message}`);
+    }
+  }
+
+  // Import team (teamMembers → team collection)
+  console.log('\n👥 Importing team...');
+  for (const member of teamMembers) {
+    try {
+      const docData = {
+        jmeno: member.title,
+        popis: member.content, // Often team bio is in content
+        slug: member.slug,
+        imageUrl: member.imageUrl || '',
+        poradi: 0,
+        aktivni: true,
+        wpLink: member.link,
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+        updatedAt: admin.firestore.FieldValue.serverTimestamp()
+      };
+
+      await db.collection('team').add(docData);
+      console.log(`   ✅ ${member.title}`);
+    } catch (error) {
+      console.error(`   ❌ ${member.title}: ${error.message}`);
     }
   }
 

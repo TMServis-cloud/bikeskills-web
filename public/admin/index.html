@@ -60,6 +60,10 @@
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
           Články
         </a>
+        <a href="#" class="nav-item" data-section="team">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+          Tým
+        </a>
       </nav>
       <div class="sidebar-footer">
         <div class="user-info">
@@ -301,6 +305,97 @@
               <div class="modal-actions">
                 <button type="button" class="btn btn-ghost" data-modal="modal-clanek">Zrušit</button>
                 <button type="submit" class="btn btn-primary" id="btn-save-clanek">Uložit článek</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== TÝM SECTION ===== -->
+      <section id="section-team" class="content-section" style="display: none;">
+        <div class="section-header">
+          <h1>Správa týmu</h1>
+          <button id="btn-new-team" class="btn btn-primary">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Přidat člena
+          </button>
+        </div>
+
+        <!-- Tým Table -->
+        <div class="table-container">
+          <table class="data-table" id="team-table">
+            <thead>
+              <tr>
+                <th>Foto</th>
+                <th>Jméno</th>
+                <th>Pořadí</th>
+                <th>Stav</th>
+                <th class="th-actions">Akce</th>
+              </tr>
+            </thead>
+            <tbody id="team-tbody">
+              <tr class="loading-row">
+                <td colspan="5">Načítání...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Tým Edit Modal -->
+        <div id="modal-team" class="modal" style="display: none;">
+          <div class="modal-overlay"></div>
+          <div class="modal-content">
+            <div class="modal-header">
+              <h2 id="modal-team-title">Nový člen týmu</h2>
+              <button class="modal-close" data-modal="modal-team">&times;</button>
+            </div>
+            <form id="form-team" class="modal-form">
+              <input type="hidden" id="team-id">
+
+              <div class="form-group">
+                <label for="team-jmeno">Jméno *</label>
+                <input type="text" id="team-jmeno" required placeholder="Jméno a příjmení">
+              </div>
+
+              <div class="form-group">
+                <label for="team-popis">Biografie / Popis</label>
+                <textarea id="team-popis" rows="6" placeholder="Něco o tomto členovi..."></textarea>
+              </div>
+
+              <div class="form-group">
+                <label for="team-image">Fotografie</label>
+                <div class="image-upload-area">
+                  <input type="file" id="team-image-file" accept="image/*" class="file-input">
+                  <label for="team-image-file" class="file-label">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                    <span>Nahrát fotku</span>
+                  </label>
+                  <input type="text" id="team-image-url" placeholder="nebo zadejte URL" class="image-url-input">
+                  <div id="team-image-preview" class="image-preview"></div>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="team-slug">Slug (URL)</label>
+                  <input type="text" id="team-slug" placeholder="jan-novak">
+                </div>
+                <div class="form-group">
+                  <label for="team-poradi">Pořadí</label>
+                  <input type="number" id="team-poradi" value="0">
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="checkbox-label">
+                  <input type="checkbox" id="team-aktivni" checked>
+                  <span>Aktivní (zobrazit na webu)</span>
+                </label>
+              </div>
+
+              <div class="modal-actions">
+                <button type="button" class="btn btn-ghost" data-modal="modal-team">Zrušit</button>
+                <button type="submit" class="btn btn-primary" id="btn-save-team">Uložit člena</button>
               </div>
             </form>
           </div>

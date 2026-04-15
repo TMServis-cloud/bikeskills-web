@@ -77,6 +77,7 @@ function showDashboard(user) {
   // Load data
   loadAkce();
   loadClanky();
+  loadTeam();
 }
 
 // Login form - Email
@@ -485,8 +486,10 @@ document.getElementById('btn-confirm-delete').addEventListener('click', async ()
 
     if (currentDeleteTarget.collection === 'akce') {
       loadAkce();
-    } else {
+    } else if (currentDeleteTarget.collection === 'clanky') {
       loadClanky();
+    } else if (currentDeleteTarget.collection === 'team') {
+      loadTeam();
     }
   } catch (error) {
     console.error('Error deleting:', error);
@@ -497,6 +500,154 @@ document.getElementById('btn-confirm-delete').addEventListener('click', async ()
   btn.textContent = 'Smazat';
   currentDeleteTarget = null;
 });
+
+// ============================================================
+// TÝM - CRUD
+// ============================================================
+async function loadTeam() {
+  const tbody = document.getElementById('team-tbody');
+  tbody.innerHTML = '<tr class="loading-row"><td colspan="5">Načítání...</td></tr>';
+
+  try {
+    const snapshot = await db.collection('team')
+      .orderBy('poradi', 'asc')
+      .get();
+
+    if (snapshot.empty) {
+      tbody.innerHTML = '<tr class="loading-row"><td colspan="5">Žádní členové týmu. Přidejte prvního.</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = '';
+    snapshot.forEach(doc => {
+      const data = doc.data();
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>
+          <div style="width:40px;height:40px;border-radius:50%;overflow:hidden;background:#eee;">
+            ${data.imageUrl ? `<img src="${escapeHtml(data.imageUrl)}" style="width:100%;height:100%;object-fit:cover;">` : ''}
+          </div>
+        </td>
+        <td><strong>${escapeHtml(data.jmeno || '')}</strong></td>
+        <td>${data.poradi || 0}</td>
+        <td><span class="status-badge ${data.aktivni !== false ? 'status-otevreno' : 'status-odjeto'}">${data.aktivni !== false ? 'Aktivní' : 'Skryto'}</span></td>
+        <td>
+          <div class="td-actions">
+            <button class="btn-icon" title="Upravit" onclick="editTeam('${doc.id}')">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            </button>
+            <button class="btn-icon btn-icon-danger" title="Smazat" onclick="confirmDeleteTeam('${doc.id}', '${escapeHtml(data.jmeno || '')}')">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+            </button>
+          </div>
+        </td>
+      `;
+      tbody.appendChild(row);
+    });
+  } catch (error) {
+    console.error('Error loading team:', error);
+    tbody.innerHTML = '<tr class="loading-row"><td colspan="5">Chyba načítání dat.</td></tr>';
+  }
+}
+
+// New Team
+document.getElementById('btn-new-team').addEventListener('click', () => {
+  document.getElementById('team-id').value = '';
+  document.getElementById('form-team').reset();
+  document.getElementById('team-aktivni').checked = true;
+  document.getElementById('team-poradi').value = 0;
+  document.getElementById('team-image-preview').innerHTML = '';
+  document.getElementById('modal-team-title').textContent = 'Nový člen týmu';
+  openModal('modal-team');
+});
+
+// Edit Team
+async function editTeam(id) {
+  try {
+    const doc = await db.collection('team').doc(id).get();
+    if (!doc.exists) {
+      showToast('Člen nenalezen', 'error');
+      return;
+    }
+
+    const data = doc.data();
+    document.getElementById('team-id').value = id;
+    document.getElementById('team-jmeno').value = data.jmeno || '';
+    document.getElementById('team-slug').value = data.slug || '';
+    document.getElementById('team-popis').value = data.popis || '';
+    document.getElementById('team-poradi').value = data.poradi || 0;
+    document.getElementById('team-aktivni').checked = data.aktivni !== false;
+    document.getElementById('team-image-url').value = data.imageUrl || '';
+
+    const preview = document.getElementById('team-image-preview');
+    if (data.imageUrl) {
+      preview.innerHTML = `<img src="${escapeHtml(data.imageUrl)}" alt="Preview">`;
+    } else {
+      preview.innerHTML = '';
+    }
+
+    document.getElementById('modal-team-title').textContent = 'Upravit člena týmu';
+    openModal('modal-team');
+  } catch (error) {
+    console.error('Error loading team member:', error);
+    showToast('Chyba načítání člena', 'error');
+  }
+}
+
+// Save Team
+document.getElementById('form-team').addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  const id = document.getElementById('team-id').value;
+  const btn = document.getElementById('btn-save-team');
+  btn.disabled = true;
+  btn.textContent = 'Ukládání...';
+
+  try {
+    let imageUrl = document.getElementById('team-image-url').value;
+    const fileInput = document.getElementById('team-image-file');
+    if (fileInput.files.length > 0) {
+      imageUrl = await uploadImage(fileInput.files[0], 'team');
+    }
+
+    const jmeno = document.getElementById('team-jmeno').value.trim();
+    const slug = document.getElementById('team-slug').value.trim() || generateSlug(jmeno);
+
+    const data = {
+      jmeno: jmeno,
+      slug: slug,
+      popis: document.getElementById('team-popis').value.trim(),
+      poradi: parseInt(document.getElementById('team-poradi').value) || 0,
+      imageUrl: imageUrl,
+      aktivni: document.getElementById('team-aktivni').checked,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    };
+
+    if (id) {
+      await db.collection('team').doc(id).update(data);
+      showToast('Záznam týmu aktualizován ✓');
+    } else {
+      data.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+      await db.collection('team').add(data);
+      showToast('Člen přidán do týmu ✓');
+    }
+
+    closeModal('modal-team');
+    loadTeam();
+  } catch (error) {
+    console.error('Error saving team member:', error);
+    showToast('Chyba ukládání: ' + error.message, 'error');
+  }
+
+  btn.disabled = false;
+  btn.textContent = 'Uložit člena';
+});
+
+function confirmDeleteTeam(id, name) {
+  currentDeleteTarget = { collection: 'team', id: id, name: name };
+  document.getElementById('delete-item-name').textContent = name;
+  openModal('modal-delete');
+}
 
 // ============================================================
 // IMAGE UPLOAD
@@ -616,7 +767,6 @@ function generateSlug(text) {
     .replace(/^-|-$/g, '');
 }
 
-// Auto-generate slug from title
 document.getElementById('akce-nazev').addEventListener('blur', (e) => {
   const slugField = document.getElementById('akce-slug');
   if (!slugField.value && e.target.value) {
@@ -626,6 +776,13 @@ document.getElementById('akce-nazev').addEventListener('blur', (e) => {
 
 document.getElementById('clanek-titulek').addEventListener('blur', (e) => {
   const slugField = document.getElementById('clanek-slug');
+  if (!slugField.value && e.target.value) {
+    slugField.value = generateSlug(e.target.value);
+  }
+});
+
+document.getElementById('team-jmeno').addEventListener('blur', (e) => {
+  const slugField = document.getElementById('team-slug');
   if (!slugField.value && e.target.value) {
     slugField.value = generateSlug(e.target.value);
   }
