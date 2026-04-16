@@ -84,6 +84,8 @@ function generateSlug(text) {
 function stripHtml(html) {
   if (!html) return '';
   return html
+    .replace(/<!--\s*wp:[^>]*-->/g, '')   // WP Gutenberg block comments
+    .replace(/<!--\s*\/wp:[^>]*-->/g, '') // WP Gutenberg closing block comments
     .replace(/<[^>]*>/g, '')
     .replace(/&amp;/g, '&')
     .replace(/&lt;/g, '<')
@@ -91,6 +93,17 @@ function stripHtml(html) {
     .replace(/&quot;/g, '"')
     .replace(/&#039;/g, "'")
     .replace(/&nbsp;/g, ' ')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+}
+
+// Odstraní WP block komentáře z HTML obsahu, zachová HTML tagy (pro rich text)
+function stripWpBlocks(html) {
+  if (!html) return '';
+  return html
+    .replace(/<!--\s*wp:[^>]*-->/g, '')
+    .replace(/<!--\s*\/wp:[^>]*-->/g, '')
+    .replace(/\n{3,}/g, '\n\n')
     .trim();
 }
 
@@ -264,7 +277,7 @@ async function importToFirestore(data) {
         datum: post.date,
         autor: 'Bikeskills tým',
         perex: post.excerpt || stripHtml(post.content).substring(0, 200),
-        obsah: post.content,
+        obsah: stripWpBlocks(post.content),
         slug: post.slug,
         imageUrl: post.imageUrl || '',
         publikovano: true,
@@ -286,7 +299,7 @@ async function importToFirestore(data) {
     try {
       const docData = {
         jmeno: member.title,
-        popis: member.content, // Often team bio is in content
+        popis: stripHtml(member.content),
         slug: member.slug,
         imageUrl: member.imageUrl || '',
         poradi: 0,
