@@ -175,7 +175,7 @@
               </div>
 
               <div class="form-group">
-                <label for="akce-image">Obrázek</label>
+                <label for="akce-image">Hlavní obrázek</label>
                 <div class="image-upload-area">
                   <input type="file" id="akce-image-file" accept="image/*" class="file-input">
                   <label for="akce-image-file" class="file-label">
@@ -184,6 +184,51 @@
                   </label>
                   <input type="text" id="akce-image-url" placeholder="nebo zadejte URL obrázku" class="image-url-input">
                   <div id="akce-image-preview" class="image-preview"></div>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label>Galerie (další fotky)</label>
+                <div class="gallery-grid">
+                  <div class="gallery-field">
+                    <label class="gallery-label">Foto 2</label>
+                    <input type="file" id="akce-g1-file" accept="image/*" class="file-input gallery-file">
+                    <label for="akce-g1-file" class="file-label file-label-sm">Nahrát</label>
+                    <input type="text" id="akce-galerie1" placeholder="URL foto 2" class="image-url-input">
+                    <div id="akce-g1-preview" class="image-preview image-preview-sm"></div>
+                  </div>
+                  <div class="gallery-field">
+                    <label class="gallery-label">Foto 3</label>
+                    <input type="file" id="akce-g2-file" accept="image/*" class="file-input gallery-file">
+                    <label for="akce-g2-file" class="file-label file-label-sm">Nahrát</label>
+                    <input type="text" id="akce-galerie2" placeholder="URL foto 3" class="image-url-input">
+                    <div id="akce-g2-preview" class="image-preview image-preview-sm"></div>
+                  </div>
+                  <div class="gallery-field">
+                    <label class="gallery-label">Foto 4</label>
+                    <input type="file" id="akce-g3-file" accept="image/*" class="file-input gallery-file">
+                    <label for="akce-g3-file" class="file-label file-label-sm">Nahrát</label>
+                    <input type="text" id="akce-galerie3" placeholder="URL foto 4" class="image-url-input">
+                    <div id="akce-g3-preview" class="image-preview image-preview-sm"></div>
+                  </div>
+                  <div class="gallery-field">
+                    <label class="gallery-label">Foto 5</label>
+                    <input type="file" id="akce-g4-file" accept="image/*" class="file-input gallery-file">
+                    <label for="akce-g4-file" class="file-label file-label-sm">Nahrát</label>
+                    <input type="text" id="akce-galerie4" placeholder="URL foto 5" class="image-url-input">
+                    <div id="akce-g4-preview" class="image-preview image-preview-sm"></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="akce-video-url">Video (YouTube URL)</label>
+                  <input type="url" id="akce-video-url" placeholder="https://www.youtube.com/watch?v=...">
+                </div>
+                <div class="form-group">
+                  <label for="akce-instagram-url">Instagram post (URL)</label>
+                  <input type="url" id="akce-instagram-url" placeholder="https://www.instagram.com/p/...">
                 </div>
               </div>
 
@@ -286,6 +331,51 @@
                   </label>
                   <input type="text" id="clanek-image-url" placeholder="nebo zadejte URL obrázku" class="image-url-input">
                   <div id="clanek-image-preview" class="image-preview"></div>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label>Galerie (další fotky)</label>
+                <div class="gallery-grid">
+                  <div class="gallery-field">
+                    <label class="gallery-label">Foto 2</label>
+                    <input type="file" id="clanek-g1-file" accept="image/*" class="file-input gallery-file">
+                    <label for="clanek-g1-file" class="file-label file-label-sm">Nahrát</label>
+                    <input type="text" id="clanek-galerie1" placeholder="URL foto 2" class="image-url-input">
+                    <div id="clanek-g1-preview" class="image-preview image-preview-sm"></div>
+                  </div>
+                  <div class="gallery-field">
+                    <label class="gallery-label">Foto 3</label>
+                    <input type="file" id="clanek-g2-file" accept="image/*" class="file-input gallery-file">
+                    <label for="clanek-g2-file" class="file-label file-label-sm">Nahrát</label>
+                    <input type="text" id="clanek-galerie2" placeholder="URL foto 3" class="image-url-input">
+                    <div id="clanek-g2-preview" class="image-preview image-preview-sm"></div>
+                  </div>
+                  <div class="gallery-field">
+                    <label class="gallery-label">Foto 4</label>
+                    <input type="file" id="clanek-g3-file" accept="image/*" class="file-input gallery-file">
+                    <label for="clanek-g3-file" class="file-label file-label-sm">Nahrát</label>
+                    <input type="text" id="clanek-galerie3" placeholder="URL foto 4" class="image-url-input">
+                    <div id="clanek-g3-preview" class="image-preview image-preview-sm"></div>
+                  </div>
+                  <div class="gallery-field">
+                    <label class="gallery-label">Foto 5</label>
+                    <input type="file" id="clanek-g4-file" accept="image/*" class="file-input gallery-file">
+                    <label for="clanek-g4-file" class="file-label file-label-sm">Nahrát</label>
+                    <input type="text" id="clanek-galerie4" placeholder="URL foto 5" class="image-url-input">
+                    <div id="clanek-g4-preview" class="image-preview image-preview-sm"></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="clanek-video-url">Video (YouTube URL)</label>
+                  <input type="url" id="clanek-video-url" placeholder="https://www.youtube.com/watch?v=...">
+                </div>
+                <div class="form-group">
+                  <label for="clanek-instagram-url">Instagram post (URL)</label>
+                  <input type="url" id="clanek-instagram-url" placeholder="https://www.instagram.com/p/...">
                 </div>
               </div>
 

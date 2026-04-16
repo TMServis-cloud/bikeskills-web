@@ -802,3 +802,45 @@ textarea {
     align-items: flex-start;
   }
 }
+
+/* ===== GALERIE ===== */
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.gallery-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px;
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+}
+
+.gallery-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.file-label-sm {
+  padding: 5px 10px;
+  font-size: 12px;
+  gap: 4px;
+}
+
+.file-label-sm svg {
+  display: none;
+}
+
+.image-preview-sm img {
+  max-width: 100%;
+  max-height: 80px;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+}

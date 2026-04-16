@@ -194,12 +194,32 @@ async function loadAkce() {
   }
 }
 
+// Pomocná funkce: vymaže galerii v formuláři
+function clearAkceGallery() {
+  [1,2,3,4].forEach(n => {
+    const urlEl = document.getElementById(`akce-galerie${n}`);
+    const prevEl = document.getElementById(`akce-g${n}-preview`);
+    if (urlEl) urlEl.value = '';
+    if (prevEl) prevEl.innerHTML = '';
+  });
+}
+
+function clearClanekGallery() {
+  [1,2,3,4].forEach(n => {
+    const urlEl = document.getElementById(`clanek-galerie${n}`);
+    const prevEl = document.getElementById(`clanek-g${n}-preview`);
+    if (urlEl) urlEl.value = '';
+    if (prevEl) prevEl.innerHTML = '';
+  });
+}
+
 // New akce
 document.getElementById('btn-new-akce').addEventListener('click', () => {
   document.getElementById('akce-id').value = '';
   document.getElementById('form-akce').reset();
   document.getElementById('akce-aktivni').checked = true;
   document.getElementById('akce-image-preview').innerHTML = '';
+  clearAkceGallery();
   document.getElementById('modal-akce-title').textContent = 'Nová akce';
   openModal('modal-akce');
 });
@@ -226,6 +246,17 @@ async function editAkce(id) {
     document.getElementById('akce-slug').value = data.slug || '';
     document.getElementById('akce-aktivni').checked = data.aktivni !== false;
     document.getElementById('akce-image-url').value = data.imageUrl || '';
+    document.getElementById('akce-video-url').value = data.videoUrl || '';
+    document.getElementById('akce-instagram-url').value = data.instagramUrl || '';
+
+    // Galerie
+    [1,2,3,4].forEach(n => {
+      const urlEl = document.getElementById(`akce-galerie${n}`);
+      const prevEl = document.getElementById(`akce-g${n}-preview`);
+      const val = data[`galerie${n}`] || '';
+      if (urlEl) urlEl.value = val;
+      if (prevEl) prevEl.innerHTML = val ? `<img src="${escapeHtml(val)}" alt="Foto ${n+1}">` : '';
+    });
 
     // Show image preview
     const preview = document.getElementById('akce-image-preview');
@@ -263,6 +294,18 @@ document.getElementById('form-akce').addEventListener('submit', async (e) => {
     const nazev = document.getElementById('akce-nazev').value.trim();
     const slug = document.getElementById('akce-slug').value.trim() || generateSlug(nazev);
 
+    // Galerie — upload souborů pokud vybrány
+    const galerie = {};
+    for (const n of [1,2,3,4]) {
+      let gUrl = document.getElementById(`akce-galerie${n}`).value.trim();
+      const gFile = document.getElementById(`akce-g${n}-file`);
+      if (gFile && gFile.files.length > 0) {
+        gUrl = await uploadImage(gFile.files[0], 'akce/gallery');
+        document.getElementById(`akce-galerie${n}`).value = gUrl;
+      }
+      galerie[`galerie${n}`] = gUrl || null;
+    }
+
     const data = {
       nazev: nazev,
       datumText: document.getElementById('akce-datum').value.trim(),
@@ -276,6 +319,9 @@ document.getElementById('form-akce').addEventListener('submit', async (e) => {
       popis: document.getElementById('akce-popis').value.trim(),
       slug: slug,
       imageUrl: imageUrl,
+      videoUrl: document.getElementById('akce-video-url').value.trim() || null,
+      instagramUrl: document.getElementById('akce-instagram-url').value.trim() || null,
+      ...galerie,
       aktivni: document.getElementById('akce-aktivni').checked,
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     };
@@ -359,6 +405,7 @@ document.getElementById('btn-new-clanek').addEventListener('click', () => {
   document.getElementById('clanek-publikovano').checked = true;
   document.getElementById('clanek-autor').value = 'Bikeskills tým';
   document.getElementById('clanek-image-preview').innerHTML = '';
+  clearClanekGallery();
   if (quillEditor) quillEditor.setContents([]);
   document.getElementById('modal-clanek-title').textContent = 'Nový článek';
   openModal('modal-clanek');
@@ -384,6 +431,17 @@ async function editClanek(id) {
     document.getElementById('clanek-slug').value = data.slug || '';
     document.getElementById('clanek-publikovano').checked = data.publikovano !== false;
     document.getElementById('clanek-image-url').value = data.imageUrl || '';
+    document.getElementById('clanek-video-url').value = data.videoUrl || '';
+    document.getElementById('clanek-instagram-url').value = data.instagramUrl || '';
+
+    // Galerie
+    [1,2,3,4].forEach(n => {
+      const urlEl = document.getElementById(`clanek-galerie${n}`);
+      const prevEl = document.getElementById(`clanek-g${n}-preview`);
+      const val = data[`galerie${n}`] || '';
+      if (urlEl) urlEl.value = val;
+      if (prevEl) prevEl.innerHTML = val ? `<img src="${escapeHtml(val)}" alt="Foto ${n+1}">` : '';
+    });
 
     // Load content into Quill
     if (quillEditor) {
@@ -431,6 +489,18 @@ document.getElementById('form-clanek').addEventListener('submit', async (e) => {
     const slug = document.getElementById('clanek-slug').value.trim() || generateSlug(titulek);
     const datumValue = document.getElementById('clanek-datum').value;
 
+    // Galerie — upload souborů pokud vybrány
+    const galerie = {};
+    for (const n of [1,2,3,4]) {
+      let gUrl = document.getElementById(`clanek-galerie${n}`).value.trim();
+      const gFile = document.getElementById(`clanek-g${n}-file`);
+      if (gFile && gFile.files.length > 0) {
+        gUrl = await uploadImage(gFile.files[0], 'blog/gallery');
+        document.getElementById(`clanek-galerie${n}`).value = gUrl;
+      }
+      galerie[`galerie${n}`] = gUrl || null;
+    }
+
     const data = {
       titulek: titulek,
       datum: datumValue ? new Date(datumValue) : null,
@@ -439,6 +509,9 @@ document.getElementById('form-clanek').addEventListener('submit', async (e) => {
       obsah: quillEditor ? quillEditor.root.innerHTML : '',
       slug: slug,
       imageUrl: imageUrl,
+      videoUrl: document.getElementById('clanek-video-url').value.trim() || null,
+      instagramUrl: document.getElementById('clanek-instagram-url').value.trim() || null,
+      ...galerie,
       publikovano: document.getElementById('clanek-publikovano').checked,
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     };
@@ -671,7 +744,15 @@ document.querySelectorAll('.file-input').forEach(input => {
     const file = e.target.files[0];
     if (!file) return;
 
-    const previewId = input.id.replace('-file', '-preview');
+    // Galerie soubory mají id vzoru "akce-g1-file" → preview "akce-g1-preview"
+    // Hlavní soubory mají id vzoru "akce-image-file" → preview "akce-image-preview"
+    let previewId;
+    if (input.classList.contains('gallery-file')) {
+      previewId = input.id.replace('-file', '-preview');
+    } else {
+      previewId = input.id.replace('-file', '-preview');
+    }
+
     const preview = document.getElementById(previewId);
     if (preview) {
       const reader = new FileReader();
