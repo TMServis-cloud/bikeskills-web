@@ -48,8 +48,8 @@ function init() {
     fs.mkdirSync(PUBLIC_DIR, { recursive: true });
   }
 
-  // Copy assets (css, js, images, fonts)
-  ['css', 'js', 'images', 'fonts'].forEach(dir => {
+  // Copy assets (css, js, images, fonts, documents)
+  ['css', 'js', 'images', 'fonts', 'documents'].forEach(dir => {
     const src = path.join(EXPORT_DIR, dir);
     const dest = path.join(PUBLIC_DIR, dir);
     if (fs.existsSync(src)) {

@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node -e ':*)",
+      "Read(//Users/kabelcihiworkstation/Library/CloudStorage/GoogleDrive-cihacek@chytreit.cz/Můj disk/Google Antigravity projekty/elektrobikefestival/elektrobikefestival.webflow/documents/**)",
+      "Bash(grep -h 'data-src=\"documents/' \"/Users/kabelcihiworkstation/Library/CloudStorage/GoogleDrive-cihacek@chytreit.cz/Můj disk/Google Antigravity projekty/bikeskills-web/public/\"*.html)",
+      "Read(//Users/kabelcihiworkstation/Library/CloudStorage/**)",
+      "Read(//Users/kabelcihiworkstation/Downloads/**)",
+      "Read(//Users/kabelcihiworkstation/**)",
+      "Read(//private/tmp/claude-501/-Users-kabelcihiworkstation-Library-CloudStorage-GoogleDrive-cihacek-chytreit.cz-M-j-disk-Google-Antigravity-projekty-bikeskills-web/2dfcdde2-7c0e-4ca1-b9c2-9a59c606b3f2/tasks/**)"
+    ]
+  }
+}
