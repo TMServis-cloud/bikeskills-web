@@ -48,10 +48,10 @@ function toggleEmpty(emptyEl, hasItems) {
   emptyEl.style.display = hasItems ? 'none' : '';
 }
 
-/** Převede YouTube URL na embed URL */
+/** Převede YouTube URL (libovolný formát) na embed URL */
 function youtubeEmbedUrl(url) {
   if (!url) return null;
-  const m = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+  const m = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/|youtube\.com\/v\/|youtube\.com\/shorts\/)([a-zA-Z0-9_-]{11})/);
   return m ? `https://www.youtube.com/embed/${m[1]}` : null;
 }
 
@@ -216,9 +216,29 @@ function injectFilterBar(id, beforeEl) {
   return bar;
 }
 
-const BTN_STYLE = 'padding:0.35rem 1.1rem;border-radius:2rem;border:1.5px solid #545a4f;background:transparent;color:#d0d3c9;cursor:pointer;font-size:0.85rem;font-family:inherit;letter-spacing:0.03em;transition:background 0.2s,color 0.2s;';
-const BTN_ACTIVE_STYLE = 'padding:0.35rem 1.1rem;border-radius:2rem;border:1.5px solid #545a4f;background:#545a4f;color:#fff;cursor:pointer;font-size:0.85rem;font-family:inherit;letter-spacing:0.03em;transition:background 0.2s,color 0.2s;';
+const SELECT_STYLE = 'background:#1e2021;color:#d0d3c9;border:1.5px solid #545a4f;padding:0.4rem 0.8rem;font-family:inherit;font-size:0.85rem;cursor:pointer;margin-right:0.75rem;';
+const BTN_STYLE = 'padding:0.35rem 1.1rem;border:1.5px solid #545a4f;background:transparent;color:#d0d3c9;cursor:pointer;font-size:0.85rem;font-family:inherit;letter-spacing:0.03em;transition:background 0.2s,color 0.2s;';
+const BTN_ACTIVE_STYLE = 'padding:0.35rem 1.1rem;border:1.5px solid #545a4f;background:#545a4f;color:#fff;cursor:pointer;font-size:0.85rem;font-family:inherit;letter-spacing:0.03em;transition:background 0.2s,color 0.2s;';
 const SEP_STYLE = 'width:1px;height:1.25rem;background:#545a4f;margin:0 0.25rem;align-self:center;flex-shrink:0;';
+
+function makeYearSelect(years, currentYear, onChange) {
+  const sel = document.createElement('select');
+  sel.setAttribute('style', SELECT_STYLE);
+  const allOpt = document.createElement('option');
+  allOpt.value = 'all';
+  allOpt.textContent = 'Všechny roky';
+  if (currentYear === 'all') allOpt.selected = true;
+  sel.appendChild(allOpt);
+  years.forEach(y => {
+    const opt = document.createElement('option');
+    opt.value = y;
+    opt.textContent = y;
+    if (y === currentYear) opt.selected = true;
+    sel.appendChild(opt);
+  });
+  sel.addEventListener('change', () => onChange(sel.value));
+  return sel;
+}
 
 function makeBtn(label, isActive, onClick) {
   const btn = document.createElement('button');
@@ -237,10 +257,7 @@ function makeSep() {
 function buildAkceFilterBar(bar, years) {
   bar.innerHTML = '';
 
-  bar.appendChild(makeBtn('Všechny roky', akceYearFilter === 'all', () => { akceYearFilter = 'all'; currentAkcePage = 1; renderAkceListPage(); }));
-  years.forEach(y => {
-    bar.appendChild(makeBtn(y, akceYearFilter === y, () => { akceYearFilter = y; currentAkcePage = 1; renderAkceListPage(); }));
-  });
+  bar.appendChild(makeYearSelect(years, akceYearFilter, v => { akceYearFilter = v; currentAkcePage = 1; renderAkceListPage(); }));
 
   bar.appendChild(makeSep());
 
@@ -251,11 +268,14 @@ function buildAkceFilterBar(bar, years) {
 
 function buildClankyFilterBar(bar, years) {
   bar.innerHTML = '';
+  bar.appendChild(makeYearSelect(years, clankyYearFilter, v => { clankyYearFilter = v; currentClankyPage = 1; renderClankyListPage(); }));
+}
 
-  bar.appendChild(makeBtn('Všechny roky', clankyYearFilter === 'all', () => { clankyYearFilter = 'all'; currentClankyPage = 1; renderClankyListPage(); }));
-  years.forEach(y => {
-    bar.appendChild(makeBtn(y, clankyYearFilter === y, () => { clankyYearFilter = y; currentClankyPage = 1; renderClankyListPage(); }));
-  });
+/** Pokud je text bez HTML tagů, zabalí odstavce do <p> */
+function ensureHtml(text) {
+  if (!text) return '';
+  if (/<[a-z][^>]*>/i.test(text)) return text;
+  return text.split(/\n{2,}/).map(p => `<p>${p.replace(/\n/g, '<br>')}</p>`).join('');
 }
 
 function wirePagination(prevBtn, nextBtn, getPage, setPage, getFiltered, render) {
@@ -429,14 +449,16 @@ async function loadAkceDetail(slug) {
 
     const contentEl = item.querySelector('[item="content"]');
     if (contentEl) {
-      contentEl.innerHTML = data.popis || '';
+      contentEl.innerHTML = ensureHtml(data.popis);
       contentEl.classList.remove('w-dyn-bind-empty');
+      contentEl.querySelectorAll('img').forEach(img => { img.onerror = function() { this.style.display = 'none'; }; });
     }
 
     const videoEl = item.querySelector('.video-4');
     if (videoEl) {
       const embedUrl = youtubeEmbedUrl(data.videoUrl);
       if (embedUrl) {
+        videoEl.style.cssText = 'position:relative;padding-bottom:56.25%;height:0;overflow:hidden;';
         videoEl.innerHTML = `<iframe src="${embedUrl}" frameborder="0" allowfullscreen loading="lazy" style="position:absolute;top:0;left:0;width:100%;height:100%;"></iframe>`;
         videoEl.classList.remove('w-dyn-bind-empty');
       } else {
@@ -654,7 +676,11 @@ async function loadClanekDetail(slug) {
 
     // Obsah
     const contentEl = document.querySelector('[item="content"].rich-text-block-3, .div-block-325 [item="content"]');
-    if (contentEl) { contentEl.innerHTML = data.obsah || ''; contentEl.classList.remove('w-dyn-bind-empty'); }
+    if (contentEl) {
+      contentEl.innerHTML = ensureHtml(data.obsah);
+      contentEl.classList.remove('w-dyn-bind-empty');
+      contentEl.querySelectorAll('img').forEach(img => { img.onerror = function() { this.style.display = 'none'; }; });
+    }
 
     // Hlavní fotka
     const imgEl = document.querySelector('.div-block-324 img[item="featured-image"], img[item="featured-image"].image-53');
@@ -675,6 +701,7 @@ async function loadClanekDetail(slug) {
     if (videoEl) {
       const embedUrl = youtubeEmbedUrl(data.videoUrl);
       if (embedUrl) {
+        videoEl.style.cssText = 'position:relative;padding-bottom:56.25%;height:0;overflow:hidden;';
         videoEl.innerHTML = `<iframe src="${embedUrl}" frameborder="0" allowfullscreen loading="lazy" style="position:absolute;top:0;left:0;width:100%;height:100%;"></iframe>`;
         videoEl.classList.remove('w-dyn-bind-empty');
       } else {
@@ -683,16 +710,21 @@ async function loadClanekDetail(slug) {
       }
     }
 
-    // Galerie fotografií
+    // Galerie fotografií — CSS grid
     const galItems = document.querySelector('.collection-list-wrapper-6 .collection-list-13.w-dyn-items');
     const galTemplate = galItems ? galItems.querySelector('.collection-item-7.w-dyn-item') : null;
     if (galItems && galTemplate) {
       if (galerie.length) {
+        galItems.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:0.75rem;';
         galItems.innerHTML = '';
         galerie.forEach(url => {
           const gi = galTemplate.cloneNode(true);
           const gImg = gi.querySelector('img.image-54, img');
-          if (gImg) { gImg.src = url; gImg.alt = data.titulek || ''; gImg.classList.remove('w-dyn-bind-empty'); }
+          if (gImg) {
+            gImg.src = url; gImg.alt = data.titulek || '';
+            gImg.style.cssText = 'width:100%;height:200px;object-fit:cover;display:block;';
+            gImg.classList.remove('w-dyn-bind-empty');
+          }
           galItems.appendChild(gi);
         });
         const emptyState = document.querySelector('.collection-list-wrapper-6 .w-dyn-empty');
@@ -863,9 +895,9 @@ async function loadTeamDetail(slug) {
       const url = videoUrls[idx];
       const embedUrl = url ? youtubeEmbedUrl(url) : null;
       if (embedUrl) {
+        videoEl.style.cssText = 'position:relative;padding-bottom:56.25%;height:0;overflow:hidden;';
         videoEl.innerHTML = `<iframe src="${embedUrl}" frameborder="0" allowfullscreen loading="lazy" style="position:absolute;top:0;left:0;width:100%;height:100%;"></iframe>`;
         videoEl.classList.remove('w-dyn-bind-empty');
-        videoEl.style.display = '';
       } else {
         videoEl.style.display = 'none';
       }
