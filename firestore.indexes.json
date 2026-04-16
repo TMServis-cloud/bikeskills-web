@@ -1,0 +1,37 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "clanky",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "publikovano", "order": "ASCENDING" },
+        { "fieldPath": "datum", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "akce",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "aktivni", "order": "ASCENDING" },
+        { "fieldPath": "datumSort", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "akce",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "aktivni", "order": "ASCENDING" },
+        { "fieldPath": "datumSort", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "team",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "aktivni", "order": "ASCENDING" },
+        { "fieldPath": "poradi", "order": "ASCENDING" }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}

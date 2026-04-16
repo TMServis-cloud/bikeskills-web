@@ -1,0 +1,12 @@
+[
+  {
+    "source": "/",
+    "destination": "/akce/?post_type=akce&p=237619/",
+    "type": 301
+  },
+  {
+    "source": "/",
+    "destination": "/akce/?post_type=akce&p=248081/",
+    "type": 301
+  }
+]

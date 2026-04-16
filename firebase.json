@@ -80,10 +80,16 @@
       { "source": "/exhibicni-vystoupeni-lipova-u-chebu/", "destination": "/blog/exhibicni-vystoupeni-lipova-u-chebu/", "type": 301 },
       { "source": "/season-mix-2025-z-cihiho-telefonu/", "destination": "/blog/season-mix-2025-z-cihiho-telefonu/", "type": 301 },
       { "source": "/galavecer-bigmat/", "destination": "/blog/galavecer-bigmat/", "type": 301 }
+    ],
+    "rewrites": [
+      { "source": "/blog/**", "destination": "/detail_post.html" },
+      { "source": "/akce/**", "destination": "/detail_akce.html" },
+      { "source": "/team/**", "destination": "/detail_archive-team.html" }
     ]
   },
   "firestore": {
-    "rules": "firestore.rules"
+    "rules": "firestore.rules",
+    "indexes": "firestore.indexes.json"
   },
   "storage": {
     "rules": "storage.rules"

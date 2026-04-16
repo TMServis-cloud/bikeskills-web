@@ -7,7 +7,14 @@
       "Read(//Users/kabelcihiworkstation/Library/CloudStorage/**)",
       "Read(//Users/kabelcihiworkstation/Downloads/**)",
       "Read(//Users/kabelcihiworkstation/**)",
-      "Read(//private/tmp/claude-501/-Users-kabelcihiworkstation-Library-CloudStorage-GoogleDrive-cihacek-chytreit.cz-M-j-disk-Google-Antigravity-projekty-bikeskills-web/2dfcdde2-7c0e-4ca1-b9c2-9a59c606b3f2/tasks/**)"
+      "Read(//private/tmp/claude-501/-Users-kabelcihiworkstation-Library-CloudStorage-GoogleDrive-cihacek-chytreit.cz-M-j-disk-Google-Antigravity-projekty-bikeskills-web/2dfcdde2-7c0e-4ca1-b9c2-9a59c606b3f2/tasks/**)",
+      "Bash(node -e ' *)",
+      "WebFetch(domain:bikeskills.cz)",
+      "Bash(curl -s \"https://bikeskills.cz/wp-load.php?security_token=8daacbcd6383cb31&export_id=13&action=get_data\" -o /tmp/akce-export.csv)",
+      "Read(//tmp/**)",
+      "Bash(curl -v \"https://bikeskills.cz/wp-load.php?security_token=8daacbcd6383cb31&export_id=13&action=get_data\" -o /tmp/akce-export.csv)",
+      "Bash(curl -s -L -A \"Mozilla/5.0\" \"https://bikeskills.cz/wp-load.php?security_token=8daacbcd6383cb31&export_id=13&action=get_data\" -o /tmp/akce-export.csv)",
+      "Read(//private/tmp/**)"
     ]
   }
 }

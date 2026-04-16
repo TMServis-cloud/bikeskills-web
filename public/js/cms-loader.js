@@ -91,6 +91,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const slug = path.includes('/akce/') ? path.replace('/akce/', '').replace(/\/$/, '') : null;
     if (slug) loadAkceDetail(slug);
   }
+
+  if (path === '/team' || path === '/team.html' || path === '/team/') {
+    loadTeamList();
+  }
+
+  if (path.startsWith('/detail_archive-team') || (path.startsWith('/team/') && path.length > '/team/'.length)) {
+    const slug = path.includes('/team/') ? path.replace('/team/', '').replace(/\/$/, '') : null;
+    if (slug) loadTeamDetail(slug);
+  }
 });
 
 // ============================================================
@@ -367,6 +376,120 @@ async function loadClankyList() {
     });
   } catch (err) {
     console.error('Chyba načítání clanky list:', err);
+  }
+}
+
+// ============================================================
+// TÝM
+// ============================================================
+
+/**
+ * Struktura team karty v team.html:
+ *   .collection-item-9.w-dyn-item[item="permalink"]
+ *     .jezdec-block
+ *       img.image-49[item="featured-image"]
+ *       .div-block-315
+ *         .text-block-135[item="title"]      ← jmeno
+ *         .text-block-136[item="excerpt"]    ← popis (krátké bio)
+ *         a[item="permalink"]                ← odkaz na detail
+ */
+function renderTeamItem(template, data) {
+  const item = template.cloneNode(true);
+
+  const href = `/team/${data.slug}/`;
+  item.querySelectorAll('[item="permalink"]').forEach(el => { el.href = href; });
+
+  const titleEl = item.querySelector('[item="title"], .text-block-135');
+  if (titleEl) {
+    titleEl.textContent = data.jmeno || '';
+    titleEl.classList.remove('w-dyn-bind-empty');
+  }
+
+  const excerptEl = item.querySelector('[item="excerpt"], .text-block-136');
+  if (excerptEl) {
+    const bio = data.popis || '';
+    excerptEl.textContent = bio.length > 120 ? bio.substring(0, 120) + '…' : bio;
+    excerptEl.classList.remove('w-dyn-bind-empty');
+  }
+
+  const imgEl = item.querySelector('[item="featured-image"], .image-49');
+  if (imgEl) {
+    if (data.imageUrl) {
+      imgEl.src = data.imageUrl;
+      imgEl.alt = data.jmeno || '';
+      imgEl.classList.remove('w-dyn-bind-empty');
+    }
+  }
+
+  return item;
+}
+
+async function loadTeamList() {
+  const wfl = getWebflowList('.collection-list-wrapper-3');
+  if (!wfl) return;
+  const { itemsList, template, emptyEl } = wfl;
+
+  try {
+    const snapshot = await db.collection('team')
+      .where('aktivni', '==', true)
+      .orderBy('poradi', 'asc')
+      .get();
+
+    if (snapshot.empty) {
+      toggleEmpty(emptyEl, false);
+      itemsList.innerHTML = '';
+      return;
+    }
+
+    toggleEmpty(emptyEl, true);
+    itemsList.innerHTML = '';
+    snapshot.forEach(doc => {
+      itemsList.appendChild(renderTeamItem(template, doc.data()));
+    });
+  } catch (err) {
+    console.error('Chyba načítání týmu:', err);
+  }
+}
+
+async function loadTeamDetail(slug) {
+  const container = document.getElementById('Team-member-Section');
+  if (!container) return;
+
+  try {
+    const snapshot = await db.collection('team')
+      .where('slug', '==', slug)
+      .limit(1)
+      .get();
+
+    if (snapshot.empty) {
+      container.innerHTML = '<p>Člen týmu nenalezen.</p>';
+      return;
+    }
+
+    const data = snapshot.docs[0].data();
+
+    const titleEl = container.querySelector('[item="title"]');
+    if (titleEl) {
+      titleEl.textContent = data.jmeno || '';
+      titleEl.classList.remove('w-dyn-bind-empty');
+    }
+
+    const contentEl = container.querySelector('[item="content"]');
+    if (contentEl) {
+      contentEl.innerHTML = data.popis || '';
+      contentEl.classList.remove('w-dyn-bind-empty');
+    }
+
+    const imgEl = container.querySelector('[item="featured-image"]');
+    if (imgEl && data.imageUrl) {
+      imgEl.src = data.imageUrl;
+      imgEl.alt = data.jmeno || '';
+      imgEl.classList.remove('w-dyn-bind-empty');
+    }
+
+    document.title = `${data.jmeno} | BIKESKILLS`;
+  } catch (err) {
+    console.error('Chyba načítání člena týmu:', err);
   }
 }
 
