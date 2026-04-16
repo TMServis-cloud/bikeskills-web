@@ -1,12 +1,14 @@
 /**
  * BIKESKILLS CMS Loader
- * Načítá akce a články z Firebase Firestore a renderuje na frontend
+ * Načítá akce a články z Firebase Firestore a renderuje do Webflow HTML struktury.
+ *
+ * Webflow používá šablonové .w-dyn-item elementy uvnitř .w-dyn-items.
+ * Tento skript klonuje šablonu, naplní daty z Firestore a zobrazí výsledky.
  */
 
 // ============================================================
 // FIREBASE CONFIG
 // ============================================================
-// TODO: Nahradit skutečnou konfigurací po vytvoření Firebase projektu
 const firebaseConfig = {
   apiKey: "AIzaSyD-DnZA0IV6S7iGTAayrMdxSyndNJ8JqZM",
   authDomain: "bikeskills-web.firebaseapp.com",
@@ -17,7 +19,6 @@ const firebaseConfig = {
   measurementId: "G-Y1GJE85WDX"
 };
 
-// Initialize Firebase only if not already initialized
 if (!firebase.apps.length) {
   firebase.initializeApp(firebaseConfig);
 }
@@ -25,14 +26,42 @@ if (!firebase.apps.length) {
 const db = firebase.firestore();
 
 // ============================================================
-// STATUS CONFIGURATION
+// HELPERS
 // ============================================================
-const STATUS_CONFIG = {
-  otevreno: { label: 'Otevřeno', class: 'status-open' },
-  prihlasujte: { label: 'Přihlašujte se', class: 'status-register' },
-  obsazeno: { label: 'Obsazeno', class: 'status-full' },
-  odjeto: { label: 'Odjeto', class: 'status-done' }
-};
+function escapeHtml(text) {
+  if (!text) return '';
+  const div = document.createElement('div');
+  div.textContent = String(text);
+  return div.innerHTML;
+}
+
+/**
+ * Získá seznam prvků a šablonu z Webflow .w-dyn-list struktury.
+ * @param {string} containerSelector - CSS selektor pro .w-dyn-list nebo rodičovský kontejner
+ * @returns {{ itemsList: Element, template: Element, emptyEl: Element } | null}
+ */
+function getWebflowList(containerSelector) {
+  const list = document.querySelector(containerSelector);
+  if (!list) return null;
+
+  const itemsList = list.querySelector('.w-dyn-items');
+  if (!itemsList) return null;
+
+  const template = itemsList.querySelector('.w-dyn-item');
+  if (!template) return null;
+
+  const emptyEl = list.querySelector('.w-dyn-empty');
+
+  return { itemsList, template, emptyEl };
+}
+
+/**
+ * Po naplnění seznamu: skryje empty state, nebo ho zobrazí pokud nic není.
+ */
+function toggleEmpty(emptyEl, hasItems) {
+  if (!emptyEl) return;
+  emptyEl.style.display = hasItems ? 'none' : '';
+}
 
 // ============================================================
 // PAGE DETECTION & INITIALIZATION
@@ -40,48 +69,120 @@ const STATUS_CONFIG = {
 document.addEventListener('DOMContentLoaded', () => {
   const path = window.location.pathname;
 
-  // Homepage - load preview of akce and articles
   if (path === '/' || path === '/index.html' || path === '/index') {
     loadAkcePreview();
     loadClankyPreview();
   }
 
-  // Akce list page
-  if (path === '/akce' || path === '/akce.html' || path === '/akce/') {
+  if (path === '/akce-archive' || path === '/akce-archive.html' || path === '/akce-archive/' || path === '/akce' || path === '/akce/') {
     loadAkceList();
   }
 
-  // Akce detail page
-  if (path.startsWith('/akce/') && path !== '/akce/' && path !== '/akce.html') {
-    const slug = path.split('/akce/')[1].replace(/\/$/, '');
-    if (slug) loadAkceDetail(slug);
-  }
-
-  // Blog list page
   if (path === '/blog' || path === '/blog.html' || path === '/blog/') {
     loadClankyList();
   }
 
-  // Blog detail page
-  if (path.startsWith('/blog/') && path !== '/blog/' && path !== '/blog.html') {
-    const slug = path.split('/blog/')[1].replace(/\/$/, '');
+  if (path.startsWith('/blog/') && path.length > '/blog/'.length) {
+    const slug = path.replace('/blog/', '').replace(/\/$/, '');
     if (slug) loadClanekDetail(slug);
+  }
+
+  if (path.startsWith('/detail_akce') || (path.startsWith('/akce/') && path.length > '/akce/'.length)) {
+    const slug = path.includes('/akce/') ? path.replace('/akce/', '').replace(/\/$/, '') : null;
+    if (slug) loadAkceDetail(slug);
   }
 });
 
 // ============================================================
-// AKCE (EVENTS)
+// AKCE (UDÁLOSTI)
 // ============================================================
 
 /**
- * Load preview of upcoming events for homepage
+ * Vytvoří naklonovaný akce-item a naplní ho daty.
+ * Struktura akce karty v Webflow HTML:
+ *   .collection-item-akce.w-dyn-item
+ *     a.akce-box[item="permalink"]
+ *       .akce-text-blok
+ *         h3.akce-heading[item="title"]
+ *         .akce-datum[acf:text="datum"]
+ *       .akce-level[acf:text="akce-level"]
+ *       .akce-image-blok
+ *         img.image-55[item="featured-image"]
+ *       .div-block-330
+ *         .akce-ridersnumber[acf:text="riders-number"]
+ *         .akce-cena[acf:text="price"]
  */
+function renderAkceItem(template, data) {
+  const item = template.cloneNode(true);
+
+  // Permalink
+  const href = `/akce/${data.slug}/`;
+  item.querySelectorAll('[item="permalink"], a.akce-box').forEach(el => { el.href = href; });
+
+  // Název
+  const titleEl = item.querySelector('[item="title"], .akce-heading');
+  if (titleEl) {
+    titleEl.textContent = data.nazev || '';
+    titleEl.classList.remove('w-dyn-bind-empty');
+  }
+
+  // Datum
+  const datumEl = item.querySelector('.akce-datum, [acf\\:text="datum"]');
+  if (datumEl) {
+    datumEl.textContent = data.datumText || '';
+    datumEl.classList.remove('w-dyn-bind-empty');
+  }
+
+  // Úroveň jezdců
+  const levelEl = item.querySelector('.akce-level, [acf\\:text="akce-level"]');
+  if (levelEl) {
+    levelEl.textContent = data.uroven || '';
+    levelEl.classList.remove('w-dyn-bind-empty');
+  }
+
+  // Obrázek
+  const imgEl = item.querySelector('[item="featured-image"], img.image-55');
+  if (imgEl) {
+    if (data.imageUrl) {
+      imgEl.src = data.imageUrl;
+      imgEl.alt = data.nazev || '';
+      imgEl.classList.remove('w-dyn-bind-empty');
+    } else {
+      const imgBlock = imgEl.closest('.akce-image-blok');
+      if (imgBlock) imgBlock.style.display = 'none';
+    }
+  }
+
+  // Stav / obsazenost
+  const ridersEl = item.querySelector('.akce-ridersnumber, [acf\\:text="riders-number"]');
+  if (ridersEl) {
+    ridersEl.textContent = data.stavLabel || data.stav || '';
+    ridersEl.classList.remove('w-dyn-bind-empty');
+  }
+
+  // Cena
+  const cenaEl = item.querySelector('.akce-cena, [acf\\:text="price"]');
+  if (cenaEl) {
+    cenaEl.textContent = data.cena ? data.cena.toLocaleString('cs-CZ') : '';
+    cenaEl.classList.remove('w-dyn-bind-empty');
+    // Skrýt ",-CZK" pokud není cena
+    if (!data.cena) {
+      const cenaAfter = cenaEl.nextElementSibling;
+      if (cenaAfter && cenaAfter.classList.contains('akce-cena-after')) {
+        cenaAfter.style.display = 'none';
+      }
+    }
+  }
+
+  return item;
+}
+
 async function loadAkcePreview() {
-  const container = document.getElementById('akce-preview');
-  if (!container) return;
+  const wfl = getWebflowList('.collection-list-wrappe-campy');
+  if (!wfl) return;
+  const { itemsList, template, emptyEl } = wfl;
 
   try {
-    const today = new Date().toISOString().split('T')[0];
     const snapshot = await db.collection('akce')
       .where('aktivni', '==', true)
       .orderBy('datumSort', 'asc')
@@ -89,26 +190,25 @@ async function loadAkcePreview() {
       .get();
 
     if (snapshot.empty) {
-      container.innerHTML = '<p class="cms-empty">Aktuálně nemáme naplánované žádné akce.</p>';
+      toggleEmpty(emptyEl, false);
+      itemsList.innerHTML = '';
       return;
     }
 
-    container.innerHTML = '';
+    toggleEmpty(emptyEl, true);
+    itemsList.innerHTML = '';
     snapshot.forEach(doc => {
-      const data = doc.data();
-      container.appendChild(createAkceCard(data));
+      itemsList.appendChild(renderAkceItem(template, doc.data()));
     });
-  } catch (error) {
-    console.error('Error loading akce preview:', error);
+  } catch (err) {
+    console.error('Chyba načítání akce preview:', err);
   }
 }
 
-/**
- * Load full list of events
- */
 async function loadAkceList() {
-  const container = document.getElementById('akce-list');
-  if (!container) return;
+  const wfl = getWebflowList('.collection-list-wrappe-campy');
+  if (!wfl) return;
+  const { itemsList, template, emptyEl } = wfl;
 
   try {
     const snapshot = await db.collection('akce')
@@ -117,23 +217,21 @@ async function loadAkceList() {
       .get();
 
     if (snapshot.empty) {
-      container.innerHTML = '<p class="cms-empty">Aktuálně nemáme naplánované žádné akce.</p>';
+      toggleEmpty(emptyEl, false);
+      itemsList.innerHTML = '';
       return;
     }
 
-    container.innerHTML = '';
+    toggleEmpty(emptyEl, true);
+    itemsList.innerHTML = '';
     snapshot.forEach(doc => {
-      const data = doc.data();
-      container.appendChild(createAkceCard(data));
+      itemsList.appendChild(renderAkceItem(template, doc.data()));
     });
-  } catch (error) {
-    console.error('Error loading akce list:', error);
+  } catch (err) {
+    console.error('Chyba načítání akce list:', err);
   }
 }
 
-/**
- * Load event detail by slug
- */
 async function loadAkceDetail(slug) {
   const container = document.getElementById('akce-detail');
   if (!container) return;
@@ -145,73 +243,82 @@ async function loadAkceDetail(slug) {
       .get();
 
     if (snapshot.empty) {
-      container.innerHTML = '<p class="cms-empty">Akce nenalezena.</p>';
+      container.innerHTML = '<p>Akce nenalezena.</p>';
       return;
     }
 
     const data = snapshot.docs[0].data();
-    const status = STATUS_CONFIG[data.stav] || STATUS_CONFIG.otevreno;
+    const statusLabels = { otevreno: 'Otevřeno', prihlasujte: 'Přihlašujte se', obsazeno: 'Obsazeno', odjeto: 'Odjeto' };
+    const stavLabel = statusLabels[data.stav] || data.stavLabel || '';
 
     container.innerHTML = `
       <div class="akce-detail-content">
-        ${data.imageUrl ? `<div class="akce-detail-image"><img src="${data.imageUrl}" alt="${escapeHtml(data.nazev)}" loading="lazy"></div>` : ''}
-        <div class="akce-detail-info">
-          <h1 class="akce-detail-title">${escapeHtml(data.nazev)}</h1>
-          <div class="akce-detail-meta">
-            ${data.datumText ? `<span class="akce-meta-item"><strong>Datum:</strong> ${escapeHtml(data.datumText)}</span>` : ''}
-            ${data.uroven ? `<span class="akce-meta-item"><strong>Úroveň:</strong> ${escapeHtml(data.uroven)}</span>` : ''}
-            ${data.cena ? `<span class="akce-meta-item"><strong>Cena:</strong> ${data.cena.toLocaleString('cs-CZ')} CZK</span>` : ''}
-            <span class="akce-meta-item"><strong>Stav:</strong> <span class="akce-status ${status.class}">${status.label}</span></span>
-          </div>
-          <div class="akce-detail-description">${data.popis || ''}</div>
+        ${data.imageUrl ? `<div class="akce-detail-image"><img src="${escapeHtml(data.imageUrl)}" alt="${escapeHtml(data.nazev)}" loading="lazy"></div>` : ''}
+        <h1>${escapeHtml(data.nazev)}</h1>
+        <div class="akce-detail-meta">
+          ${data.datumText ? `<span><strong>Datum:</strong> ${escapeHtml(data.datumText)}</span>` : ''}
+          ${data.uroven ? `<span><strong>Úroveň:</strong> ${escapeHtml(data.uroven)}</span>` : ''}
+          ${data.cena ? `<span><strong>Cena:</strong> ${data.cena.toLocaleString('cs-CZ')} CZK</span>` : ''}
+          ${stavLabel ? `<span><strong>Stav:</strong> ${escapeHtml(stavLabel)}</span>` : ''}
         </div>
+        <div class="akce-detail-description">${data.popis || ''}</div>
       </div>
     `;
-
-    // Update page title
     document.title = `${data.nazev} | BIKESKILLS`;
-  } catch (error) {
-    console.error('Error loading akce detail:', error);
-    container.innerHTML = '<p class="cms-empty">Chyba načítání akce.</p>';
+  } catch (err) {
+    console.error('Chyba načítání akce detail:', err);
   }
 }
 
+// ============================================================
+// ČLÁNKY (BLOG)
+// ============================================================
+
 /**
- * Create an event card element
+ * Vytvoří naklonovaný blog-item a naplní ho daty.
+ * Struktura blog karty v Webflow HTML:
+ *   .collection-blog-item.w-dyn-item
+ *     a.collection-item__card-blog[item="permalink"]
+ *       .card-blog__wrapper-image
+ *         img.wrapper-image__img[item="featured-image"]
+ *       .card-blog__wrapper-text
+ *         h2/h3.wrapper--text__title[item="title"]
+ *     .secondary-link-block.blog
+ *       a[item="permalink"] "Číst dále"
  */
-function createAkceCard(data) {
-  const status = STATUS_CONFIG[data.stav] || STATUS_CONFIG.otevreno;
-  const card = document.createElement('a');
-  card.href = `/akce/${data.slug}/`;
-  card.className = 'akce-card w-inline-block';
+function renderClanekItem(template, data) {
+  const item = template.cloneNode(true);
 
-  card.innerHTML = `
-    ${data.imageUrl ? `<div class="akce-card-image"><img src="${data.imageUrl}" alt="${escapeHtml(data.nazev)}" loading="lazy"></div>` : ''}
-    <div class="akce-card-content">
-      <h3 class="akce-card-title">${escapeHtml(data.nazev)}</h3>
-      <div class="akce-card-date">${escapeHtml(data.datumText || '')}</div>
-      <div class="akce-card-level">${escapeHtml(data.uroven || '')}</div>
-      <div class="akce-card-description">${escapeHtml((data.popis || '').substring(0, 150))}${(data.popis || '').length > 150 ? '...' : ''}</div>
-      <div class="akce-card-footer">
-        <span class="akce-card-status ${status.class}">${status.label}</span>
-        ${data.cena ? `<span class="akce-card-price">${data.cena.toLocaleString('cs-CZ')}<span class="akce-card-currency">,- CZK</span></span>` : ''}
-      </div>
-    </div>
-  `;
+  const href = `/blog/${data.slug}/`;
+  item.querySelectorAll('[item="permalink"]').forEach(el => { el.href = href; });
 
-  return card;
+  // Titulek
+  const titleEl = item.querySelector('[item="title"], .wrapper--text__title');
+  if (titleEl) {
+    titleEl.textContent = data.titulek || '';
+    titleEl.classList.remove('w-dyn-bind-empty');
+  }
+
+  // Obrázek
+  const imgEl = item.querySelector('[item="featured-image"], .wrapper-image__img');
+  if (imgEl) {
+    if (data.imageUrl) {
+      imgEl.src = data.imageUrl;
+      imgEl.alt = data.titulek || '';
+      imgEl.classList.remove('w-dyn-bind-empty');
+    } else {
+      const imgWrap = imgEl.closest('.card-blog__wrapper-image');
+      if (imgWrap) imgWrap.style.display = 'none';
+    }
+  }
+
+  return item;
 }
 
-// ============================================================
-// ČLÁNKY (ARTICLES)
-// ============================================================
-
-/**
- * Load preview of latest articles for homepage
- */
 async function loadClankyPreview() {
-  const container = document.getElementById('clanky-preview');
-  if (!container) return;
+  const wfl = getWebflowList('.collection-list-blog');
+  if (!wfl) return;
+  const { itemsList, template, emptyEl } = wfl;
 
   try {
     const snapshot = await db.collection('clanky')
@@ -221,26 +328,25 @@ async function loadClankyPreview() {
       .get();
 
     if (snapshot.empty) {
-      container.innerHTML = '<p class="cms-empty">Zatím nemáme žádné články.</p>';
+      toggleEmpty(emptyEl, false);
+      itemsList.innerHTML = '';
       return;
     }
 
-    container.innerHTML = '';
+    toggleEmpty(emptyEl, true);
+    itemsList.innerHTML = '';
     snapshot.forEach(doc => {
-      const data = doc.data();
-      container.appendChild(createClanekCard(data));
+      itemsList.appendChild(renderClanekItem(template, doc.data()));
     });
-  } catch (error) {
-    console.error('Error loading clanky preview:', error);
+  } catch (err) {
+    console.error('Chyba načítání clanky preview:', err);
   }
 }
 
-/**
- * Load full list of articles
- */
 async function loadClankyList() {
-  const container = document.getElementById('clanky-list');
-  if (!container) return;
+  const wfl = getWebflowList('.collection-list-blog');
+  if (!wfl) return;
+  const { itemsList, template, emptyEl } = wfl;
 
   try {
     const snapshot = await db.collection('clanky')
@@ -249,23 +355,21 @@ async function loadClankyList() {
       .get();
 
     if (snapshot.empty) {
-      container.innerHTML = '<p class="cms-empty">Zatím nemáme žádné články.</p>';
+      toggleEmpty(emptyEl, false);
+      itemsList.innerHTML = '';
       return;
     }
 
-    container.innerHTML = '';
+    toggleEmpty(emptyEl, true);
+    itemsList.innerHTML = '';
     snapshot.forEach(doc => {
-      const data = doc.data();
-      container.appendChild(createClanekCard(data));
+      itemsList.appendChild(renderClanekItem(template, doc.data()));
     });
-  } catch (error) {
-    console.error('Error loading clanky list:', error);
+  } catch (err) {
+    console.error('Chyba načítání clanky list:', err);
   }
 }
 
-/**
- * Load article detail by slug
- */
 async function loadClanekDetail(slug) {
   const container = document.getElementById('clanek-detail');
   if (!container) return;
@@ -277,7 +381,7 @@ async function loadClanekDetail(slug) {
       .get();
 
     if (snapshot.empty) {
-      container.innerHTML = '<p class="cms-empty">Článek nenalezen.</p>';
+      container.innerHTML = '<p>Článek nenalezen.</p>';
       return;
     }
 
@@ -287,55 +391,18 @@ async function loadClanekDetail(slug) {
       : '';
 
     container.innerHTML = `
-      <article class="clanek-detail-content">
-        ${data.imageUrl ? `<div class="clanek-detail-image"><img src="${data.imageUrl}" alt="${escapeHtml(data.titulek)}" loading="lazy"></div>` : ''}
-        <h1 class="clanek-detail-title">${escapeHtml(data.titulek)}</h1>
+      <article>
+        ${data.imageUrl ? `<div class="clanek-detail-image"><img src="${escapeHtml(data.imageUrl)}" alt="${escapeHtml(data.titulek)}" loading="lazy"></div>` : ''}
+        <h1>${escapeHtml(data.titulek)}</h1>
         <div class="clanek-detail-meta">
-          ${datum ? `<span class="clanek-meta-date">${datum}</span>` : ''}
-          ${data.autor ? `<span class="clanek-meta-author">${escapeHtml(data.autor)}</span>` : ''}
+          ${datum ? `<span>${datum}</span>` : ''}
+          ${data.autor ? `<span>${escapeHtml(data.autor)}</span>` : ''}
         </div>
         <div class="clanek-detail-body">${data.obsah || ''}</div>
       </article>
     `;
-
-    // Update page title
     document.title = `${data.titulek} | BIKESKILLS`;
-  } catch (error) {
-    console.error('Error loading clanek detail:', error);
-    container.innerHTML = '<p class="cms-empty">Chyba načítání článku.</p>';
+  } catch (err) {
+    console.error('Chyba načítání clanek detail:', err);
   }
-}
-
-/**
- * Create an article card element
- */
-function createClanekCard(data) {
-  const datum = data.datum
-    ? new Date(data.datum.seconds ? data.datum.seconds * 1000 : data.datum).toLocaleDateString('cs-CZ')
-    : '';
-
-  const card = document.createElement('a');
-  card.href = `/blog/${data.slug}/`;
-  card.className = 'clanek-card w-inline-block';
-
-  card.innerHTML = `
-    ${data.imageUrl ? `<div class="clanek-card-image"><img src="${data.imageUrl}" alt="${escapeHtml(data.titulek)}" loading="lazy"></div>` : ''}
-    <div class="clanek-card-content">
-      <h3 class="clanek-card-title">${escapeHtml(data.titulek)}</h3>
-      ${datum ? `<div class="clanek-card-date">${datum}</div>` : ''}
-      ${data.perex ? `<div class="clanek-card-perex">${escapeHtml(data.perex)}</div>` : ''}
-      <span class="clanek-card-link">Číst dále</span>
-    </div>
-  `;
-
-  return card;
-}
-
-// ============================================================
-// UTILITY
-// ============================================================
-function escapeHtml(text) {
-  const div = document.createElement('div');
-  div.textContent = text;
-  return div.innerHTML;
 }

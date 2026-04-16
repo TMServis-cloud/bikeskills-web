@@ -119,7 +119,6 @@ async function parseWordPressXml(xmlPath) {
   console.log(`📊 Found ${items.length} items in XML`);
 
   const posts = [];
-  const events = [];
   const teamMembers = [];
   const pages = [];
 
@@ -197,15 +196,12 @@ async function parseWordPressXml(xmlPath) {
     const isTeamType = postType === 'team';
     const isTeamPost = postType === 'post' && catLower.includes('team') && !catLower.includes('novinka');
 
-    // Events: category 'akce' OR known event post types OR title keywords
-    const isEventCat = catLower.includes('akce') || catLower.includes('vsechny-akce');
-    const isEventType = ['udesly_evt', 'events', 'tribe_events', 'akce'].includes(postType);
-    const isEventTitle = /exhibic|camp|workshop|příměstský tábor|příměstský camp|kurz/i.test(title);
+    // Poznámka: Akce (kurzy, campy, exhibice) jsou spravovány ručně přes admin panel.
+    // WP export neobsahuje strukturovaná data událostí — obsahuje jen blog reporty o
+    // proběhlých akcích. Všechny posty jdou do 'clanky'. Kolekce 'akce' se plní přes admin.
 
     if (isTeamType || isTeamPost) {
       teamMembers.push(parsedItem);
-    } else if (isEventType || (postType === 'post' && (isEventCat || isEventTitle))) {
-      events.push(parsedItem);
     } else if (postType === 'post') {
       posts.push(parsedItem);
     } else {
@@ -226,7 +222,7 @@ async function parseWordPressXml(xmlPath) {
   }
 
   // Replace thumbnail IDs with actual URLs
-  for (const item of [...posts, ...events, ...teamMembers]) {
+  for (const item of [...posts, ...teamMembers]) {
     if (item.imageUrl && attachmentMap[item.imageUrl]) {
       item.imageUrl = attachmentMap[item.imageUrl];
     } else if (item.imageUrl && !item.imageUrl.startsWith('http')) {
@@ -245,18 +241,17 @@ async function parseWordPressXml(xmlPath) {
   }
   const dedupedTeam = Array.from(teamMap.values());
 
-  return { posts, events, teamMembers: dedupedTeam, pages, attachments: Object.values(attachmentMap) };
+  return { posts, teamMembers: dedupedTeam, pages, attachments: Object.values(attachmentMap) };
 }
 
 // ============================================================
 // IMPORT TO FIRESTORE
 // ============================================================
 async function importToFirestore(data) {
-  const { posts, events, teamMembers, pages } = data;
+  const { posts, teamMembers, pages } = data;
 
   console.log(`\n📥 Importing to Firestore...`);
   console.log(`   Články (posts): ${posts.length}`);
-  console.log(`   Akce (events): ${events.length}`);
   console.log(`   Team: ${teamMembers.length}`);
   console.log(`   Stránky (pages): ${pages.length} (skipped)`);
 
@@ -282,42 +277,6 @@ async function importToFirestore(data) {
       console.log(`   ✅ ${post.title}`);
     } catch (error) {
       console.error(`   ❌ ${post.title}: ${error.message}`);
-    }
-  }
-
-  // Import events (events → akce collection)
-  console.log('\n🗓️ Importing akce...');
-  for (const event of events) {
-    try {
-      const datumSort = event.date ? event.date.toISOString().split('T')[0] : '';
-      const datumText = event.date
-        ? event.date.toLocaleDateString('cs-CZ', { day: '2-digit', month: '2-digit', year: 'numeric' })
-        : '';
-
-      const docData = {
-        nazev: event.title,
-        datum: event.date,
-        datumSort: datumSort,
-        datumText: datumText,
-        uroven: '', // Will need to be set manually
-        popis: stripHtml(event.content),
-        cena: null, // Will need to be set manually
-        mena: 'CZK',
-        stav: 'odjeto', // Default to "odjeto" for imported events, adjust as needed
-        stavLabel: 'Odjeto',
-        kategorie: guessCategory(event),
-        slug: event.slug,
-        imageUrl: event.imageUrl || '',
-        aktivni: true,
-        wpLink: event.link,
-        createdAt: admin.firestore.FieldValue.serverTimestamp(),
-        updatedAt: admin.firestore.FieldValue.serverTimestamp()
-      };
-
-      await db.collection('akce').add(docData);
-      console.log(`   ✅ ${event.title}`);
-    } catch (error) {
-      console.error(`   ❌ ${event.title}: ${error.message}`);
     }
   }
 
@@ -371,21 +330,6 @@ async function importToFirestore(data) {
 }
 
 // ============================================================
-// HELPERS
-// ============================================================
-function guessCategory(event) {
-  const title = (event.title || '').toLowerCase();
-  const content = (event.content || '').toLowerCase();
-  const text = title + ' ' + content;
-
-  if (text.includes('trial')) return 'trialovy';
-  if (text.includes('camp') || text.includes('ladí') || text.includes('ladi')) return 'camp';
-  if (text.includes('workshop')) return 'workshop';
-  if (text.includes('kurz')) return 'kurz';
-  return 'jine';
-}
-
-// ============================================================
 // MAIN
 // ============================================================
 async function main() {
@@ -396,18 +340,15 @@ async function main() {
 
   console.log(`\n📊 Summary:`);
   console.log(`   Posts (→ články): ${data.posts.length}`);
-  console.log(`   Events (→ akce): ${data.events.length}`);
+  console.log(`   Team: ${data.teamMembers.length}`);
   console.log(`   Pages: ${data.pages.length}`);
   console.log(`   Attachments: ${data.attachments.length}`);
+  console.log(`   Akce: spravovány ručně přes admin panel`);
 
   // Show what we found
   if (data.posts.length > 0) {
     console.log('\n📝 Články:');
     data.posts.forEach(p => console.log(`   - ${p.title} (${p.slug})`));
-  }
-  if (data.events.length > 0) {
-    console.log('\n🗓️ Akce:');
-    data.events.forEach(e => console.log(`   - ${e.title} (${e.slug})`));
   }
 
   // Ask for confirmation before importing
