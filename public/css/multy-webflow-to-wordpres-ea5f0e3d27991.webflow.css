@@ -7114,6 +7114,46 @@ blockquote {
   padding-left: 30px;
 }
 
+.dropdown-link.w--current {
+  color: #fff;
+}
+
+/* W-richtext content headings, links, lists */
+.w-richtext h2 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin: 1.75rem 0 0.6rem;
+  color: var(--bílo-seda);
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+.w-richtext h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 1.25rem 0 0.4rem;
+  color: var(--bílo-seda);
+}
+.w-richtext p {
+  margin: 0 0 0.85rem;
+}
+.w-richtext a {
+  color: #5b9bd5;
+  text-decoration: underline;
+}
+.w-richtext a:hover {
+  color: #2d60ab;
+}
+.w-richtext ul, .w-richtext ol {
+  padding-left: 1.5rem;
+  margin-bottom: 0.85rem;
+}
+.w-richtext li {
+  margin-bottom: 0.3rem;
+}
+.w-richtext strong, .w-richtext b {
+  font-weight: 700;
+}
+
 .apple-pay {
   border-radius: 4rem;
 }

@@ -148,11 +148,18 @@ function renderAkceItem(template, data) {
 
   const cenaEl = item.querySelector('.akce-cena, [acf\\:text="price"]');
   if (cenaEl) {
-    cenaEl.textContent = data.cena ? data.cena.toLocaleString('cs-CZ') : '';
-    cenaEl.classList.remove('w-dyn-bind-empty');
-    if (!data.cena) {
+    if (data.cena) {
+      cenaEl.textContent = data.cena.toLocaleString('cs-CZ');
+      cenaEl.classList.remove('w-dyn-bind-empty');
+    } else {
+      // Nahraď cenu odkazem na individuální kurzy
       const after = cenaEl.nextElementSibling;
       if (after && after.classList.contains('akce-cena-after')) after.style.display = 'none';
+      const popisEl = cenaEl.previousElementSibling;
+      if (popisEl && popisEl.classList.contains('akce-popis')) popisEl.style.display = 'none';
+      cenaEl.textContent = 'individuální kurzy →';
+      cenaEl.style.cssText = 'font-size:0.8em;letter-spacing:0.03em;opacity:0.85;';
+      cenaEl.classList.remove('w-dyn-bind-empty');
     }
   }
 
@@ -165,14 +172,20 @@ async function loadAkcePreview() {
   const { itemsList, template, emptyEl } = wfl;
 
   try {
-    const snapshot = await db.collection('akce')
-      .orderBy('datumSort', 'asc')
-      .get();
+    const snapshot = await db.collection('akce').get();
+    const today = new Date();
+    const todayStr = `${today.getFullYear()}${String(today.getMonth() + 1).padStart(2, '0')}${String(today.getDate()).padStart(2, '0')}`;
 
-    const docs = snapshot.docs
-      .map(d => d.data())
-      .filter(d => d.aktivni !== false)
-      .slice(0, 6);
+    const all = snapshot.docs.map(d => d.data()).filter(d => d.aktivni !== false);
+    // Nejbližší nadcházející akce seřazené od nejbližšího data
+    const upcoming = all
+      .filter(d => String(d.datumSort || '0') >= todayStr)
+      .sort((a, b) => String(a.datumSort || '0').localeCompare(String(b.datumSort || '0')));
+    // Pokud je málo nadcházejících, doplníme nedávno proběhlé
+    const past = all
+      .filter(d => String(d.datumSort || '0') < todayStr)
+      .sort((a, b) => String(b.datumSort || '0').localeCompare(String(a.datumSort || '0')));
+    const docs = [...upcoming, ...past].slice(0, 6);
 
     if (!docs.length) { toggleEmpty(emptyEl, false); itemsList.innerHTML = ''; return; }
 
@@ -190,7 +203,8 @@ async function loadAkcePreview() {
 let allAkceData = [];
 let currentAkcePage = 1;
 let akceYearFilter = 'all';
-let akceStatusFilter = 'all';
+let akceZamereniFilter = 'all';
+let akceCenaFilter = 'all';
 
 function getYearFromDatumSort(datumSort) {
   if (!datumSort) return null;
@@ -254,16 +268,30 @@ function makeSep() {
   return s;
 }
 
-function buildAkceFilterBar(bar, years) {
+function makeGenericSelect(options, currentVal, onChange) {
+  const sel = document.createElement('select');
+  sel.setAttribute('style', SELECT_STYLE);
+  options.forEach(([val, label]) => {
+    const opt = document.createElement('option');
+    opt.value = val;
+    opt.textContent = label;
+    if (val === currentVal) opt.selected = true;
+    sel.appendChild(opt);
+  });
+  sel.addEventListener('change', () => onChange(sel.value));
+  return sel;
+}
+
+function buildAkceFilterBar(bar, years, typy) {
   bar.innerHTML = '';
 
   bar.appendChild(makeYearSelect(years, akceYearFilter, v => { akceYearFilter = v; currentAkcePage = 1; renderAkceListPage(); }));
 
-  bar.appendChild(makeSep());
+  const zamereniOpts = [['all', 'Všechna zaměření'], ...typy.map(t => [t, t])];
+  bar.appendChild(makeGenericSelect(zamereniOpts, akceZamereniFilter, v => { akceZamereniFilter = v; currentAkcePage = 1; renderAkceListPage(); }));
 
-  bar.appendChild(makeBtn('Vše', akceStatusFilter === 'all', () => { akceStatusFilter = 'all'; currentAkcePage = 1; renderAkceListPage(); }));
-  bar.appendChild(makeBtn('Aktuální', akceStatusFilter === 'aktualni', () => { akceStatusFilter = 'aktualni'; currentAkcePage = 1; renderAkceListPage(); }));
-  bar.appendChild(makeBtn('Odjeto', akceStatusFilter === 'odjeto', () => { akceStatusFilter = 'odjeto'; currentAkcePage = 1; renderAkceListPage(); }));
+  const cenaOpts = [['all', 'Jakákoliv cena'], ['scena', 'S cenou'], ['zdarma', 'Zdarma / ind.']];
+  bar.appendChild(makeGenericSelect(cenaOpts, akceCenaFilter, v => { akceCenaFilter = v; currentAkcePage = 1; renderAkceListPage(); }));
 }
 
 function buildClankyFilterBar(bar, years) {
@@ -306,6 +334,7 @@ const PAGE_SIZE = 12;
 
 let _akceFilterBar = null;
 let _akceYears = [];
+let _akceTypy = [];
 let _akcePrevBtn = null;
 let _akceNextBtn = null;
 let _akceItemsList = null;
@@ -316,8 +345,9 @@ function getFilteredAkce() {
   return allAkceData.filter(d => {
     const year = getYearFromDatumSort(d.datumSort);
     if (akceYearFilter !== 'all' && year !== akceYearFilter) return false;
-    if (akceStatusFilter === 'odjeto' && !isAkceOdjeto(d)) return false;
-    if (akceStatusFilter === 'aktualni' && isAkceOdjeto(d)) return false;
+    if (akceZamereniFilter !== 'all' && (d.typAkce || '') !== akceZamereniFilter) return false;
+    if (akceCenaFilter === 'scena' && !d.cena) return false;
+    if (akceCenaFilter === 'zdarma' && d.cena) return false;
     return true;
   });
 }
@@ -325,7 +355,7 @@ function getFilteredAkce() {
 function renderAkceListPage() {
   if (!_akceItemsList || !_akceTemplate) return;
 
-  buildAkceFilterBar(_akceFilterBar, _akceYears);
+  buildAkceFilterBar(_akceFilterBar, _akceYears, _akceTypy);
 
   const filtered = getFilteredAkce();
   const start = (currentAkcePage - 1) * PAGE_SIZE;
@@ -369,15 +399,21 @@ async function loadAkceList() {
   );
 
   try {
-    const snapshot = await db.collection('akce').orderBy('datumSort', 'desc').get();
-    allAkceData = snapshot.docs.map(d => d.data()).filter(d => d.aktivni !== false);
+    // Bez orderBy — Firestore vylučuje dokumenty bez indexovaného pole
+    const snapshot = await db.collection('akce').get();
+    allAkceData = snapshot.docs.map(d => d.data())
+      .filter(d => d.aktivni !== false)
+      .sort((a, b) => String(b.datumSort || '0').localeCompare(String(a.datumSort || '0')));
 
     const yearSet = new Set();
+    const typSet = new Set();
     allAkceData.forEach(d => {
       const y = getYearFromDatumSort(d.datumSort);
       if (y) yearSet.add(y);
+      if (d.typAkce) typSet.add(d.typAkce);
     });
     _akceYears = Array.from(yearSet).sort((a, b) => b - a);
+    _akceTypy = Array.from(typSet).sort();
 
     renderAkceListPage();
   } catch (err) {
@@ -696,33 +732,38 @@ async function loadClanekDetail(slug) {
       }
     }
 
-    // YouTube video
-    const videoEl = document.querySelector('.div-block-328 .w-video.w-embed');
-    if (videoEl) {
-      const embedUrl = youtubeEmbedUrl(data.videoUrl);
-      if (embedUrl) {
-        videoEl.style.cssText = 'position:relative;padding-bottom:56.25%;height:0;overflow:hidden;';
-        videoEl.innerHTML = `<iframe src="${embedUrl}" frameborder="0" allowfullscreen loading="lazy" style="position:absolute;top:0;left:0;width:100%;height:100%;"></iframe>`;
-        videoEl.classList.remove('w-dyn-bind-empty');
-      } else {
-        const wrap = videoEl.parentElement;
-        if (wrap) wrap.style.display = 'none';
+    // YouTube video — vložíme pod obsah jako plná šířka
+    const divBlock328 = document.querySelector('.div-block-328');
+    const embedUrl = youtubeEmbedUrl(data.videoUrl);
+    if (embedUrl) {
+      // Přesun videa pod obsah (div-block-325) místo do side sloupce
+      const contentParent = document.querySelector('.div-block-325');
+      if (contentParent) {
+        const videoDiv = document.createElement('div');
+        videoDiv.style.cssText = 'position:relative;padding-bottom:56.25%;height:0;overflow:hidden;margin-top:1.5rem;width:100%;';
+        videoDiv.innerHTML = `<iframe src="${embedUrl}" frameborder="0" allowfullscreen loading="lazy" style="position:absolute;top:0;left:0;width:100%;height:100%;"></iframe>`;
+        contentParent.appendChild(videoDiv);
       }
+      if (divBlock328) divBlock328.style.display = 'none';
+    } else {
+      if (divBlock328) divBlock328.style.display = 'none';
     }
 
-    // Galerie fotografií — CSS grid
+    // Galerie fotografií — zachová CSS grid z Webflow (1fr 1fr 1fr 1fr), opraví min-width
     const galItems = document.querySelector('.collection-list-wrapper-6 .collection-list-13.w-dyn-items');
     const galTemplate = galItems ? galItems.querySelector('.collection-item-7.w-dyn-item') : null;
     if (galItems && galTemplate) {
       if (galerie.length) {
-        galItems.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:0.75rem;';
         galItems.innerHTML = '';
         galerie.forEach(url => {
           const gi = galTemplate.cloneNode(true);
+          gi.style.minWidth = '0';  // přebije min-width:100% z Webflow CSS
+          const innerDiv = gi.querySelector('.div-block-342');
+          if (innerDiv) innerDiv.style.minWidth = '0';
           const gImg = gi.querySelector('img.image-54, img');
           if (gImg) {
             gImg.src = url; gImg.alt = data.titulek || '';
-            gImg.style.cssText = 'width:100%;height:200px;object-fit:cover;display:block;';
+            gImg.style.cssText = 'width:100%;aspect-ratio:4/3;object-fit:cover;display:block;min-width:0;';
             gImg.classList.remove('w-dyn-bind-empty');
           }
           galItems.appendChild(gi);
