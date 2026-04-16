@@ -26,8 +26,12 @@ const storage = firebase.storage();
 // ============================================================
 // STATE
 // ============================================================
-let quillEditor = null;
+let quillEditor = null;       // editor pro obsah článku
+let quillAkcePopis = null;   // editor pro popis akce
 let currentDeleteTarget = null; // { collection, id, name }
+let akceGalerieUrls = [];   // pole URL fotek pro galerii akce
+let clanekGalerieUrls = []; // pole URL fotek pro galerii článku
+const GALLERY_MAX = 20;
 const STATUS_LABELS = {
   otevreno: 'Otevřeno',
   prihlasujte: 'Přihlašujte se',
@@ -56,22 +60,55 @@ function showDashboard(user) {
   document.getElementById('admin-dashboard').style.display = 'flex';
   document.getElementById('user-email').textContent = user.email;
   
-  // Initialize Quill editor
+  // Quill image handler — nahraje obrázek do Firebase Storage a vloží URL
+  function makeQuillImageHandler(quill, uploadFolder) {
+    return function() {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = 'image/*';
+      input.click();
+      input.onchange = async () => {
+        const file = input.files[0];
+        if (!file) return;
+        try {
+          const url = await uploadImage(file, uploadFolder);
+          const range = quill.getSelection(true);
+          quill.insertEmbed(range.index, 'image', url);
+          quill.setSelection(range.index + 1);
+        } catch (err) {
+          showToast('Chyba nahrávání obrázku: ' + err.message, 'error');
+        }
+      };
+    };
+  }
+
+  const toolbarOptions = [
+    [{ 'header': [1, 2, 3, false] }],
+    ['bold', 'italic', 'underline', 'strike'],
+    [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+    ['link', 'image'],
+    ['blockquote'],
+    ['clean']
+  ];
+
+  // Editor pro obsah článku
   if (!quillEditor) {
     quillEditor = new Quill('#clanek-editor', {
       theme: 'snow',
-      modules: {
-        toolbar: [
-          [{ 'header': [1, 2, 3, false] }],
-          ['bold', 'italic', 'underline', 'strike'],
-          [{ 'list': 'ordered' }, { 'list': 'bullet' }],
-          ['link', 'image'],
-          ['blockquote', 'code-block'],
-          ['clean']
-        ]
-      },
+      modules: { toolbar: { container: toolbarOptions, handlers: {} } },
       placeholder: 'Obsah článku...'
     });
+    quillEditor.getModule('toolbar').addHandler('image', makeQuillImageHandler(quillEditor, 'blog/content'));
+  }
+
+  // Editor pro popis akce
+  if (!quillAkcePopis) {
+    quillAkcePopis = new Quill('#akce-popis-editor', {
+      theme: 'snow',
+      modules: { toolbar: { container: toolbarOptions, handlers: {} } },
+      placeholder: 'Popis akce...'
+    });
+    quillAkcePopis.getModule('toolbar').addHandler('image', makeQuillImageHandler(quillAkcePopis, 'akce/content'));
   }
 
   // Load data
@@ -194,24 +231,116 @@ async function loadAkce() {
   }
 }
 
-// Pomocná funkce: vymaže galerii v formuláři
-function clearAkceGallery() {
-  [1,2,3,4].forEach(n => {
-    const urlEl = document.getElementById(`akce-galerie${n}`);
-    const prevEl = document.getElementById(`akce-g${n}-preview`);
-    if (urlEl) urlEl.value = '';
-    if (prevEl) prevEl.innerHTML = '';
+// ============================================================
+// DYNAMIC GALLERY
+// ============================================================
+
+/** Vyrendruje dynamickou galerii do containeru */
+function renderGallery(containerId, urls) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  container.innerHTML = '';
+  urls.forEach((url, idx) => {
+    if (!url) return;
+    const div = document.createElement('div');
+    div.className = 'gallery-dynamic-item';
+    div.innerHTML = `
+      <img src="${escapeHtml(url)}" alt="Foto ${idx + 1}" loading="lazy">
+      <button type="button" class="gallery-remove-btn" title="Odebrat fotku" data-idx="${idx}">&times;</button>
+    `;
+    container.appendChild(div);
   });
+  // Disable upload button at max
+  const prefix = containerId.replace('-gallery-items', '');
+  const fileLabel = document.getElementById(`${prefix}-gallery-file-label`);
+  if (fileLabel) fileLabel.style.opacity = urls.length >= GALLERY_MAX ? '0.4' : '';
+}
+
+function renderAkceGallery() { renderGallery('akce-gallery-items', akceGalerieUrls); }
+function renderClanekGallery() { renderGallery('clanek-gallery-items', clanekGalerieUrls); }
+
+function clearAkceGallery() {
+  akceGalerieUrls = [];
+  renderAkceGallery();
 }
 
 function clearClanekGallery() {
-  [1,2,3,4].forEach(n => {
-    const urlEl = document.getElementById(`clanek-galerie${n}`);
-    const prevEl = document.getElementById(`clanek-g${n}-preview`);
-    if (urlEl) urlEl.value = '';
-    if (prevEl) prevEl.innerHTML = '';
-  });
+  clanekGalerieUrls = [];
+  renderClanekGallery();
 }
+
+// Delegovaný klik pro smazání fotky z galerie
+document.getElementById('akce-gallery-items').addEventListener('click', (e) => {
+  const btn = e.target.closest('.gallery-remove-btn');
+  if (!btn) return;
+  const idx = parseInt(btn.dataset.idx);
+  akceGalerieUrls.splice(idx, 1);
+  renderAkceGallery();
+});
+
+document.getElementById('clanek-gallery-items').addEventListener('click', (e) => {
+  const btn = e.target.closest('.gallery-remove-btn');
+  if (!btn) return;
+  const idx = parseInt(btn.dataset.idx);
+  clanekGalerieUrls.splice(idx, 1);
+  renderClanekGallery();
+});
+
+// Nahrání souborů do galerie
+document.getElementById('akce-gallery-file').addEventListener('change', async (e) => {
+  const files = Array.from(e.target.files);
+  e.target.value = '';
+  const remaining = GALLERY_MAX - akceGalerieUrls.length;
+  const toUpload = files.slice(0, remaining);
+  if (!toUpload.length) return;
+  showToast(`Nahrávám ${toUpload.length} fotek...`);
+  for (const file of toUpload) {
+    try {
+      const url = await uploadImage(file, 'akce/gallery');
+      akceGalerieUrls.push(url);
+      renderAkceGallery();
+    } catch (err) {
+      showToast('Chyba nahrávání: ' + err.message, 'error');
+    }
+  }
+});
+
+document.getElementById('clanek-gallery-file').addEventListener('change', async (e) => {
+  const files = Array.from(e.target.files);
+  e.target.value = '';
+  const remaining = GALLERY_MAX - clanekGalerieUrls.length;
+  const toUpload = files.slice(0, remaining);
+  if (!toUpload.length) return;
+  showToast(`Nahrávám ${toUpload.length} fotek...`);
+  for (const file of toUpload) {
+    try {
+      const url = await uploadImage(file, 'blog/gallery');
+      clanekGalerieUrls.push(url);
+      renderClanekGallery();
+    } catch (err) {
+      showToast('Chyba nahrávání: ' + err.message, 'error');
+    }
+  }
+});
+
+// Přidání URL do galerie
+document.getElementById('akce-gallery-add-url').addEventListener('click', () => {
+  const input = document.getElementById('akce-gallery-url-input');
+  const url = input.value.trim();
+  if (!url || akceGalerieUrls.length >= GALLERY_MAX) return;
+  akceGalerieUrls.push(url);
+  input.value = '';
+  renderAkceGallery();
+});
+
+document.getElementById('clanek-gallery-add-url').addEventListener('click', () => {
+  const input = document.getElementById('clanek-gallery-url-input');
+  const url = input.value.trim();
+  if (!url || clanekGalerieUrls.length >= GALLERY_MAX) return;
+  clanekGalerieUrls.push(url);
+  input.value = '';
+  renderClanekGallery();
+});
 
 // New akce
 document.getElementById('btn-new-akce').addEventListener('click', () => {
@@ -219,6 +348,7 @@ document.getElementById('btn-new-akce').addEventListener('click', () => {
   document.getElementById('form-akce').reset();
   document.getElementById('akce-aktivni').checked = true;
   document.getElementById('akce-image-preview').innerHTML = '';
+  if (quillAkcePopis) quillAkcePopis.setContents([]);
   clearAkceGallery();
   document.getElementById('modal-akce-title').textContent = 'Nová akce';
   openModal('modal-akce');
@@ -242,21 +372,25 @@ async function editAkce(id) {
     document.getElementById('akce-uroven').value = data.uroven || '';
     document.getElementById('akce-cena').value = data.cena || '';
     document.getElementById('akce-stav').value = data.stav || 'otevreno';
-    document.getElementById('akce-popis').value = data.popis || '';
     document.getElementById('akce-slug').value = data.slug || '';
     document.getElementById('akce-aktivni').checked = data.aktivni !== false;
     document.getElementById('akce-image-url').value = data.imageUrl || '';
     document.getElementById('akce-video-url').value = data.videoUrl || '';
     document.getElementById('akce-instagram-url').value = data.instagramUrl || '';
 
-    // Galerie
-    [1,2,3,4].forEach(n => {
-      const urlEl = document.getElementById(`akce-galerie${n}`);
-      const prevEl = document.getElementById(`akce-g${n}-preview`);
-      const val = data[`galerie${n}`] || '';
-      if (urlEl) urlEl.value = val;
-      if (prevEl) prevEl.innerHTML = val ? `<img src="${escapeHtml(val)}" alt="Foto ${n+1}">` : '';
-    });
+    // Popis do Quill editoru
+    if (quillAkcePopis) {
+      if (data.popis) quillAkcePopis.root.innerHTML = data.popis;
+      else quillAkcePopis.setContents([]);
+    }
+
+    // Galerie — podpora nového pole galerie[] i starých galerie1..4
+    if (data.galerie && data.galerie.length) {
+      akceGalerieUrls = data.galerie.filter(Boolean);
+    } else {
+      akceGalerieUrls = [data.galerie1, data.galerie2, data.galerie3, data.galerie4].filter(Boolean);
+    }
+    renderAkceGallery();
 
     // Show image preview
     const preview = document.getElementById('akce-image-preview');
@@ -293,18 +427,7 @@ document.getElementById('form-akce').addEventListener('submit', async (e) => {
 
     const nazev = document.getElementById('akce-nazev').value.trim();
     const slug = document.getElementById('akce-slug').value.trim() || generateSlug(nazev);
-
-    // Galerie — upload souborů pokud vybrány
-    const galerie = {};
-    for (const n of [1,2,3,4]) {
-      let gUrl = document.getElementById(`akce-galerie${n}`).value.trim();
-      const gFile = document.getElementById(`akce-g${n}-file`);
-      if (gFile && gFile.files.length > 0) {
-        gUrl = await uploadImage(gFile.files[0], 'akce/gallery');
-        document.getElementById(`akce-galerie${n}`).value = gUrl;
-      }
-      galerie[`galerie${n}`] = gUrl || null;
-    }
+    const popis = quillAkcePopis ? quillAkcePopis.root.innerHTML : '';
 
     const data = {
       nazev: nazev,
@@ -316,12 +439,12 @@ document.getElementById('form-akce').addEventListener('submit', async (e) => {
       mena: 'CZK',
       stav: document.getElementById('akce-stav').value,
       stavLabel: STATUS_LABELS[document.getElementById('akce-stav').value],
-      popis: document.getElementById('akce-popis').value.trim(),
+      popis: popis,
       slug: slug,
       imageUrl: imageUrl,
       videoUrl: document.getElementById('akce-video-url').value.trim() || null,
       instagramUrl: document.getElementById('akce-instagram-url').value.trim() || null,
-      ...galerie,
+      galerie: akceGalerieUrls.filter(Boolean),
       aktivni: document.getElementById('akce-aktivni').checked,
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     };
@@ -405,8 +528,8 @@ document.getElementById('btn-new-clanek').addEventListener('click', () => {
   document.getElementById('clanek-publikovano').checked = true;
   document.getElementById('clanek-autor').value = 'Bikeskills tým';
   document.getElementById('clanek-image-preview').innerHTML = '';
-  clearClanekGallery();
   if (quillEditor) quillEditor.setContents([]);
+  clearClanekGallery();
   document.getElementById('modal-clanek-title').textContent = 'Nový článek';
   openModal('modal-clanek');
 });
@@ -434,14 +557,13 @@ async function editClanek(id) {
     document.getElementById('clanek-video-url').value = data.videoUrl || '';
     document.getElementById('clanek-instagram-url').value = data.instagramUrl || '';
 
-    // Galerie
-    [1,2,3,4].forEach(n => {
-      const urlEl = document.getElementById(`clanek-galerie${n}`);
-      const prevEl = document.getElementById(`clanek-g${n}-preview`);
-      const val = data[`galerie${n}`] || '';
-      if (urlEl) urlEl.value = val;
-      if (prevEl) prevEl.innerHTML = val ? `<img src="${escapeHtml(val)}" alt="Foto ${n+1}">` : '';
-    });
+    // Galerie — podpora nového pole galerie[] i starých galerie1..4
+    if (data.galerie && data.galerie.length) {
+      clanekGalerieUrls = data.galerie.filter(Boolean);
+    } else {
+      clanekGalerieUrls = [data.galerie1, data.galerie2, data.galerie3, data.galerie4].filter(Boolean);
+    }
+    renderClanekGallery();
 
     // Load content into Quill
     if (quillEditor) {
@@ -489,18 +611,6 @@ document.getElementById('form-clanek').addEventListener('submit', async (e) => {
     const slug = document.getElementById('clanek-slug').value.trim() || generateSlug(titulek);
     const datumValue = document.getElementById('clanek-datum').value;
 
-    // Galerie — upload souborů pokud vybrány
-    const galerie = {};
-    for (const n of [1,2,3,4]) {
-      let gUrl = document.getElementById(`clanek-galerie${n}`).value.trim();
-      const gFile = document.getElementById(`clanek-g${n}-file`);
-      if (gFile && gFile.files.length > 0) {
-        gUrl = await uploadImage(gFile.files[0], 'blog/gallery');
-        document.getElementById(`clanek-galerie${n}`).value = gUrl;
-      }
-      galerie[`galerie${n}`] = gUrl || null;
-    }
-
     const data = {
       titulek: titulek,
       datum: datumValue ? new Date(datumValue) : null,
@@ -511,7 +621,7 @@ document.getElementById('form-clanek').addEventListener('submit', async (e) => {
       imageUrl: imageUrl,
       videoUrl: document.getElementById('clanek-video-url').value.trim() || null,
       instagramUrl: document.getElementById('clanek-instagram-url').value.trim() || null,
-      ...galerie,
+      galerie: clanekGalerieUrls.filter(Boolean),
       publikovano: document.getElementById('clanek-publikovano').checked,
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     };
@@ -723,44 +833,58 @@ function confirmDeleteTeam(id, name) {
 }
 
 // ============================================================
-// IMAGE UPLOAD
+// IMAGE COMPRESSION + UPLOAD
 // ============================================================
-async function uploadImage(file, folder) {
-  const timestamp = Date.now();
-  const safeName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
-  const path = `images/${folder}/${timestamp}_${safeName}`;
-  const ref = storage.ref(path);
 
+/** Zmenší obrázek na max. maxDim px a převede na WebP */
+async function compressToWebP(file, maxDim = 1920, quality = 0.85) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    const blobUrl = URL.createObjectURL(file);
+    img.onload = () => {
+      URL.revokeObjectURL(blobUrl);
+      let w = img.naturalWidth, h = img.naturalHeight;
+      if (w > maxDim || h > maxDim) {
+        if (w >= h) { h = Math.round(h * maxDim / w); w = maxDim; }
+        else { w = Math.round(w * maxDim / h); h = maxDim; }
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = w;
+      canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      canvas.toBlob(blob => resolve(blob || file), 'image/webp', quality);
+    };
+    img.onerror = () => { URL.revokeObjectURL(blobUrl); resolve(file); };
+    img.src = blobUrl;
+  });
+}
+
+async function uploadImage(file, folder) {
+  const compressed = await compressToWebP(file);
+  const timestamp = Date.now();
+  const baseName = file.name.replace(/\.[^.]+$/, '').replace(/[^a-zA-Z0-9-]/g, '_');
+  const filePath = `images/${folder}/${timestamp}_${baseName}.webp`;
+  const ref = storage.ref(filePath);
   showToast('Nahrávání obrázku...');
-  const snapshot = await ref.put(file);
-  const url = await snapshot.ref.getDownloadURL();
+  const snap = await ref.put(compressed, { contentType: 'image/webp' });
+  const url = await snap.ref.getDownloadURL();
   showToast('Obrázek nahrán ✓');
   return url;
 }
 
-// Image file change → preview
-document.querySelectorAll('.file-input').forEach(input => {
+// Hlavní obrázek — náhled při výběru souboru
+['akce-image-file', 'clanek-image-file', 'team-image-file'].forEach(inputId => {
+  const input = document.getElementById(inputId);
+  if (!input) return;
   input.addEventListener('change', (e) => {
     const file = e.target.files[0];
     if (!file) return;
-
-    // Galerie soubory mají id vzoru "akce-g1-file" → preview "akce-g1-preview"
-    // Hlavní soubory mají id vzoru "akce-image-file" → preview "akce-image-preview"
-    let previewId;
-    if (input.classList.contains('gallery-file')) {
-      previewId = input.id.replace('-file', '-preview');
-    } else {
-      previewId = input.id.replace('-file', '-preview');
-    }
-
+    const previewId = inputId.replace('-file', '-preview');
     const preview = document.getElementById(previewId);
-    if (preview) {
-      const reader = new FileReader();
-      reader.onload = (ev) => {
-        preview.innerHTML = `<img src="${ev.target.result}" alt="Preview">`;
-      };
-      reader.readAsDataURL(file);
-    }
+    if (!preview) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => { preview.innerHTML = `<img src="${ev.target.result}" alt="Preview">`; };
+    reader.readAsDataURL(file);
   });
 });
 

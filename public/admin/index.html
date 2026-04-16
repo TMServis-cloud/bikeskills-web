@@ -170,8 +170,8 @@
               </div>
 
               <div class="form-group">
-                <label for="akce-popis">Popis</label>
-                <textarea id="akce-popis" rows="5" placeholder="Popis akce..."></textarea>
+                <label>Popis akce</label>
+                <div id="akce-popis-editor" class="quill-editor"></div>
               </div>
 
               <div class="form-group">
@@ -188,36 +188,17 @@
               </div>
 
               <div class="form-group">
-                <label>Galerie (další fotky)</label>
-                <div class="gallery-grid">
-                  <div class="gallery-field">
-                    <label class="gallery-label">Foto 2</label>
-                    <input type="file" id="akce-g1-file" accept="image/*" class="file-input gallery-file">
-                    <label for="akce-g1-file" class="file-label file-label-sm">Nahrát</label>
-                    <input type="text" id="akce-galerie1" placeholder="URL foto 2" class="image-url-input">
-                    <div id="akce-g1-preview" class="image-preview image-preview-sm"></div>
-                  </div>
-                  <div class="gallery-field">
-                    <label class="gallery-label">Foto 3</label>
-                    <input type="file" id="akce-g2-file" accept="image/*" class="file-input gallery-file">
-                    <label for="akce-g2-file" class="file-label file-label-sm">Nahrát</label>
-                    <input type="text" id="akce-galerie2" placeholder="URL foto 3" class="image-url-input">
-                    <div id="akce-g2-preview" class="image-preview image-preview-sm"></div>
-                  </div>
-                  <div class="gallery-field">
-                    <label class="gallery-label">Foto 4</label>
-                    <input type="file" id="akce-g3-file" accept="image/*" class="file-input gallery-file">
-                    <label for="akce-g3-file" class="file-label file-label-sm">Nahrát</label>
-                    <input type="text" id="akce-galerie3" placeholder="URL foto 4" class="image-url-input">
-                    <div id="akce-g3-preview" class="image-preview image-preview-sm"></div>
-                  </div>
-                  <div class="gallery-field">
-                    <label class="gallery-label">Foto 5</label>
-                    <input type="file" id="akce-g4-file" accept="image/*" class="file-input gallery-file">
-                    <label for="akce-g4-file" class="file-label file-label-sm">Nahrát</label>
-                    <input type="text" id="akce-galerie4" placeholder="URL foto 5" class="image-url-input">
-                    <div id="akce-g4-preview" class="image-preview image-preview-sm"></div>
-                  </div>
+                <label>Galerie fotografií <span class="label-hint">(max. 20, automaticky převedeno na WebP)</span></label>
+                <div id="akce-gallery-items" class="gallery-dynamic-list"></div>
+                <div class="gallery-add-row">
+                  <input type="file" id="akce-gallery-file" accept="image/*" multiple class="file-input" style="display:none">
+                  <label for="akce-gallery-file" class="btn btn-ghost btn-sm" id="akce-gallery-file-label">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                    Nahrát fotky
+                  </label>
+                  <span class="gallery-hint">nebo zadejte URL:</span>
+                  <input type="text" id="akce-gallery-url-input" placeholder="https://..." class="image-url-input gallery-url-input">
+                  <button type="button" id="akce-gallery-add-url" class="btn btn-ghost btn-sm">Přidat</button>
                 </div>
               </div>
 
@@ -335,36 +316,17 @@
               </div>
 
               <div class="form-group">
-                <label>Galerie (další fotky)</label>
-                <div class="gallery-grid">
-                  <div class="gallery-field">
-                    <label class="gallery-label">Foto 2</label>
-                    <input type="file" id="clanek-g1-file" accept="image/*" class="file-input gallery-file">
-                    <label for="clanek-g1-file" class="file-label file-label-sm">Nahrát</label>
-                    <input type="text" id="clanek-galerie1" placeholder="URL foto 2" class="image-url-input">
-                    <div id="clanek-g1-preview" class="image-preview image-preview-sm"></div>
-                  </div>
-                  <div class="gallery-field">
-                    <label class="gallery-label">Foto 3</label>
-                    <input type="file" id="clanek-g2-file" accept="image/*" class="file-input gallery-file">
-                    <label for="clanek-g2-file" class="file-label file-label-sm">Nahrát</label>
-                    <input type="text" id="clanek-galerie2" placeholder="URL foto 3" class="image-url-input">
-                    <div id="clanek-g2-preview" class="image-preview image-preview-sm"></div>
-                  </div>
-                  <div class="gallery-field">
-                    <label class="gallery-label">Foto 4</label>
-                    <input type="file" id="clanek-g3-file" accept="image/*" class="file-input gallery-file">
-                    <label for="clanek-g3-file" class="file-label file-label-sm">Nahrát</label>
-                    <input type="text" id="clanek-galerie3" placeholder="URL foto 4" class="image-url-input">
-                    <div id="clanek-g3-preview" class="image-preview image-preview-sm"></div>
-                  </div>
-                  <div class="gallery-field">
-                    <label class="gallery-label">Foto 5</label>
-                    <input type="file" id="clanek-g4-file" accept="image/*" class="file-input gallery-file">
-                    <label for="clanek-g4-file" class="file-label file-label-sm">Nahrát</label>
-                    <input type="text" id="clanek-galerie4" placeholder="URL foto 5" class="image-url-input">
-                    <div id="clanek-g4-preview" class="image-preview image-preview-sm"></div>
-                  </div>
+                <label>Galerie fotografií <span class="label-hint">(max. 20, automaticky převedeno na WebP)</span></label>
+                <div id="clanek-gallery-items" class="gallery-dynamic-list"></div>
+                <div class="gallery-add-row">
+                  <input type="file" id="clanek-gallery-file" accept="image/*" multiple class="file-input" style="display:none">
+                  <label for="clanek-gallery-file" class="btn btn-ghost btn-sm" id="clanek-gallery-file-label">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                    Nahrát fotky
+                  </label>
+                  <span class="gallery-hint">nebo zadejte URL:</span>
+                  <input type="text" id="clanek-gallery-url-input" placeholder="https://..." class="image-url-input gallery-url-input">
+                  <button type="button" id="clanek-gallery-add-url" class="btn btn-ghost btn-sm">Přidat</button>
                 </div>
               </div>
 

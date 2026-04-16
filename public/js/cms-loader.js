@@ -208,47 +208,137 @@ async function loadAkceList() {
 }
 
 async function loadAkceDetail(slug) {
-  const container = document.getElementById('akce-detail');
-  if (!container) return;
+  const wfl = getWebflowList('.collection-list-wrapper-5');
+  if (!wfl) return;
+  const { itemsList, template, emptyEl } = wfl;
 
   try {
     const snapshot = await db.collection('akce').where('slug', '==', slug).limit(1).get();
-    if (snapshot.empty) { container.innerHTML = '<p>Akce nenalezena.</p>'; return; }
+    if (snapshot.empty) {
+      toggleEmpty(emptyEl, false);
+      itemsList.innerHTML = '';
+      return;
+    }
 
     const data = snapshot.docs[0].data();
-    const STATUS = { otevreno: 'Otevřeno', prihlasujte: 'Přihlašujte se', obsazeno: 'Obsazeno', odjeto: 'Odjeto' };
-    const stavLabel = STATUS[data.stav] || data.stavLabel || '';
-    const galerie = [data.galerie1, data.galerie2, data.galerie3, data.galerie4].filter(Boolean);
+    // Podpora nového formátu galerie[] i starého galerie1..4
+    const galerie = (data.galerie && data.galerie.length)
+      ? data.galerie.filter(Boolean)
+      : [data.galerie1, data.galerie2, data.galerie3, data.galerie4].filter(Boolean);
 
-    container.innerHTML = `
-      <div class="akce-detail-content">
-        ${data.imageUrl ? `<div class="akce-detail-image"><img src="${escapeHtml(data.imageUrl)}" alt="${escapeHtml(data.nazev)}" loading="lazy" style="width:100%;max-height:500px;object-fit:cover;border-radius:8px;"></div>` : ''}
-        <h1>${escapeHtml(data.nazev)}</h1>
-        <div class="akce-detail-meta" style="display:flex;flex-wrap:wrap;gap:1rem;margin:1rem 0;padding:1rem;background:#f5f5f5;border-radius:8px;">
-          ${data.datumText ? `<span><strong>Datum:</strong> ${escapeHtml(data.datumText)}</span>` : ''}
-          ${data.uroven ? `<span><strong>Úroveň:</strong> ${escapeHtml(data.uroven)}</span>` : ''}
-          ${data.cena ? `<span><strong>Cena:</strong> ${data.cena.toLocaleString('cs-CZ')} CZK</span>` : ''}
-          ${stavLabel ? `<span><strong>Stav:</strong> ${escapeHtml(stavLabel)}</span>` : ''}
-        </div>
-        <div class="akce-detail-description">${data.popis || ''}</div>
-        ${youtubeEmbedHtml(data.videoUrl)}
-        ${galleryHtml(galerie)}
-        ${data.instagramUrl ? `<div class="akce-instagram" style="margin:1.5rem 0;"><blockquote class="instagram-media" data-instgrm-captioned data-instgrm-permalink="${escapeHtml(data.instagramUrl)}" style="max-width:540px;margin:0 auto;"></blockquote></div>` : ''}
-      </div>
-    `;
+    // Nadpis stránky (typ akce)
+    const pageHeading = document.querySelector('.page-heading[acf\\:text="typ-akce"]');
+    if (pageHeading) {
+      pageHeading.textContent = data.typAkce || data.nazev || '';
+      pageHeading.classList.remove('w-dyn-bind-empty');
+    }
 
     document.title = `${data.nazev} | BIKESKILLS`;
 
-    // Načti Instagram embed script pokud potřeba
-    if (data.instagramUrl && !document.getElementById('ig-embed-script')) {
-      const s = document.createElement('script');
-      s.id = 'ig-embed-script';
-      s.src = 'https://www.instagram.com/embed.js';
-      s.async = true;
-      document.body.appendChild(s);
+    toggleEmpty(emptyEl, true);
+    itemsList.innerHTML = '';
+    const item = template.cloneNode(true);
+
+    // Název akce
+    const titleEl = item.querySelector('[item="title"]');
+    if (titleEl) { titleEl.textContent = data.nazev || ''; titleEl.classList.remove('w-dyn-bind-empty'); }
+
+    // Datum
+    const datumEl = item.querySelector('[acf\\:text="datum"]');
+    if (datumEl) { datumEl.textContent = data.datumText || ''; datumEl.classList.remove('w-dyn-bind-empty'); }
+
+    // Cena
+    const cenaEl = item.querySelector('[acf\\:text="price"]');
+    if (cenaEl) {
+      cenaEl.textContent = data.cena ? data.cena.toLocaleString('cs-CZ') : '';
+      cenaEl.classList.remove('w-dyn-bind-empty');
     }
+
+    // Typ/doba trvání
+    const dobaEl = item.querySelector('[acf\\:text="doba-trvani"]');
+    if (dobaEl) { dobaEl.textContent = data.typAkce || ''; dobaEl.classList.remove('w-dyn-bind-empty'); }
+
+    // Stav / obsazenost
+    const ridersEl = item.querySelector('[acf\\:text="riders-number"]');
+    if (ridersEl) { ridersEl.textContent = data.stavLabel || data.stav || ''; ridersEl.classList.remove('w-dyn-bind-empty'); }
+
+    // Úroveň
+    const levelEl = item.querySelector('[acf\\:text="akce-level"]');
+    if (levelEl) { levelEl.textContent = data.uroven || ''; levelEl.classList.remove('w-dyn-bind-empty'); }
+
+    // Hlavní obrázek
+    const imgEl = item.querySelector('img[item="featured-image"]');
+    if (imgEl) {
+      if (data.imageUrl) {
+        imgEl.src = data.imageUrl;
+        imgEl.alt = data.nazev || '';
+        imgEl.classList.remove('w-dyn-bind-empty');
+      } else {
+        imgEl.style.display = 'none';
+      }
+    }
+
+    // Obsah / popis
+    const contentEl = item.querySelector('[item="content"]');
+    if (contentEl) {
+      contentEl.innerHTML = data.popis || '';
+      contentEl.classList.remove('w-dyn-bind-empty');
+    }
+
+    // YouTube video
+    const videoEl = item.querySelector('.video-4');
+    if (videoEl) {
+      const embedUrl = youtubeEmbedUrl(data.videoUrl);
+      if (embedUrl) {
+        videoEl.innerHTML = `<iframe src="${embedUrl}" frameborder="0" allowfullscreen loading="lazy" style="position:absolute;top:0;left:0;width:100%;height:100%;"></iframe>`;
+        videoEl.classList.remove('w-dyn-bind-empty');
+      } else {
+        videoEl.style.display = 'none';
+      }
+    }
+
+    // Galerie fotografií
+    const galleryBlock = item.querySelector('.div-block-340');
+    if (galleryBlock) {
+      if (galerie.length) {
+        const galItems = galleryBlock.querySelector('.collection-list-15');
+        const galTemplate = galleryBlock.querySelector('.collection-item-8.w-dyn-item');
+        if (galItems && galTemplate) {
+          galItems.innerHTML = '';
+          galerie.forEach(url => {
+            const gi = galTemplate.cloneNode(true);
+            const gImg = gi.querySelector('img');
+            if (gImg) { gImg.src = url; gImg.alt = data.nazev || ''; }
+            galItems.appendChild(gi);
+          });
+        }
+      } else {
+        galleryBlock.style.display = 'none';
+      }
+    }
+
+    // Instagram embed
+    if (data.instagramUrl) {
+      const igDiv = document.createElement('div');
+      igDiv.style.cssText = 'margin:1.5rem 0;';
+      igDiv.innerHTML = `<blockquote class="instagram-media" data-instgrm-captioned data-instgrm-permalink="${escapeHtml(data.instagramUrl)}" style="max-width:540px;margin:0 auto;"></blockquote>`;
+      const akceDiv = item.querySelector('.akce');
+      if (akceDiv) akceDiv.appendChild(igDiv);
+      else item.appendChild(igDiv);
+
+      if (!document.getElementById('ig-embed-script')) {
+        const s = document.createElement('script');
+        s.id = 'ig-embed-script';
+        s.src = 'https://www.instagram.com/embed.js';
+        s.async = true;
+        document.body.appendChild(s);
+      }
+    }
+
+    itemsList.appendChild(item);
   } catch (err) {
     console.error('Chyba načítání akce detail:', err);
+    toggleEmpty(emptyEl, false);
   }
 }
 
@@ -330,7 +420,9 @@ async function loadClanekDetail(slug) {
     const datum = data.datum
       ? new Date(data.datum.seconds ? data.datum.seconds * 1000 : data.datum).toLocaleDateString('cs-CZ')
       : '';
-    const galerie = [data.galerie1, data.galerie2, data.galerie3, data.galerie4].filter(Boolean);
+    const galerie = (data.galerie && data.galerie.length)
+      ? data.galerie.filter(Boolean)
+      : [data.galerie1, data.galerie2, data.galerie3, data.galerie4].filter(Boolean);
 
     container.innerHTML = `
       <article>
