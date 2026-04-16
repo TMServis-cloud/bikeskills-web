@@ -165,7 +165,6 @@ async function loadAkcePreview() {
   const { itemsList, template, emptyEl } = wfl;
 
   try {
-    // Bez composite indexu: načteme vše seřazené dle datumSort, filtrujeme JS
     const snapshot = await db.collection('akce')
       .orderBy('datumSort', 'asc')
       .get();
@@ -185,23 +184,182 @@ async function loadAkcePreview() {
   }
 }
 
+// ============================================================
+// AKCE LIST — stránkování + filtr
+// ============================================================
+let allAkceData = [];
+let currentAkcePage = 1;
+let akceYearFilter = 'all';
+let akceStatusFilter = 'all';
+
+function getYearFromDatumSort(datumSort) {
+  if (!datumSort) return null;
+  const m = String(datumSort).match(/^(\d{4})/);
+  return m ? m[1] : null;
+}
+
+function isAkceOdjeto(data) {
+  if (!data.datumSort) return false;
+  const today = new Date();
+  const todayStr = `${today.getFullYear()}${String(today.getMonth() + 1).padStart(2, '0')}${String(today.getDate()).padStart(2, '0')}`;
+  return String(data.datumSort) < todayStr;
+}
+
+function injectFilterBar(id, beforeEl) {
+  let bar = document.getElementById(id);
+  if (!bar) {
+    bar = document.createElement('div');
+    bar.id = id;
+    bar.style.cssText = 'display:flex;flex-wrap:wrap;gap:0.5rem;align-items:center;padding:1rem 0 1.5rem;';
+    beforeEl.parentNode.insertBefore(bar, beforeEl);
+  }
+  return bar;
+}
+
+const BTN_STYLE = 'padding:0.35rem 1.1rem;border-radius:2rem;border:1.5px solid #545a4f;background:transparent;color:#d0d3c9;cursor:pointer;font-size:0.85rem;font-family:inherit;letter-spacing:0.03em;transition:background 0.2s,color 0.2s;';
+const BTN_ACTIVE_STYLE = 'padding:0.35rem 1.1rem;border-radius:2rem;border:1.5px solid #545a4f;background:#545a4f;color:#fff;cursor:pointer;font-size:0.85rem;font-family:inherit;letter-spacing:0.03em;transition:background 0.2s,color 0.2s;';
+const SEP_STYLE = 'width:1px;height:1.25rem;background:#545a4f;margin:0 0.25rem;align-self:center;flex-shrink:0;';
+
+function makeBtn(label, isActive, onClick) {
+  const btn = document.createElement('button');
+  btn.textContent = label;
+  btn.setAttribute('style', isActive ? BTN_ACTIVE_STYLE : BTN_STYLE);
+  btn.addEventListener('click', onClick);
+  return btn;
+}
+
+function makeSep() {
+  const s = document.createElement('span');
+  s.setAttribute('style', SEP_STYLE);
+  return s;
+}
+
+function buildAkceFilterBar(bar, years) {
+  bar.innerHTML = '';
+
+  bar.appendChild(makeBtn('Všechny roky', akceYearFilter === 'all', () => { akceYearFilter = 'all'; currentAkcePage = 1; renderAkceListPage(); }));
+  years.forEach(y => {
+    bar.appendChild(makeBtn(y, akceYearFilter === y, () => { akceYearFilter = y; currentAkcePage = 1; renderAkceListPage(); }));
+  });
+
+  bar.appendChild(makeSep());
+
+  bar.appendChild(makeBtn('Vše', akceStatusFilter === 'all', () => { akceStatusFilter = 'all'; currentAkcePage = 1; renderAkceListPage(); }));
+  bar.appendChild(makeBtn('Aktuální', akceStatusFilter === 'aktualni', () => { akceStatusFilter = 'aktualni'; currentAkcePage = 1; renderAkceListPage(); }));
+  bar.appendChild(makeBtn('Odjeto', akceStatusFilter === 'odjeto', () => { akceStatusFilter = 'odjeto'; currentAkcePage = 1; renderAkceListPage(); }));
+}
+
+function buildClankyFilterBar(bar, years) {
+  bar.innerHTML = '';
+
+  bar.appendChild(makeBtn('Všechny roky', clankyYearFilter === 'all', () => { clankyYearFilter = 'all'; currentClankyPage = 1; renderClankyListPage(); }));
+  years.forEach(y => {
+    bar.appendChild(makeBtn(y, clankyYearFilter === y, () => { clankyYearFilter = y; currentClankyPage = 1; renderClankyListPage(); }));
+  });
+}
+
+function wirePagination(prevBtn, nextBtn, getPage, setPage, getFiltered, render) {
+  if (prevBtn) {
+    prevBtn.style.cursor = 'pointer';
+    prevBtn.addEventListener('click', e => {
+      e.preventDefault();
+      if (getPage() > 1) { setPage(getPage() - 1); render(); }
+    });
+  }
+  if (nextBtn) {
+    nextBtn.style.cursor = 'pointer';
+    nextBtn.addEventListener('click', e => {
+      e.preventDefault();
+      const totalPages = Math.ceil(getFiltered().length / PAGE_SIZE);
+      if (getPage() < totalPages) { setPage(getPage() + 1); render(); }
+    });
+  }
+}
+
+function updatePaginationState(prevBtn, nextBtn, currentPage, totalItems) {
+  const totalPages = Math.ceil(totalItems / PAGE_SIZE);
+  if (prevBtn) prevBtn.style.display = currentPage > 1 ? '' : 'none';
+  if (nextBtn) nextBtn.style.display = currentPage < totalPages ? '' : 'none';
+}
+
+const PAGE_SIZE = 12;
+
+let _akceFilterBar = null;
+let _akceYears = [];
+let _akcePrevBtn = null;
+let _akceNextBtn = null;
+let _akceItemsList = null;
+let _akceTemplate = null;
+let _akceEmptyEl = null;
+
+function getFilteredAkce() {
+  return allAkceData.filter(d => {
+    const year = getYearFromDatumSort(d.datumSort);
+    if (akceYearFilter !== 'all' && year !== akceYearFilter) return false;
+    if (akceStatusFilter === 'odjeto' && !isAkceOdjeto(d)) return false;
+    if (akceStatusFilter === 'aktualni' && isAkceOdjeto(d)) return false;
+    return true;
+  });
+}
+
+function renderAkceListPage() {
+  if (!_akceItemsList || !_akceTemplate) return;
+
+  buildAkceFilterBar(_akceFilterBar, _akceYears);
+
+  const filtered = getFilteredAkce();
+  const start = (currentAkcePage - 1) * PAGE_SIZE;
+  const page = filtered.slice(start, start + PAGE_SIZE);
+
+  if (!page.length) {
+    toggleEmpty(_akceEmptyEl, false);
+    _akceItemsList.innerHTML = '';
+  } else {
+    toggleEmpty(_akceEmptyEl, true);
+    _akceItemsList.innerHTML = '';
+    page.forEach(data => _akceItemsList.appendChild(renderAkceItem(_akceTemplate, data)));
+  }
+
+  updatePaginationState(_akcePrevBtn, _akceNextBtn, currentAkcePage, filtered.length);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
 async function loadAkceList() {
   const wfl = getWebflowList('.collection-list-wrappe-campy');
   if (!wfl) return;
   const { itemsList, template, emptyEl } = wfl;
 
+  _akceItemsList = itemsList;
+  _akceTemplate = template;
+  _akceEmptyEl = emptyEl;
+
+  const listWrapper = document.querySelector('.collection-list-wrappe-campy');
+  _akceFilterBar = injectFilterBar('cms-akce-filters', listWrapper);
+
+  const paginationWrapper = document.querySelector('.w-pagination-wrapper.pagination');
+  _akcePrevBtn = paginationWrapper ? paginationWrapper.querySelector('.w-pagination-previous') : null;
+  _akceNextBtn = paginationWrapper ? paginationWrapper.querySelector('.w-pagination-next') : null;
+
+  wirePagination(
+    _akcePrevBtn, _akceNextBtn,
+    () => currentAkcePage,
+    p => { currentAkcePage = p; },
+    getFilteredAkce,
+    renderAkceListPage
+  );
+
   try {
-    const snapshot = await db.collection('akce')
-      .orderBy('datumSort', 'desc')
-      .get();
+    const snapshot = await db.collection('akce').orderBy('datumSort', 'desc').get();
+    allAkceData = snapshot.docs.map(d => d.data()).filter(d => d.aktivni !== false);
 
-    const docs = snapshot.docs.map(d => d.data()).filter(d => d.aktivni !== false);
+    const yearSet = new Set();
+    allAkceData.forEach(d => {
+      const y = getYearFromDatumSort(d.datumSort);
+      if (y) yearSet.add(y);
+    });
+    _akceYears = Array.from(yearSet).sort((a, b) => b - a);
 
-    if (!docs.length) { toggleEmpty(emptyEl, false); itemsList.innerHTML = ''; return; }
-
-    toggleEmpty(emptyEl, true);
-    itemsList.innerHTML = '';
-    docs.forEach(data => itemsList.appendChild(renderAkceItem(template, data)));
+    renderAkceListPage();
   } catch (err) {
     console.error('Chyba načítání akce list:', err);
   }
@@ -221,12 +379,10 @@ async function loadAkceDetail(slug) {
     }
 
     const data = snapshot.docs[0].data();
-    // Podpora nového formátu galerie[] i starého galerie1..4
     const galerie = (data.galerie && data.galerie.length)
       ? data.galerie.filter(Boolean)
       : [data.galerie1, data.galerie2, data.galerie3, data.galerie4].filter(Boolean);
 
-    // Nadpis stránky (typ akce)
     const pageHeading = document.querySelector('.page-heading[acf\\:text="typ-akce"]');
     if (pageHeading) {
       pageHeading.textContent = data.typAkce || data.nazev || '';
@@ -239,34 +395,27 @@ async function loadAkceDetail(slug) {
     itemsList.innerHTML = '';
     const item = template.cloneNode(true);
 
-    // Název akce
     const titleEl = item.querySelector('[item="title"]');
     if (titleEl) { titleEl.textContent = data.nazev || ''; titleEl.classList.remove('w-dyn-bind-empty'); }
 
-    // Datum
     const datumEl = item.querySelector('[acf\\:text="datum"]');
     if (datumEl) { datumEl.textContent = data.datumText || ''; datumEl.classList.remove('w-dyn-bind-empty'); }
 
-    // Cena
     const cenaEl = item.querySelector('[acf\\:text="price"]');
     if (cenaEl) {
       cenaEl.textContent = data.cena ? data.cena.toLocaleString('cs-CZ') : '';
       cenaEl.classList.remove('w-dyn-bind-empty');
     }
 
-    // Typ/doba trvání
     const dobaEl = item.querySelector('[acf\\:text="doba-trvani"]');
     if (dobaEl) { dobaEl.textContent = data.typAkce || ''; dobaEl.classList.remove('w-dyn-bind-empty'); }
 
-    // Stav / obsazenost
     const ridersEl = item.querySelector('[acf\\:text="riders-number"]');
     if (ridersEl) { ridersEl.textContent = data.stavLabel || data.stav || ''; ridersEl.classList.remove('w-dyn-bind-empty'); }
 
-    // Úroveň
     const levelEl = item.querySelector('[acf\\:text="akce-level"]');
     if (levelEl) { levelEl.textContent = data.uroven || ''; levelEl.classList.remove('w-dyn-bind-empty'); }
 
-    // Hlavní obrázek
     const imgEl = item.querySelector('img[item="featured-image"]');
     if (imgEl) {
       if (data.imageUrl) {
@@ -278,14 +427,12 @@ async function loadAkceDetail(slug) {
       }
     }
 
-    // Obsah / popis
     const contentEl = item.querySelector('[item="content"]');
     if (contentEl) {
       contentEl.innerHTML = data.popis || '';
       contentEl.classList.remove('w-dyn-bind-empty');
     }
 
-    // YouTube video
     const videoEl = item.querySelector('.video-4');
     if (videoEl) {
       const embedUrl = youtubeEmbedUrl(data.videoUrl);
@@ -297,7 +444,6 @@ async function loadAkceDetail(slug) {
       }
     }
 
-    // Galerie fotografií
     const galleryBlock = item.querySelector('.div-block-340');
     if (galleryBlock) {
       if (galerie.length) {
@@ -317,7 +463,6 @@ async function loadAkceDetail(slug) {
       }
     }
 
-    // Instagram embed
     if (data.instagramUrl) {
       const igDiv = document.createElement('div');
       igDiv.style.cssText = 'margin:1.5rem 0;';
@@ -375,7 +520,6 @@ async function loadClankyPreview() {
 
   try {
     const snapshot = await db.collection('clanky').orderBy('datum', 'desc').limit(4).get();
-
     const docs = snapshot.docs.map(d => d.data()).filter(d => d.publikovano !== false);
 
     if (!docs.length) { toggleEmpty(emptyEl, false); itemsList.innerHTML = ''; return; }
@@ -388,33 +532,103 @@ async function loadClankyPreview() {
   }
 }
 
+// ============================================================
+// ČLÁNKY LIST — stránkování + filtr
+// ============================================================
+let allClankyData = [];
+let currentClankyPage = 1;
+let clankyYearFilter = 'all';
+
+let _clankyFilterBar = null;
+let _clankyYears = [];
+let _clankyPrevBtn = null;
+let _clankyNextBtn = null;
+let _clankyItemsList = null;
+let _clankyTemplate = null;
+let _clankyEmptyEl = null;
+
+function getYearFromTimestamp(datum) {
+  if (!datum) return null;
+  try {
+    const d = datum.seconds ? new Date(datum.seconds * 1000) : new Date(datum);
+    return String(d.getFullYear());
+  } catch (e) { return null; }
+}
+
+function getFilteredClanky() {
+  return allClankyData.filter(d => {
+    if (clankyYearFilter === 'all') return true;
+    return getYearFromTimestamp(d.datum) === clankyYearFilter;
+  });
+}
+
+function renderClankyListPage() {
+  if (!_clankyItemsList || !_clankyTemplate) return;
+
+  buildClankyFilterBar(_clankyFilterBar, _clankyYears);
+
+  const filtered = getFilteredClanky();
+  const start = (currentClankyPage - 1) * PAGE_SIZE;
+  const page = filtered.slice(start, start + PAGE_SIZE);
+
+  if (!page.length) {
+    toggleEmpty(_clankyEmptyEl, false);
+    _clankyItemsList.innerHTML = '';
+  } else {
+    toggleEmpty(_clankyEmptyEl, true);
+    _clankyItemsList.innerHTML = '';
+    page.forEach(data => _clankyItemsList.appendChild(renderClanekItem(_clankyTemplate, data)));
+  }
+
+  updatePaginationState(_clankyPrevBtn, _clankyNextBtn, currentClankyPage, filtered.length);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
 async function loadClankyList() {
   const wfl = getWebflowList('.collection-list-blog');
   if (!wfl) return;
   const { itemsList, template, emptyEl } = wfl;
 
+  _clankyItemsList = itemsList;
+  _clankyTemplate = template;
+  _clankyEmptyEl = emptyEl;
+
+  const listWrapper = document.querySelector('.collection-list-blog');
+  _clankyFilterBar = injectFilterBar('cms-clanky-filters', listWrapper);
+
+  const paginationWrapper = document.querySelector('.w-pagination-wrapper.pagination');
+  _clankyPrevBtn = paginationWrapper ? paginationWrapper.querySelector('.w-pagination-previous') : null;
+  _clankyNextBtn = paginationWrapper ? paginationWrapper.querySelector('.w-pagination-next') : null;
+
+  wirePagination(
+    _clankyPrevBtn, _clankyNextBtn,
+    () => currentClankyPage,
+    p => { currentClankyPage = p; },
+    getFilteredClanky,
+    renderClankyListPage
+  );
+
   try {
     const snapshot = await db.collection('clanky').orderBy('datum', 'desc').get();
+    allClankyData = snapshot.docs.map(d => d.data()).filter(d => d.publikovano !== false);
 
-    const docs = snapshot.docs.map(d => d.data()).filter(d => d.publikovano !== false);
+    const yearSet = new Set();
+    allClankyData.forEach(d => {
+      const y = getYearFromTimestamp(d.datum);
+      if (y) yearSet.add(y);
+    });
+    _clankyYears = Array.from(yearSet).sort((a, b) => b - a);
 
-    if (!docs.length) { toggleEmpty(emptyEl, false); itemsList.innerHTML = ''; return; }
-
-    toggleEmpty(emptyEl, true);
-    itemsList.innerHTML = '';
-    docs.forEach(data => itemsList.appendChild(renderClanekItem(template, data)));
+    renderClankyListPage();
   } catch (err) {
     console.error('Chyba načítání clanky list:', err);
   }
 }
 
 async function loadClanekDetail(slug) {
-  const container = document.getElementById('clanek-detail');
-  if (!container) return;
-
   try {
     const snapshot = await db.collection('clanky').where('slug', '==', slug).limit(1).get();
-    if (snapshot.empty) { container.innerHTML = '<p>Článek nenalezen.</p>'; return; }
+    if (snapshot.empty) return;
 
     const data = snapshot.docs[0].data();
     const datum = data.datum
@@ -424,22 +638,93 @@ async function loadClanekDetail(slug) {
       ? data.galerie.filter(Boolean)
       : [data.galerie1, data.galerie2, data.galerie3, data.galerie4].filter(Boolean);
 
-    container.innerHTML = `
-      <article>
-        ${data.imageUrl ? `<div class="clanek-detail-image"><img src="${escapeHtml(data.imageUrl)}" alt="${escapeHtml(data.titulek)}" loading="lazy" style="width:100%;max-height:500px;object-fit:cover;border-radius:8px;margin-bottom:1.5rem;"></div>` : ''}
-        <h1>${escapeHtml(data.titulek)}</h1>
-        <div class="clanek-detail-meta" style="display:flex;gap:1rem;color:#888;margin-bottom:1.5rem;">
-          ${datum ? `<span>${datum}</span>` : ''}
-          ${data.autor ? `<span>${escapeHtml(data.autor)}</span>` : ''}
-        </div>
-        <div class="clanek-detail-body">${data.obsah || ''}</div>
-        ${youtubeEmbedHtml(data.videoUrl)}
-        ${galleryHtml(galerie)}
-        ${data.instagramUrl ? `<div class="clanek-instagram" style="margin:1.5rem 0;"><blockquote class="instagram-media" data-instgrm-captioned data-instgrm-permalink="${escapeHtml(data.instagramUrl)}" style="max-width:540px;margin:0 auto;"></blockquote></div>` : ''}
-      </article>
-    `;
-
     document.title = `${data.titulek} | BIKESKILLS`;
+
+    // Nadpis
+    const titleEl = document.querySelector('[item="title"].heading-83, .div-block-325 [item="title"]');
+    if (titleEl) { titleEl.textContent = data.titulek || ''; titleEl.classList.remove('w-dyn-bind-empty'); }
+
+    // Datum
+    const dateEl = document.querySelector('[item="date"].blog-date-author, .div-block-326 [item="date"]');
+    if (dateEl) { dateEl.textContent = datum; dateEl.classList.remove('w-dyn-bind-empty'); }
+
+    // Autor
+    const authorEl = document.querySelector('[item="author-display-name"].blog-date-author, .div-block-326 [item="author-display-name"]');
+    if (authorEl) { authorEl.textContent = data.autor || ''; authorEl.classList.remove('w-dyn-bind-empty'); }
+
+    // Obsah
+    const contentEl = document.querySelector('[item="content"].rich-text-block-3, .div-block-325 [item="content"]');
+    if (contentEl) { contentEl.innerHTML = data.obsah || ''; contentEl.classList.remove('w-dyn-bind-empty'); }
+
+    // Hlavní fotka
+    const imgEl = document.querySelector('.div-block-324 img[item="featured-image"], img[item="featured-image"].image-53');
+    if (imgEl) {
+      if (data.imageUrl) {
+        imgEl.src = data.imageUrl; imgEl.alt = data.titulek || '';
+        imgEl.classList.remove('w-dyn-bind-empty');
+        const wrap = imgEl.parentElement;
+        if (wrap) wrap.style.display = '';
+      } else {
+        const wrap = imgEl.parentElement;
+        if (wrap) wrap.style.display = 'none';
+      }
+    }
+
+    // YouTube video
+    const videoEl = document.querySelector('.div-block-328 .w-video.w-embed');
+    if (videoEl) {
+      const embedUrl = youtubeEmbedUrl(data.videoUrl);
+      if (embedUrl) {
+        videoEl.innerHTML = `<iframe src="${embedUrl}" frameborder="0" allowfullscreen loading="lazy" style="position:absolute;top:0;left:0;width:100%;height:100%;"></iframe>`;
+        videoEl.classList.remove('w-dyn-bind-empty');
+      } else {
+        const wrap = videoEl.parentElement;
+        if (wrap) wrap.style.display = 'none';
+      }
+    }
+
+    // Galerie fotografií
+    const galItems = document.querySelector('.collection-list-wrapper-6 .collection-list-13.w-dyn-items');
+    const galTemplate = galItems ? galItems.querySelector('.collection-item-7.w-dyn-item') : null;
+    if (galItems && galTemplate) {
+      if (galerie.length) {
+        galItems.innerHTML = '';
+        galerie.forEach(url => {
+          const gi = galTemplate.cloneNode(true);
+          const gImg = gi.querySelector('img.image-54, img');
+          if (gImg) { gImg.src = url; gImg.alt = data.titulek || ''; gImg.classList.remove('w-dyn-bind-empty'); }
+          galItems.appendChild(gi);
+        });
+        const emptyState = document.querySelector('.collection-list-wrapper-6 .w-dyn-empty');
+        if (emptyState) emptyState.style.display = 'none';
+      } else {
+        const galBlock = document.querySelector('.div-block-341');
+        if (galBlock) galBlock.style.display = 'none';
+      }
+    }
+
+    // Related posts
+    const relatedWfl = getWebflowList('.related-posts .collection-list-blog');
+    if (relatedWfl) {
+      try {
+        const relSnapshot = await db.collection('clanky')
+          .orderBy('datum', 'desc')
+          .limit(4)
+          .get();
+        const relDocs = relSnapshot.docs
+          .map(d => d.data())
+          .filter(d => d.slug !== slug && d.publikovano !== false)
+          .slice(0, 3);
+
+        if (relDocs.length) {
+          toggleEmpty(relatedWfl.emptyEl, true);
+          relatedWfl.itemsList.innerHTML = '';
+          relDocs.forEach(d => relatedWfl.itemsList.appendChild(renderClanekItem(relatedWfl.template, d)));
+        }
+      } catch (e) {
+        console.warn('Related posts error:', e);
+      }
+    }
 
     if (data.instagramUrl && !document.getElementById('ig-embed-script')) {
       const s = document.createElement('script');
@@ -509,20 +794,83 @@ async function loadTeamDetail(slug) {
     if (snapshot.empty) { container.innerHTML = '<p>Člen týmu nenalezen.</p>'; return; }
 
     const data = snapshot.docs[0].data();
+    const galerie = (data.galerie && data.galerie.length)
+      ? data.galerie.filter(Boolean)
+      : [];
 
+    document.title = `${data.jmeno} | BIKESKILLS`;
+
+    // Jméno
     const titleEl = container.querySelector('[item="title"]');
     if (titleEl) { titleEl.textContent = data.jmeno || ''; titleEl.classList.remove('w-dyn-bind-empty'); }
 
+    // Bio
     const contentEl = container.querySelector('[item="content"]');
     if (contentEl) { contentEl.innerHTML = data.popis || ''; contentEl.classList.remove('w-dyn-bind-empty'); }
 
-    const imgEl = container.querySelector('[item="featured-image"]');
-    if (imgEl && data.imageUrl) {
-      imgEl.src = data.imageUrl; imgEl.alt = data.jmeno || '';
-      imgEl.classList.remove('w-dyn-bind-empty');
+    // Hlavní fotka
+    const imgEl = container.querySelector('img[item="featured-image"]');
+    if (imgEl) {
+      if (data.imageUrl) {
+        imgEl.src = data.imageUrl; imgEl.alt = data.jmeno || '';
+        imgEl.classList.remove('w-dyn-bind-empty');
+      } else {
+        imgEl.style.display = 'none';
+      }
     }
 
-    document.title = `${data.jmeno} | BIKESKILLS`;
+    // Sociální sítě
+    const instaLink = container.querySelector('a[acf\\:url="instagram"]');
+    if (instaLink) {
+      if (data.instagram) { instaLink.href = data.instagram; instaLink.style.display = ''; }
+      else instaLink.style.display = 'none';
+    }
+    const fbLink = container.querySelector('a[acf\\:url="facebook"]');
+    if (fbLink) {
+      if (data.facebook) { fbLink.href = data.facebook; fbLink.style.display = ''; }
+      else fbLink.style.display = 'none';
+    }
+    const ytLink = container.querySelector('a[acf\\:url="youtube"]');
+    if (ytLink) {
+      if (data.youtube) { ytLink.href = data.youtube; ytLink.style.display = ''; }
+      else ytLink.style.display = 'none';
+    }
+
+    // Galerie — 8 slotů
+    for (let i = 1; i <= 8; i++) {
+      const imgSlot = container.querySelector(`img[acf\\:image="fotografie-${i}"]`);
+      const block = imgSlot ? imgSlot.closest('.photo-team-block') : null;
+      const url = galerie[i - 1];
+      if (imgSlot && url) {
+        imgSlot.src = url;
+        imgSlot.alt = data.jmeno || '';
+        if (block) block.style.display = '';
+      } else if (block) {
+        block.style.display = 'none';
+      }
+    }
+    // Skryj celý blok galerie pokud prázdný
+    const photosBlock = container.querySelector('.collection-photos');
+    if (photosBlock && !galerie.length) photosBlock.style.display = 'none';
+
+    // Videa
+    const videoUrls = [data.videoUrl, data.videoUrl2, data.videoUrl3].filter(Boolean);
+    const videoSelectors = ['.video.w-video.w-embed', '.video-3.w-video.w-embed', '.video-2.w-video.w-embed'];
+
+    videoSelectors.forEach((sel, idx) => {
+      const videoEl = container.querySelector(sel);
+      if (!videoEl) return;
+      const url = videoUrls[idx];
+      const embedUrl = url ? youtubeEmbedUrl(url) : null;
+      if (embedUrl) {
+        videoEl.innerHTML = `<iframe src="${embedUrl}" frameborder="0" allowfullscreen loading="lazy" style="position:absolute;top:0;left:0;width:100%;height:100%;"></iframe>`;
+        videoEl.classList.remove('w-dyn-bind-empty');
+        videoEl.style.display = '';
+      } else {
+        videoEl.style.display = 'none';
+      }
+    });
+
   } catch (err) {
     console.error('Chyba načítání člena týmu:', err);
   }
