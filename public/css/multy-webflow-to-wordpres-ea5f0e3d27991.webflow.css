@@ -7240,17 +7240,39 @@ body[page="blog"] .section-wrapper.kurzy-campy {
   color: var(--zluta) !important;
 }
 
-/* Hover animace karet akcí */
-.akce-box .image-55 {
-  transition: transform 0.4s ease;
+/* Akce hover — replika IX2 "Kurzy-campy hover": scale + žlutá + barvy */
+.collection-item-akce {
+  transition: transform 0.5s ease;
 }
-.akce-box:hover .image-55 {
-  transform: scale(1.08);
+.collection-item-akce:hover {
+  transform: scale(1.05);
+  z-index: 2;
 }
-.akce-box .paragraph-2 {
-  transition: opacity 0.3s ease;
+.collection-item-akce .akce-text-blok,
+.collection-item-akce .akce-heading,
+.collection-item-akce .akce-datum,
+.collection-item-akce .akce-level,
+.collection-item-akce .div-block-330,
+.collection-item-akce .paragraph-2 {
+  transition: background-color 0.5s ease, color 0.5s ease, opacity 0.5s ease;
 }
-.akce-box:hover .paragraph-2 {
+.collection-item-akce:hover .akce-text-blok {
+  background-color: rgb(239, 193, 1) !important;
+}
+.collection-item-akce:hover .akce-heading {
+  color: rgb(34, 37, 40) !important;
+}
+.collection-item-akce:hover .akce-datum {
+  color: rgb(34, 37, 40) !important;
+}
+.collection-item-akce:hover .akce-level {
+  color: rgb(255, 255, 255) !important;
+}
+.collection-item-akce:hover .div-block-330 {
+  background-color: rgb(239, 193, 1) !important;
+  color: rgb(34, 37, 40) !important;
+}
+.collection-item-akce:hover .paragraph-2 {
   opacity: 1 !important;
 }
 

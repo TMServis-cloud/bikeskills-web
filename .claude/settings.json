@@ -32,7 +32,10 @@
       "Bash(open \"https://bikeskills-web.web.app\")",
       "Bash(screencapture -T 3 /tmp/bikeskills-shop.png)",
       "Bash(open -a \"Google Chrome\" \"https://bikeskills-web.web.app/#shop\")",
-      "Bash(screencapture /tmp/bikeskills-shop.png)"
+      "Bash(screencapture /tmp/bikeskills-shop.png)",
+      "Bash(python3 -c \" with open\\('public/images/Kreslicí-plátno-3.svg' if False else '', 'rb'\\) as f: pass \")",
+      "Bash(cp \"public/images/Kreslicí-plátno-3.svg\" \"public/images/e13-logo.svg\")",
+      "Bash(cp \"bikeskills.webflow/images/Kreslicí-plátno-3.svg\" \"bikeskills.webflow/images/e13-logo.svg\")"
     ]
   }
 }

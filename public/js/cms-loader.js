@@ -1095,17 +1095,24 @@ async function loadTeamDetail(slug) {
   }
 }
 
-// Footer sociální ikony — Lottie hover animace (stejná jako top bar)
+// Footer sociální ikony — Lottie hover animace (stejná jako top bar, a-96/a-97 z IX2)
+// webflow.js vystavuje lottie jako window.bodymovin
 window.addEventListener('load', function() {
   setTimeout(function() {
+    var bm = window.bodymovin;
+    if (!bm || !bm.getRegisteredAnimations) return;
+    var allAnims = bm.getRegisteredAnimations();
     document.querySelectorAll('.footer-link-block .link-block-button').forEach(function(btn) {
       var lottieEl = btn.querySelector('[data-animation-type="lottie"]');
       if (!lottieEl) return;
-      var allAnims = (window.lottie && window.lottie.getRegisteredAnimations) ? window.lottie.getRegisteredAnimations() : [];
       var anim = allAnims.find(function(a) { return a.wrapper === lottieEl || a.container === lottieEl; });
       if (!anim) return;
-      btn.addEventListener('mouseenter', function() { anim.setDirection(1); anim.play(); });
-      btn.addEventListener('mouseleave', function() { anim.setDirection(-1); anim.play(); });
+      anim.goToAndStop(0, true);
+      btn.addEventListener('mouseenter', function() { anim.setDirection(1); anim.goToAndPlay(0, true); });
+      btn.addEventListener('mouseleave', function() {
+        anim.setDirection(-1);
+        anim.goToAndPlay(anim.totalFrames - 1, true);
+      });
     });
   }, 800);
 });
