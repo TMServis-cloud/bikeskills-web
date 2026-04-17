@@ -7240,6 +7240,18 @@ body[page="blog"] .section-wrapper.kurzy-campy {
   color: var(--zluta) !important;
 }
 
+/* Footer sociální ikony — hover efekt (Lottie IX2 není v zápatí zapojeno) */
+.footer-link-block .link-block-button,
+.footer-link-block .link-block-button .lottie-social-icon {
+  transition: transform 0.2s ease, filter 0.2s ease;
+}
+.footer-link-block .link-block-button:hover {
+  transform: scale(1.2);
+}
+.footer-link-block .link-block-button:hover .lottie-social-icon {
+  filter: brightness(1.4);
+}
+
 .apple-pay {
   border-radius: 4rem;
 }

@@ -81,6 +81,95 @@ function galleryHtml(images) {
 }
 
 // ============================================================
+// LIGHTBOX
+// ============================================================
+(function initLightboxStyles() {
+  const style = document.createElement('style');
+  style.textContent = `
+#bs-lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:999999;align-items:center;justify-content:center;cursor:zoom-out}
+#bs-lightbox.open{display:flex}
+#bs-lightbox img{max-width:90vw;max-height:88vh;object-fit:contain;border-radius:4px;cursor:default;box-shadow:0 0 60px rgba(0,0,0,.9)}
+#bs-lightbox .lb-close{position:absolute;top:.75rem;right:1.25rem;color:#fff;font-size:2.2rem;cursor:pointer;line-height:1;opacity:.8;user-select:none}
+#bs-lightbox .lb-close:hover{opacity:1}
+#bs-lightbox .lb-prev,#bs-lightbox .lb-next{position:absolute;top:50%;transform:translateY(-50%);color:#fff;font-size:3rem;cursor:pointer;padding:.5rem 1rem;user-select:none;opacity:.6;transition:opacity .2s}
+#bs-lightbox .lb-prev{left:0}#bs-lightbox .lb-next{right:0}
+#bs-lightbox .lb-prev:hover,#bs-lightbox .lb-next:hover{opacity:1}
+#bs-lightbox .lb-counter{position:absolute;bottom:1rem;left:50%;transform:translateX(-50%);color:#fff;font-size:.85rem;opacity:.6}
+  `;
+  document.head.appendChild(style);
+})();
+
+let _lbImages = [], _lbIndex = 0;
+
+function openLightbox(imgs, idx) {
+  let lb = document.getElementById('bs-lightbox');
+  if (!lb) {
+    lb = document.createElement('div');
+    lb.id = 'bs-lightbox';
+    lb.innerHTML = '<span class="lb-close">&times;</span><span class="lb-prev">&#8249;</span><img src="" alt=""><span class="lb-next">&#8250;</span><span class="lb-counter"></span>';
+    document.body.appendChild(lb);
+    lb.querySelector('.lb-close').addEventListener('click', () => lb.classList.remove('open'));
+    lb.addEventListener('click', e => { if (e.target === lb) lb.classList.remove('open'); });
+    lb.querySelector('.lb-prev').addEventListener('click', e => { e.stopPropagation(); lbNav(-1); });
+    lb.querySelector('.lb-next').addEventListener('click', e => { e.stopPropagation(); lbNav(1); });
+    document.addEventListener('keydown', e => {
+      if (!lb.classList.contains('open')) return;
+      if (e.key === 'Escape') lb.classList.remove('open');
+      if (e.key === 'ArrowLeft') lbNav(-1);
+      if (e.key === 'ArrowRight') lbNav(1);
+    });
+  }
+  _lbImages = imgs; _lbIndex = idx;
+  lbShow();
+  lb.classList.add('open');
+}
+
+function lbNav(dir) {
+  _lbIndex = (_lbIndex + dir + _lbImages.length) % _lbImages.length;
+  lbShow();
+}
+
+function lbShow() {
+  const lb = document.getElementById('bs-lightbox');
+  if (!lb) return;
+  const img = lb.querySelector('img');
+  const counter = lb.querySelector('.lb-counter');
+  const prev = lb.querySelector('.lb-prev');
+  const next = lb.querySelector('.lb-next');
+  img.src = _lbImages[_lbIndex];
+  if (counter) counter.textContent = _lbImages.length > 1 ? `${_lbIndex + 1} / ${_lbImages.length}` : '';
+  const show = _lbImages.length > 1;
+  if (prev) prev.style.display = show ? '' : 'none';
+  if (next) next.style.display = show ? '' : 'none';
+}
+
+function attachLightbox(containerEl, imgSelector) {
+  if (!containerEl) return;
+  const allImgs = Array.from(containerEl.querySelectorAll(imgSelector || 'img'))
+    .filter(el => el.src && !el.src.endsWith('#'));
+  if (!allImgs.length) return;
+  // Použij data-full-url (WP galerie) pokud existuje, jinak src
+  const srcs = allImgs.map(el => el.getAttribute('data-full-url') || el.src);
+  allImgs.forEach((el, i) => {
+    el.style.cursor = 'zoom-in';
+    el.addEventListener('click', e => { e.preventDefault(); e.stopPropagation(); openLightbox(srcs, i); });
+  });
+}
+
+// Přidá target="_blank" rel="noopener" na všechny externí linky v kontejneru
+function externalLinksNewTab(containerEl) {
+  if (!containerEl) return;
+  const host = window.location.hostname;
+  containerEl.querySelectorAll('a[href]').forEach(a => {
+    const href = a.getAttribute('href') || '';
+    if (href.startsWith('http') && !href.includes(host) && !href.includes('bikeskills.cz')) {
+      a.setAttribute('target', '_blank');
+      a.setAttribute('rel', 'noopener noreferrer');
+    }
+  });
+}
+
+// ============================================================
 // PAGE DETECTION
 // ============================================================
 document.addEventListener('DOMContentLoaded', () => {
@@ -564,6 +653,14 @@ async function loadAkceDetail(slug) {
       }
     }
 
+    // Lightbox na galerii + obsah, externí linky v novém panelu
+    attachLightbox(galleryBlock);
+    const akceContentEl = item.querySelector('[item="content"]');
+    if (akceContentEl) {
+      attachLightbox(akceContentEl);
+      externalLinksNewTab(akceContentEl);
+    }
+
     itemsList.appendChild(item);
   } catch (err) {
     console.error('Chyba načítání akce detail:', err);
@@ -832,6 +929,11 @@ async function loadClanekDetail(slug) {
       s.async = true;
       document.body.appendChild(s);
     }
+
+    // Lightbox na fotky obsahu + externí linky v novém panelu
+    attachLightbox(contentEl);
+    externalLinksNewTab(document.querySelector('.div-block-325'));
+
   } catch (err) {
     console.error('Chyba načítání clanek detail:', err);
   }
@@ -969,6 +1071,10 @@ async function loadTeamDetail(slug) {
         videoEl.style.display = 'none';
       }
     });
+
+    // Lightbox na galerii týmu
+    attachLightbox(container, 'img[acf\\:image], img[item="featured-image"]');
+    externalLinksNewTab(container);
 
   } catch (err) {
     console.error('Chyba načítání člena týmu:', err);
