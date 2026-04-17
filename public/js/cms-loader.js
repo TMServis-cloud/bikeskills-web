@@ -55,6 +55,12 @@ function youtubeEmbedUrl(url) {
   return m ? `https://www.youtube.com/embed/${m[1]}` : null;
 }
 
+/** Normalizuje typAkce — sjednotí kapitalizaci (první písmeno velké) */
+function normalizeTypAkce(val) {
+  if (!val) return '';
+  return val.charAt(0).toUpperCase() + val.slice(1);
+}
+
 /** Sestaví HTML pro YouTube embed */
 function youtubeEmbedHtml(url) {
   const embedUrl = youtubeEmbedUrl(url);
@@ -185,7 +191,7 @@ async function loadAkcePreview() {
     const past = all
       .filter(d => String(d.datumSort || '0') < todayStr)
       .sort((a, b) => String(b.datumSort || '0').localeCompare(String(a.datumSort || '0')));
-    const docs = [...upcoming, ...past].slice(0, 6);
+    const docs = [...upcoming, ...past].slice(0, 8);
 
     if (!docs.length) { toggleEmpty(emptyEl, false); itemsList.innerHTML = ''; return; }
 
@@ -345,7 +351,7 @@ function getFilteredAkce() {
   return allAkceData.filter(d => {
     const year = getYearFromDatumSort(d.datumSort);
     if (akceYearFilter !== 'all' && year !== akceYearFilter) return false;
-    if (akceZamereniFilter !== 'all' && (d.typAkce || '') !== akceZamereniFilter) return false;
+    if (akceZamereniFilter !== 'all' && normalizeTypAkce(d.typAkce || '') !== akceZamereniFilter) return false;
     if (akceCenaFilter === 'scena' && !d.cena) return false;
     if (akceCenaFilter === 'zdarma' && d.cena) return false;
     return true;
@@ -410,7 +416,7 @@ async function loadAkceList() {
     allAkceData.forEach(d => {
       const y = getYearFromDatumSort(d.datumSort);
       if (y) yearSet.add(y);
-      if (d.typAkce) typSet.add(d.typAkce);
+      if (d.typAkce) typSet.add(normalizeTypAkce(d.typAkce));
     });
     _akceYears = Array.from(yearSet).sort((a, b) => b - a);
     _akceTypy = Array.from(typSet).sort();
@@ -441,7 +447,7 @@ async function loadAkceDetail(slug) {
 
     const pageHeading = document.querySelector('.page-heading[acf\\:text="typ-akce"]');
     if (pageHeading) {
-      pageHeading.textContent = data.typAkce || data.nazev || '';
+      pageHeading.textContent = normalizeTypAkce(data.typAkce) || data.nazev || '';
       pageHeading.classList.remove('w-dyn-bind-empty');
     }
 
@@ -464,7 +470,7 @@ async function loadAkceDetail(slug) {
     }
 
     const dobaEl = item.querySelector('[acf\\:text="doba-trvani"]');
-    if (dobaEl) { dobaEl.textContent = data.typAkce || ''; dobaEl.classList.remove('w-dyn-bind-empty'); }
+    if (dobaEl) { dobaEl.textContent = normalizeTypAkce(data.typAkce || ''); dobaEl.classList.remove('w-dyn-bind-empty'); }
 
     const ridersEl = item.querySelector('[acf\\:text="riders-number"]');
     if (ridersEl) { ridersEl.textContent = data.stavLabel || data.stav || ''; ridersEl.classList.remove('w-dyn-bind-empty'); }
