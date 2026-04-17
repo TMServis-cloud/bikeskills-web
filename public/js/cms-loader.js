@@ -919,12 +919,12 @@ async function loadClanekDetail(slug) {
       try {
         const relSnapshot = await db.collection('clanky')
           .orderBy('datum', 'desc')
-          .limit(4)
+          .limit(5)
           .get();
         const relDocs = relSnapshot.docs
           .map(d => d.data())
           .filter(d => d.slug !== slug && d.publikovano !== false)
-          .slice(0, 3);
+          .slice(0, 4);
 
         if (relDocs.length) {
           toggleEmpty(relatedWfl.emptyEl, true);
