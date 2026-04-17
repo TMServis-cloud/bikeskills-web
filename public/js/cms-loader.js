@@ -305,6 +305,26 @@ function buildClankyFilterBar(bar, years) {
   bar.appendChild(makeYearSelect(years, clankyYearFilter, v => { clankyYearFilter = v; currentClankyPage = 1; renderClankyListPage(); }));
 }
 
+/**
+ * Post-procesuje WP HTML obsah:
+ * - Nahradí wp-block-embed YouTube figury za skutečné iframy
+ */
+function processWpContent(html) {
+  if (!html) return html;
+  // Najde <figure class="wp-block-embed..."><div class="wp-block-embed__wrapper">URL</div></figure>
+  // a nahradí je responsive iframe wrapperem
+  return html.replace(
+    /<figure[^>]*wp-block-embed[^>]*>[\s\S]*?<div[^>]*wp-block-embed__wrapper[^>]*>\s*(https?:\/\/[^\s<]+)\s*<\/div>[\s\S]*?<\/figure>/gi,
+    (match, url) => {
+      const embedUrl = youtubeEmbedUrl(url.trim());
+      if (!embedUrl) return match;
+      return `<div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;margin:1.5rem 0;">` +
+        `<iframe src="${embedUrl}" frameborder="0" allowfullscreen loading="lazy" ` +
+        `style="position:absolute;top:0;left:0;width:100%;height:100%;"></iframe></div>`;
+    }
+  );
+}
+
 /** Pokud je text bez HTML tagů, zabalí odstavce do <p> */
 function ensureHtml(text) {
   if (!text) return '';
@@ -719,7 +739,7 @@ async function loadClanekDetail(slug) {
     // Obsah
     const contentEl = document.querySelector('[item="content"].rich-text-block-3, .div-block-325 [item="content"]');
     if (contentEl) {
-      contentEl.innerHTML = ensureHtml(data.obsah);
+      contentEl.innerHTML = ensureHtml(processWpContent(data.obsah));
       contentEl.classList.remove('w-dyn-bind-empty');
       contentEl.querySelectorAll('img').forEach(img => { img.onerror = function() { this.style.display = 'none'; }; });
     }

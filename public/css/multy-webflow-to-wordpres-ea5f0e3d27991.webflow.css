@@ -7159,6 +7159,49 @@ blockquote {
   font-weight: 700;
 }
 
+/* Blog stránka — odlišení pozadí sekce od karet článků */
+body[page="blog"] .section-wrapper.kurzy-campy {
+  background-color: #2E302C;
+}
+
+/* WP gallery block → 4 sloupce grid */
+.w-richtext .blocks-gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.5rem;
+  padding: 0;
+  list-style: none;
+  margin: 1rem 0 1.5rem;
+}
+.w-richtext .blocks-gallery-item {
+  margin: 0;
+}
+.w-richtext .blocks-gallery-item figure {
+  margin: 0;
+}
+.w-richtext .blocks-gallery-item img {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+  border-radius: 4px;
+  display: block;
+}
+
+/* WP video embed block — zobrazení jako iframe kontejner */
+.wp-block-embed__wrapper {
+  position: relative;
+  padding-bottom: 56.25%;
+  height: 0;
+  overflow: hidden;
+  margin: 1rem 0;
+}
+.wp-block-embed__wrapper iframe {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  border: 0;
+}
+
 /* Hover animace ČÍST DÁLE v blogu — náhrada za Webflow IX2 která nefunguje na klonovaných elementech */
 .secondary-link-block.blog .secondary-button-line {
   transform: scaleX(0) !important;
