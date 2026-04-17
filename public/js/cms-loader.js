@@ -156,13 +156,24 @@ function attachLightbox(containerEl, imgSelector) {
   });
 }
 
+// Vrátí true pokud je odkaz externí (jiná doména nebo subdoména)
+function isExternalLink(href) {
+  if (!href || !href.startsWith('http')) return false;
+  try {
+    const url = new URL(href);
+    const h = url.hostname;
+    // Interní: bikeskills.cz, www.bikeskills.cz, bikeskills-web.web.app, localhost
+    if (h === 'bikeskills.cz' || h === 'www.bikeskills.cz') return false;
+    if (h === window.location.hostname) return false;
+    return true;
+  } catch { return false; }
+}
+
 // Přidá target="_blank" rel="noopener" na všechny externí linky v kontejneru
 function externalLinksNewTab(containerEl) {
   if (!containerEl) return;
-  const host = window.location.hostname;
   containerEl.querySelectorAll('a[href]').forEach(a => {
-    const href = a.getAttribute('href') || '';
-    if (href.startsWith('http') && !href.includes(host) && !href.includes('bikeskills.cz')) {
+    if (isExternalLink(a.getAttribute('href') || '')) {
       a.setAttribute('target', '_blank');
       a.setAttribute('rel', 'noopener noreferrer');
     }
@@ -173,6 +184,9 @@ function externalLinksNewTab(containerEl) {
 // PAGE DETECTION
 // ============================================================
 document.addEventListener('DOMContentLoaded', () => {
+  // Globálně: všechny externí linky otevřít v novém okně
+  externalLinksNewTab(document.body);
+
   const path = window.location.pathname;
 
   if (path === '/' || path === '/index.html' || path === '/index') {
