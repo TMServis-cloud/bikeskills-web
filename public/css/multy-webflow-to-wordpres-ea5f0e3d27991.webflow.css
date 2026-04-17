@@ -7240,13 +7240,18 @@ body[page="blog"] .section-wrapper.kurzy-campy {
   color: var(--zluta) !important;
 }
 
-/* Footer sociální ikony — bílé výchozí, barevné na hover (bez rotace) */
-.footer-link-block .link-block-button .lottie-social-icon {
-  filter: brightness(0) invert(1);
-  transition: filter 0.3s ease;
+/* Hover animace karet akcí */
+.akce-box .image-55 {
+  transition: transform 0.4s ease;
 }
-.footer-link-block .link-block-button:hover .lottie-social-icon {
-  filter: none;
+.akce-box:hover .image-55 {
+  transform: scale(1.08);
+}
+.akce-box .paragraph-2 {
+  transition: opacity 0.3s ease;
+}
+.akce-box:hover .paragraph-2 {
+  opacity: 1 !important;
 }
 
 /* Kontakt — ikona mapy hover */

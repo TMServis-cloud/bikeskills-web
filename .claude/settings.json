@@ -14,7 +14,25 @@
       "Read(//tmp/**)",
       "Bash(curl -v \"https://bikeskills.cz/wp-load.php?security_token=8daacbcd6383cb31&export_id=13&action=get_data\" -o /tmp/akce-export.csv)",
       "Bash(curl -s -L -A \"Mozilla/5.0\" \"https://bikeskills.cz/wp-load.php?security_token=8daacbcd6383cb31&export_id=13&action=get_data\" -o /tmp/akce-export.csv)",
-      "Read(//private/tmp/**)"
+      "Read(//private/tmp/**)",
+      "Bash(python3)",
+      "Bash(grep -E \"\\\\.html$\")",
+      "Bash(firebase login *)",
+      "Bash(open -a Terminal \"/Users/kabelcihiworkstation/Library/CloudStorage/GoogleDrive-cihacek@chytreit.cz/Můj disk/Google Antigravity projekty/bikeskills-web\")",
+      "Bash(firebase deploy *)",
+      "Bash(python3 -c ' *)",
+      "Bash(node scripts/akce-import.js)",
+      "Bash(grep -o 'lottie[A-Za-z]*\\\\s*=\\\\s*[^;,{]*' \"/Users/kabelcihiworkstation/Library/CloudStorage/GoogleDrive-cihacek@chytreit.cz/Můj disk/Google Antigravity projekty/bikeskills-web/public/js/webflow.js\")",
+      "Bash(identify \"/Users/kabelcihiworkstation/Library/CloudStorage/GoogleDrive-cihacek@chytreit.cz/Můj disk/Google Antigravity projekty/bikeskills-web/public/images/e13.webp\")",
+      "Bash(sips -g pixelWidth -g pixelHeight \"/Users/kabelcihiworkstation/Library/CloudStorage/GoogleDrive-cihacek@chytreit.cz/Můj disk/Google Antigravity projekty/bikeskills-web/public/images/e13.webp\")",
+      "Bash(sips -g pixelWidth -g pixelHeight \"/Users/kabelcihiworkstation/Library/CloudStorage/GoogleDrive-cihacek@chytreit.cz/Můj disk/Google Antigravity projekty/bikeskills-web/public/images/bikeskills_2bikeskills.webp\")",
+      "Bash(sips -g pixelWidth -g pixelHeight \"/Users/kabelcihiworkstation/Library/CloudStorage/GoogleDrive-cihacek@chytreit.cz/Můj disk/Google Antigravity projekty/bikeskills-web/public/images/Bikeworkx.webp\")",
+      "Bash(sips -g pixelWidth -g pixelHeight '/Users/kabelcihiworkstation/Library/CloudStorage/GoogleDrive-cihacek@chytreit.cz/Můj disk/Google Antigravity projekty/bikeskills-web/public/images/__TRACKED_VAR__')",
+      "WebFetch(domain:bikeskills-web.web.app)",
+      "Bash(open \"https://bikeskills-web.web.app\")",
+      "Bash(screencapture -T 3 /tmp/bikeskills-shop.png)",
+      "Bash(open -a \"Google Chrome\" \"https://bikeskills-web.web.app/#shop\")",
+      "Bash(screencapture /tmp/bikeskills-shop.png)"
     ]
   }
 }

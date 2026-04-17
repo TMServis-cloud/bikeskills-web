@@ -1094,3 +1094,18 @@ async function loadTeamDetail(slug) {
     console.error('Chyba načítání člena týmu:', err);
   }
 }
+
+// Footer sociální ikony — Lottie hover animace (stejná jako top bar)
+window.addEventListener('load', function() {
+  setTimeout(function() {
+    document.querySelectorAll('.footer-link-block .link-block-button').forEach(function(btn) {
+      var lottieEl = btn.querySelector('[data-animation-type="lottie"]');
+      if (!lottieEl) return;
+      var allAnims = (window.lottie && window.lottie.getRegisteredAnimations) ? window.lottie.getRegisteredAnimations() : [];
+      var anim = allAnims.find(function(a) { return a.wrapper === lottieEl || a.container === lottieEl; });
+      if (!anim) return;
+      btn.addEventListener('mouseenter', function() { anim.setDirection(1); anim.play(); });
+      btn.addEventListener('mouseleave', function() { anim.setDirection(-1); anim.play(); });
+    });
+  }, 800);
+});
