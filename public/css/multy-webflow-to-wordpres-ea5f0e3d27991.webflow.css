@@ -7164,7 +7164,7 @@ body[page="blog"] .section-wrapper.kurzy-campy {
   background-color: #2E302C;
 }
 
-/* WP gallery block → 4 sloupce grid */
+/* WP gallery block → 4 sloupce grid (starý formát: blocks-gallery-grid) */
 .w-richtext .blocks-gallery-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -7180,6 +7180,28 @@ body[page="blog"] .section-wrapper.kurzy-campy {
   margin: 0;
 }
 .w-richtext .blocks-gallery-item img {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+  border-radius: 4px;
+  display: block;
+}
+
+/* WP gallery block → 4 sloupce grid (nový Gutenberg formát: has-nested-images) */
+.w-richtext .wp-block-gallery {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.5rem;
+  margin: 1rem 0 1.5rem;
+}
+.w-richtext .wp-block-gallery .wp-block-image {
+  margin: 0;
+  min-width: 0;
+}
+.w-richtext .wp-block-gallery .wp-block-image a {
+  display: block;
+}
+.w-richtext .wp-block-gallery .wp-block-image img {
   width: 100%;
   height: 160px;
   object-fit: cover;
