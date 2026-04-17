@@ -1,12 +1,12 @@
 [
   {
     "source": "/",
-    "destination": "/akce/?post_type=akce&p=237619/",
+    "destination": "/akce/ladime-bikepark-polevsko/",
     "type": 301
   },
   {
     "source": "/",
-    "destination": "/akce/?post_type=akce&p=248081/",
+    "destination": "/akce/trialovy-individual-prazdniny/",
     "type": 301
   }
 ]
