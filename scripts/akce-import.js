@@ -186,6 +186,14 @@ async function main() {
     const uroven = obj['akce-level'] || '';
     const popis = stripWpBlocks(obj['Content'] || obj['Excerpt'] || '');
     const wpLink = obj['Permalink'] || '';
+    const videoUrl = obj['akce-video'] || '';
+    const dobaTrvani = obj['doba-trvani'] || '';
+    const galerie = [
+      obj['akce-more-img'] || '',
+      obj['akce-more-img-2'] || '',
+      obj['akce-more-img-3'] || '',
+      obj['akce-more-img-4'] || ''
+    ].filter(Boolean);
 
     const docData = {
       nazev: title,
@@ -198,10 +206,13 @@ async function main() {
       mena: 'CZK',
       stav: stav,
       stavLabel: STAV_LABELS[stav] || stav,
-      ridersNumberWp: ridersNum,   // zachováme původní WP hodnotu
+      ridersNumberWp: ridersNum,
       popis: popis,
       slug: slug,
       imageUrl: imageUrl,
+      videoUrl: videoUrl,
+      dobaTrvani: dobaTrvani,
+      galerie: galerie,
       aktivni: true,
       wpLink: wpLink,
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
