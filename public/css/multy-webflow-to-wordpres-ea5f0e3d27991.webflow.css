@@ -7159,6 +7159,22 @@ blockquote {
   font-weight: 700;
 }
 
+/* Hover animace ČÍST DÁLE v blogu — náhrada za Webflow IX2 která nefunguje na klonovaných elementech */
+.secondary-link-block.blog .secondary-button-line {
+  transform: scaleX(0) !important;
+  transform-origin: left center;
+  transition: transform 0.3s ease-out;
+}
+.secondary-link-block.blog:hover .secondary-button-line {
+  transform: scaleX(1) !important;
+}
+.secondary-link-block.blog .secondary-link {
+  transition: color 0.2s ease;
+}
+.secondary-link-block.blog:hover .secondary-link {
+  color: var(--zluta) !important;
+}
+
 .apple-pay {
   border-radius: 4rem;
 }
