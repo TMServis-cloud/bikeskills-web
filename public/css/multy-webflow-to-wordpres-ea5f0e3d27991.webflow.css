@@ -7137,11 +7137,16 @@ blockquote {
   margin: 0 0 0.85rem;
 }
 .w-richtext a {
-  color: #5b9bd5;
+  color: var(--zluta);
   text-decoration: underline;
 }
 .w-richtext a:hover {
-  color: #2d60ab;
+  color: #fff;
+}
+.w-richtext h3 strong,
+.w-richtext h3 b {
+  font-weight: 700;
+  color: var(--zluta);
 }
 .w-richtext ul, .w-richtext ol {
   padding-left: 1.5rem;

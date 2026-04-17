@@ -132,6 +132,16 @@ function stripHtml(html) {
     .replace(/\n{3,}/g, '\n\n').trim();
 }
 
+// Zachová HTML tagy, odstraní jen WP block komentáře
+function stripWpBlocks(html) {
+  if (!html) return '';
+  return html
+    .replace(/<!--\s*wp:[^>]*-->/g, '')
+    .replace(/<!--\s*\/wp:[^>]*-->/g, '')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+}
+
 // ============================================================
 // MAIN
 // ============================================================
@@ -174,7 +184,7 @@ async function main() {
       : generateSlug(title);
     const imageUrl = obj['Image Featured'] || obj['Image URL'] || '';
     const uroven = obj['akce-level'] || '';
-    const popis = stripHtml(obj['Content'] || obj['Excerpt'] || '');
+    const popis = stripWpBlocks(obj['Content'] || obj['Excerpt'] || '');
     const wpLink = obj['Permalink'] || '';
 
     const docData = {
