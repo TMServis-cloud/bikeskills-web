@@ -252,6 +252,14 @@ function renderAkceItem(template, data) {
     }
   }
 
+  const excerptEl = item.querySelector('.paragraph-2, [item="excerpt"]');
+  if (excerptEl) {
+    const popis = data.popis || '';
+    const stripped = popis.replace(/<[^>]*>/g, '');
+    excerptEl.textContent = stripped.length > 150 ? stripped.substring(0, 150) + '…' : stripped;
+    excerptEl.classList.remove('w-dyn-bind-empty');
+  }
+
   const ridersEl = item.querySelector('.akce-ridersnumber, [acf\\:text="riders-number"]');
   if (ridersEl) { ridersEl.textContent = data.stavLabel || data.stav || ''; ridersEl.classList.remove('w-dyn-bind-empty'); }
 

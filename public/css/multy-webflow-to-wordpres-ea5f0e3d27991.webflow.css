@@ -7245,7 +7245,7 @@ body[page="blog"] .section-wrapper.kurzy-campy {
   transition: transform 0.5s ease;
 }
 .collection-item-akce:hover {
-  transform: scale(1.1);
+  transform: scale(1.1) !important;
   z-index: 2;
 }
 .collection-item-akce .akce-text-blok,
@@ -7274,6 +7274,20 @@ body[page="blog"] .section-wrapper.kurzy-campy {
 }
 .collection-item-akce:hover .paragraph-2 {
   opacity: 1 !important;
+}
+
+/* Footer social ikony — větší než header (.small = 17px) */
+.footer-link-block .lottie-social-icon.small {
+  width: 32px;
+  min-width: 32px;
+  max-height: 32px;
+}
+
+/* Campy stránka — tlačítko vycentrovat s top margin */
+.termin-blok > .banner-button.left {
+  align-self: center;
+  margin-top: 15px;
+  margin-bottom: 0;
 }
 
 /* Kontakt — ikona mapy hover */
