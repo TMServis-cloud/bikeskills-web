@@ -4264,7 +4264,7 @@ blockquote {
   grid-row-gap: 16px;
   background-color: var(--sedo-zelena);
   grid-template-rows: auto;
-  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
   grid-auto-columns: 1fr;
   justify-content: start;
   padding-top: 15px;
