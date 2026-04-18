@@ -61,6 +61,22 @@ function normalizeTypAkce(val) {
   return val.charAt(0).toUpperCase() + val.slice(1);
 }
 
+function setPageMeta(title, description, imageUrl) {
+  document.title = title;
+  const stripped = (description || '').replace(/<[^>]*>/g, '').trim();
+  const desc = stripped.length > 160 ? stripped.substring(0, 157) + '…' : stripped;
+  const set = (sel, val) => { const el = document.querySelector(sel); if (el && val) el.setAttribute('content', val); };
+  set('meta[name="description"]', desc);
+  set('meta[property="og:title"]', title);
+  set('meta[property="og:description"]', desc);
+  set('meta[property="twitter:title"]', title);
+  set('meta[property="twitter:description"]', desc);
+  if (imageUrl) {
+    set('meta[property="og:image"]', imageUrl);
+    set('meta[property="twitter:image"]', imageUrl);
+  }
+}
+
 /** Sestaví HTML pro YouTube embed */
 function youtubeEmbedHtml(url) {
   const embedUrl = youtubeEmbedUrl(url);
@@ -582,7 +598,7 @@ async function loadAkceDetail(slug) {
       pageHeading.classList.remove('w-dyn-bind-empty');
     }
 
-    document.title = `${data.nazev} | BIKESKILLS`;
+    setPageMeta(`${data.nazev} | BikeSkills`, data.popis, data.imageUrl);
 
     toggleEmpty(emptyEl, true);
     itemsList.innerHTML = '';
@@ -841,7 +857,7 @@ async function loadClanekDetail(slug) {
       ? data.galerie.filter(Boolean)
       : [data.galerie1, data.galerie2, data.galerie3, data.galerie4].filter(Boolean);
 
-    document.title = `${data.titulek} | BIKESKILLS`;
+    setPageMeta(`${data.titulek} | BikeSkills`, data.popis || data.perex, galerie[0] || data.imageUrl);
 
     // Nadpis
     const titleEl = document.querySelector('[item="title"].heading-83, .div-block-325 [item="title"]');
@@ -1021,7 +1037,7 @@ async function loadTeamDetail(slug) {
       ? data.galerie.filter(Boolean)
       : [];
 
-    document.title = `${data.jmeno} | BIKESKILLS`;
+    setPageMeta(`${data.jmeno} | BikeSkills Team`, data.bio, data.imageUrl);
 
     // Jméno
     const titleEl = container.querySelector('[item="title"]');
