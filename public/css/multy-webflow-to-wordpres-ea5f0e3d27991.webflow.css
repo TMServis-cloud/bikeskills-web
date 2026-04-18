@@ -7245,7 +7245,7 @@ body[page="blog"] .section-wrapper.kurzy-campy {
   transition: transform 0.5s ease;
 }
 .collection-item-akce:hover {
-  transform: scale(1.05);
+  transform: scale(1.1);
   z-index: 2;
 }
 .collection-item-akce .akce-text-blok,
