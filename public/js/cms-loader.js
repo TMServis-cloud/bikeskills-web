@@ -61,11 +61,6 @@ function normalizeTypAkce(val) {
   return val.charAt(0).toUpperCase() + val.slice(1);
 }
 
-function fixImageUrl(url) {
-  if (!url) return url;
-  return url.replace('https://bikeskills.cz/wp-content/', 'https://wp.bikeskills.cz/wp-content/')
-            .replace('http://bikeskills.cz/wp-content/', 'https://wp.bikeskills.cz/wp-content/');
-}
 
 function setPageMeta(title, description, imageUrl) {
   document.title = title;
@@ -270,7 +265,7 @@ function renderAkceItem(template, data) {
   const imgEl = item.querySelector('[item="featured-image"], img.image-55');
   if (imgEl) {
     if (data.imageUrl) {
-      imgEl.src = fixImageUrl(data.imageUrl); imgEl.alt = data.nazev || '';
+      imgEl.src = data.imageUrl; imgEl.alt = data.nazev || '';
       imgEl.classList.remove('w-dyn-bind-empty');
     } else {
       const imgBlock = imgEl.closest('.akce-image-blok');
@@ -608,7 +603,7 @@ async function loadAkceDetail(slug) {
       pageHeading.classList.remove('w-dyn-bind-empty');
     }
 
-    setPageMeta(`${data.nazev} | BikeSkills`, data.popis, fixImageUrl(data.imageUrl));
+    setPageMeta(`${data.nazev} | BikeSkills`, data.popis, data.imageUrl);
 
     toggleEmpty(emptyEl, true);
     itemsList.innerHTML = '';
@@ -638,7 +633,7 @@ async function loadAkceDetail(slug) {
     const imgEl = item.querySelector('img[item="featured-image"]');
     if (imgEl) {
       if (data.imageUrl) {
-        imgEl.src = fixImageUrl(data.imageUrl);
+        imgEl.src = data.imageUrl;
         imgEl.alt = data.nazev || '';
         imgEl.classList.remove('w-dyn-bind-empty');
       } else {
@@ -731,7 +726,7 @@ function renderClanekItem(template, data) {
   const imgEl = item.querySelector('[item="featured-image"], .wrapper-image__img');
   if (imgEl) {
     if (data.imageUrl) {
-      imgEl.src = fixImageUrl(data.imageUrl); imgEl.alt = data.titulek || '';
+      imgEl.src = data.imageUrl; imgEl.alt = data.titulek || '';
       imgEl.classList.remove('w-dyn-bind-empty');
     } else {
       const imgWrap = imgEl.closest('.card-blog__wrapper-image');
@@ -867,7 +862,7 @@ async function loadClanekDetail(slug) {
       ? data.galerie.filter(Boolean)
       : [data.galerie1, data.galerie2, data.galerie3, data.galerie4].filter(Boolean);
 
-    setPageMeta(`${data.titulek} | BikeSkills`, data.popis || data.perex, fixImageUrl(galerie[0] || data.imageUrl));
+    setPageMeta(`${data.titulek} | BikeSkills`, data.popis || data.perex, galerie[0] || data.imageUrl);
 
     // Nadpis
     const titleEl = document.querySelector('[item="title"].heading-83, .div-block-325 [item="title"]');
@@ -893,7 +888,7 @@ async function loadClanekDetail(slug) {
     const imgEl = document.querySelector('.div-block-324 img[item="featured-image"], img[item="featured-image"].image-53');
     if (imgEl) {
       if (data.imageUrl) {
-        imgEl.src = fixImageUrl(data.imageUrl); imgEl.alt = data.titulek || '';
+        imgEl.src = data.imageUrl; imgEl.alt = data.titulek || '';
         imgEl.classList.remove('w-dyn-bind-empty');
         const wrap = imgEl.parentElement;
         if (wrap) wrap.style.display = '';
@@ -1008,7 +1003,7 @@ function renderTeamItem(template, data) {
 
   const imgEl = item.querySelector('[item="featured-image"], .image-49');
   if (imgEl && data.imageUrl) {
-    imgEl.src = fixImageUrl(data.imageUrl); imgEl.alt = data.jmeno || '';
+    imgEl.src = data.imageUrl; imgEl.alt = data.jmeno || '';
     imgEl.classList.remove('w-dyn-bind-empty');
   }
 
@@ -1047,7 +1042,7 @@ async function loadTeamDetail(slug) {
       ? data.galerie.filter(Boolean)
       : [];
 
-    setPageMeta(`${data.jmeno} | BikeSkills Team`, data.bio, fixImageUrl(data.imageUrl));
+    setPageMeta(`${data.jmeno} | BikeSkills Team`, data.bio, data.imageUrl);
 
     // Jméno
     const titleEl = container.querySelector('[item="title"]');
@@ -1061,7 +1056,7 @@ async function loadTeamDetail(slug) {
     const imgEl = container.querySelector('img[item="featured-image"]');
     if (imgEl) {
       if (data.imageUrl) {
-        imgEl.src = fixImageUrl(data.imageUrl); imgEl.alt = data.jmeno || '';
+        imgEl.src = data.imageUrl; imgEl.alt = data.jmeno || '';
         imgEl.classList.remove('w-dyn-bind-empty');
       } else {
         imgEl.style.display = 'none';
