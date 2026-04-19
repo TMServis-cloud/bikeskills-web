@@ -75,6 +75,10 @@ function setPageMeta(title, description, imageUrl) {
     set('meta[property="og:image"]', imageUrl);
     set('meta[property="twitter:image"]', imageUrl);
   }
+  // Canonical URL pro detail stránky
+  let canonical = document.querySelector('link[rel="canonical"]');
+  if (!canonical) { canonical = document.createElement('link'); canonical.rel = 'canonical'; document.head.appendChild(canonical); }
+  canonical.href = window.location.href.split('?')[0];
 }
 
 /** Sestaví HTML pro YouTube embed */
