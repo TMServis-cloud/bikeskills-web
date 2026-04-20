@@ -28,9 +28,11 @@ const storage = firebase.storage();
 // ============================================================
 let quillEditor = null;       // editor pro obsah článku
 let quillAkcePopis = null;   // editor pro popis akce
+let quillTeamPopis = null;   // editor pro popis člena týmu
 let currentDeleteTarget = null; // { collection, id, name }
 let akceGalerieUrls = [];   // pole URL fotek pro galerii akce
 let clanekGalerieUrls = []; // pole URL fotek pro galerii článku
+let teamGalerieUrls = [];   // pole URL fotek pro galerii člena týmu
 const GALLERY_MAX = 20;
 const STATUS_LABELS = {
   otevreno: 'Otevřeno',
@@ -109,6 +111,16 @@ function showDashboard(user) {
       placeholder: 'Popis akce...'
     });
     quillAkcePopis.getModule('toolbar').addHandler('image', makeQuillImageHandler(quillAkcePopis, 'akce/content'));
+  }
+
+  // Editor pro popis člena týmu
+  if (!quillTeamPopis) {
+    quillTeamPopis = new Quill('#team-popis-editor', {
+      theme: 'snow',
+      modules: { toolbar: { container: toolbarOptions, handlers: {} } },
+      placeholder: 'Biografie / popis jezdce...'
+    });
+    quillTeamPopis.getModule('toolbar').addHandler('image', makeQuillImageHandler(quillTeamPopis, 'team/content'));
   }
 
   // Load data
@@ -258,6 +270,7 @@ function renderGallery(containerId, urls) {
 
 function renderAkceGallery() { renderGallery('akce-gallery-items', akceGalerieUrls); }
 function renderClanekGallery() { renderGallery('clanek-gallery-items', clanekGalerieUrls); }
+function renderTeamGallery() { renderGallery('team-gallery-items', teamGalerieUrls); }
 
 function clearAkceGallery() {
   akceGalerieUrls = [];
@@ -284,6 +297,14 @@ document.getElementById('clanek-gallery-items').addEventListener('click', (e) =>
   const idx = parseInt(btn.dataset.idx);
   clanekGalerieUrls.splice(idx, 1);
   renderClanekGallery();
+});
+
+document.getElementById('team-gallery-items').addEventListener('click', (e) => {
+  const btn = e.target.closest('.gallery-remove-btn');
+  if (!btn) return;
+  const idx = parseInt(btn.dataset.idx);
+  teamGalerieUrls.splice(idx, 1);
+  renderTeamGallery();
 });
 
 // Nahrání souborů do galerie
@@ -323,6 +344,24 @@ document.getElementById('clanek-gallery-file').addEventListener('change', async 
   }
 });
 
+document.getElementById('team-gallery-file').addEventListener('change', async (e) => {
+  const files = Array.from(e.target.files);
+  e.target.value = '';
+  const remaining = GALLERY_MAX - teamGalerieUrls.length;
+  const toUpload = files.slice(0, remaining);
+  if (!toUpload.length) return;
+  showToast(`Nahrávám ${toUpload.length} fotek...`);
+  for (const file of toUpload) {
+    try {
+      const url = await uploadImage(file, 'team/gallery');
+      teamGalerieUrls.push(url);
+      renderTeamGallery();
+    } catch (err) {
+      showToast('Chyba nahrávání: ' + err.message, 'error');
+    }
+  }
+});
+
 // Přidání URL do galerie
 document.getElementById('akce-gallery-add-url').addEventListener('click', () => {
   const input = document.getElementById('akce-gallery-url-input');
@@ -340,6 +379,15 @@ document.getElementById('clanek-gallery-add-url').addEventListener('click', () =
   clanekGalerieUrls.push(url);
   input.value = '';
   renderClanekGallery();
+});
+
+document.getElementById('team-gallery-add-url').addEventListener('click', () => {
+  const input = document.getElementById('team-gallery-url-input');
+  const url = input.value.trim();
+  if (!url || teamGalerieUrls.length >= GALLERY_MAX) return;
+  teamGalerieUrls.push(url);
+  input.value = '';
+  renderTeamGallery();
 });
 
 // New akce
@@ -740,6 +788,9 @@ document.getElementById('btn-new-team').addEventListener('click', () => {
   document.getElementById('team-aktivni').checked = true;
   document.getElementById('team-poradi').value = 0;
   document.getElementById('team-image-preview').innerHTML = '';
+  if (quillTeamPopis) quillTeamPopis.setContents([]);
+  teamGalerieUrls = [];
+  renderGallery('team-gallery-items', teamGalerieUrls);
   document.getElementById('modal-team-title').textContent = 'Nový člen týmu';
   openModal('modal-team');
 });
@@ -757,10 +808,19 @@ async function editTeam(id) {
     document.getElementById('team-id').value = id;
     document.getElementById('team-jmeno').value = data.jmeno || '';
     document.getElementById('team-slug').value = data.slug || '';
-    document.getElementById('team-popis').value = data.popis || '';
     document.getElementById('team-poradi').value = data.poradi || 0;
     document.getElementById('team-aktivni').checked = data.aktivni !== false;
     document.getElementById('team-image-url').value = data.imageUrl || '';
+    document.getElementById('team-video-url').value = data.videoUrl || '';
+    document.getElementById('team-video-url2').value = data.videoUrl2 || '';
+    document.getElementById('team-video-url3').value = data.videoUrl3 || '';
+
+    if (quillTeamPopis) {
+      quillTeamPopis.clipboard.dangerouslyPasteHTML(data.popis || '');
+    }
+
+    teamGalerieUrls = Array.isArray(data.galerie) ? [...data.galerie] : [];
+    renderGallery('team-gallery-items', teamGalerieUrls);
 
     const preview = document.getElementById('team-image-preview');
     if (data.imageUrl) {
@@ -795,13 +855,18 @@ document.getElementById('form-team').addEventListener('submit', async (e) => {
 
     const jmeno = document.getElementById('team-jmeno').value.trim();
     const slug = document.getElementById('team-slug').value.trim() || generateSlug(jmeno);
+    const popis = quillTeamPopis ? quillTeamPopis.root.innerHTML : '';
 
     const data = {
       jmeno: jmeno,
       slug: slug,
-      popis: document.getElementById('team-popis').value.trim(),
+      popis: popis,
       poradi: parseInt(document.getElementById('team-poradi').value) || 0,
       imageUrl: imageUrl,
+      galerie: teamGalerieUrls,
+      videoUrl: document.getElementById('team-video-url').value.trim() || null,
+      videoUrl2: document.getElementById('team-video-url2').value.trim() || null,
+      videoUrl3: document.getElementById('team-video-url3').value.trim() || null,
       aktivni: document.getElementById('team-aktivni').checked,
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     };

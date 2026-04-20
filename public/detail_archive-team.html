@@ -28,9 +28,32 @@
     max-width: 100%;
     height: auto;
 }
-/* Zobrazení obsahu blog a akce */ 
+/* Zobrazení obsahu blog a akce */
 .w-dyn-bind-empty {
     display: block !important;
+}
+/* Team bio text — bílá barva, odstavce */
+.rich-text-block-2 {
+  color: #ebe4da !important;
+}
+.rich-text-block-2 p {
+  margin-bottom: 1em;
+}
+.rich-text-block-2 br + br {
+  display: block;
+  content: "";
+  margin-top: 0.8em;
+}
+/* Team galerie — čtvercové fotky */
+.photo-team-block {
+  aspect-ratio: 1 / 1;
+  max-height: none;
+  overflow: hidden;
+}
+.photo-gallerie-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }  
 /* Product mizení velikosti co není skladem */ 
   .variations-label.disabled {

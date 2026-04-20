@@ -396,7 +396,7 @@
         <!-- Tým Edit Modal -->
         <div id="modal-team" class="modal" style="display: none;">
           <div class="modal-overlay"></div>
-          <div class="modal-content">
+          <div class="modal-content modal-content-wide">
             <div class="modal-header">
               <h2 id="modal-team-title">Nový člen týmu</h2>
               <button class="modal-close" data-modal="modal-team">&times;</button>
@@ -410,8 +410,8 @@
               </div>
 
               <div class="form-group">
-                <label for="team-popis">Biografie / Popis</label>
-                <textarea id="team-popis" rows="6" placeholder="Něco o tomto členovi..."></textarea>
+                <label>Biografie / Popis</label>
+                <div id="team-popis-editor" class="quill-editor"></div>
               </div>
 
               <div class="form-group">
@@ -425,6 +425,34 @@
                   <input type="text" id="team-image-url" placeholder="nebo zadejte URL" class="image-url-input">
                   <div id="team-image-preview" class="image-preview"></div>
                 </div>
+              </div>
+
+              <div class="form-group">
+                <label>Galerie fotografií <span class="label-hint">(max. 20, automaticky převedeno na WebP)</span></label>
+                <div id="team-gallery-items" class="gallery-dynamic-list"></div>
+                <div class="gallery-add-row">
+                  <input type="file" id="team-gallery-file" accept="image/*" multiple class="file-input" style="display:none">
+                  <label for="team-gallery-file" class="btn btn-ghost btn-sm" id="team-gallery-file-label">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                    Nahrát fotky
+                  </label>
+                  <span class="gallery-hint">nebo zadejte URL:</span>
+                  <input type="text" id="team-gallery-url-input" placeholder="https://..." class="image-url-input gallery-url-input">
+                  <button type="button" id="team-gallery-add-url" class="btn btn-ghost btn-sm">Přidat</button>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="team-video-url">Video 1 (YouTube URL)</label>
+                <input type="url" id="team-video-url" placeholder="https://www.youtube.com/watch?v=...">
+              </div>
+              <div class="form-group">
+                <label for="team-video-url2">Video 2 (YouTube URL)</label>
+                <input type="url" id="team-video-url2" placeholder="https://www.youtube.com/watch?v=...">
+              </div>
+              <div class="form-group">
+                <label for="team-video-url3">Video 3 (YouTube URL)</label>
+                <input type="url" id="team-video-url3" placeholder="https://www.youtube.com/watch?v=...">
               </div>
 
               <div class="form-row">
@@ -488,7 +516,7 @@
   <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
 
   <!-- Admin Script -->
-  <script src="/js/admin.js"></script>
+  <script src="/js/admin.js?v=3"></script>
 
 </body>
 </html>
