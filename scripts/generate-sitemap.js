@@ -69,32 +69,36 @@ async function main() {
   const entries = STATIC_PAGES.map(p => urlEntry(p));
 
   // Blog
-  const clankySnap = await db.collection('clanky').where('aktivni', '==', true).get();
-  console.log(`  📝 Články: ${clankySnap.size}`);
-  clankySnap.forEach(doc => {
-    const d = doc.data();
-    if (!d.slug) return;
-    entries.push(urlEntry({
-      loc: `/blog/${d.slug}/`,
-      priority: '0.6',
-      changefreq: 'yearly',
-      lastmod: toLastmod(d.updatedAt || d.createdAt),
-    }));
-  });
+  const clankySnap = await db.collection('clanky').get();
+  const clanky = clankySnap.docs.map(d => d.data()).filter(d => d.slug && d.publikovano !== false);
+  console.log(`  📝 Články: ${clanky.length}`);
+  clanky.forEach(d => entries.push(urlEntry({
+    loc: `/blog/${d.slug}/`,
+    priority: '0.6',
+    changefreq: 'yearly',
+    lastmod: toLastmod(d.datum || d.updatedAt || d.createdAt),
+  })));
 
   // Akce
-  const akceSnap = await db.collection('akce').where('aktivni', '==', true).get();
-  console.log(`  🚴 Akce: ${akceSnap.size}`);
-  akceSnap.forEach(doc => {
-    const d = doc.data();
-    if (!d.slug) return;
-    entries.push(urlEntry({
-      loc: `/akce/${d.slug}/`,
-      priority: '0.7',
-      changefreq: 'monthly',
-      lastmod: toLastmod(d.updatedAt || d.createdAt),
-    }));
-  });
+  const akceSnap = await db.collection('akce').get();
+  const akce = akceSnap.docs.map(d => d.data()).filter(d => d.slug && d.publikovano !== false);
+  console.log(`  🚴 Akce: ${akce.length}`);
+  akce.forEach(d => entries.push(urlEntry({
+    loc: `/akce/${d.slug}/`,
+    priority: '0.7',
+    changefreq: 'monthly',
+    lastmod: toLastmod(d.datum || d.updatedAt || d.createdAt),
+  })));
+
+  // Tým
+  const teamSnap = await db.collection('team').get();
+  const team = teamSnap.docs.map(d => d.data()).filter(d => d.slug);
+  console.log(`  👤 Tým: ${team.length}`);
+  team.forEach(d => entries.push(urlEntry({
+    loc: `/team/${d.slug}/`,
+    priority: '0.6',
+    changefreq: 'monthly',
+  })));
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">

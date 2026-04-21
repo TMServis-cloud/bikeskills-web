@@ -62,21 +62,33 @@ function normalizeTypAkce(val) {
 }
 
 
-function setPageMeta(title, description, imageUrl) {
+function injectJsonLd(schema) {
+  const existing = document.getElementById('json-ld-schema');
+  if (existing) existing.remove();
+  const s = document.createElement('script');
+  s.id = 'json-ld-schema';
+  s.type = 'application/ld+json';
+  s.textContent = JSON.stringify(schema);
+  document.head.appendChild(s);
+}
+
+function setPageMeta(title, description, imageUrl, ogType) {
   document.title = title;
   const stripped = (description || '').replace(/<[^>]*>/g, '').trim();
   const desc = stripped.length > 160 ? stripped.substring(0, 157) + '…' : stripped;
-  const set = (sel, val) => { const el = document.querySelector(sel); if (el && val) el.setAttribute('content', val); };
-  set('meta[name="description"]', desc);
-  set('meta[property="og:title"]', title);
-  set('meta[property="og:description"]', desc);
-  set('meta[property="twitter:title"]', title);
-  set('meta[property="twitter:description"]', desc);
+  const setMeta = (sel, val) => { const el = document.querySelector(sel); if (el && val) el.setAttribute('content', val); };
+  setMeta('meta[name="description"]', desc);
+  setMeta('meta[property="og:title"]', title);
+  setMeta('meta[property="og:description"]', desc);
+  setMeta('meta[property="og:type"]', ogType || 'website');
+  setMeta('meta[property="twitter:title"]', title);
+  setMeta('meta[property="twitter:description"]', desc);
   if (imageUrl) {
-    set('meta[property="og:image"]', imageUrl);
-    set('meta[property="twitter:image"]', imageUrl);
+    setMeta('meta[property="og:image"]', imageUrl);
+    setMeta('meta[property="twitter:image"]', imageUrl);
   }
-  // Canonical URL pro detail stránky
+  const ogUrl = document.querySelector('meta[property="og:url"]');
+  if (ogUrl) ogUrl.setAttribute('content', window.location.href);
   let canonical = document.querySelector('link[rel="canonical"]');
   if (!canonical) { canonical = document.createElement('link'); canonical.rel = 'canonical'; document.head.appendChild(canonical); }
   canonical.href = window.location.href.split('?')[0];
@@ -95,7 +107,7 @@ function youtubeEmbedHtml(url) {
 function galleryHtml(images) {
   if (!images || !images.length) return '';
   const items = images.filter(Boolean).map(url =>
-    `<div class="gallery-item"><img src="${escapeHtml(resolveUrl(url))}" loading="lazy" style="width:100%;height:200px;object-fit:cover;border-radius:4px;"></div>`
+    `<div class="gallery-item"><img src="${escapeHtml(resolveUrl(url))}" loading="lazy" alt="" style="width:100%;height:200px;object-fit:cover;border-radius:4px;"></div>`
   ).join('');
   if (!items) return '';
   return `<div class="akce-galerie" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:0.75rem;margin:1.5rem 0;">${items}</div>`;
@@ -655,7 +667,16 @@ async function loadAkceDetail(slug) {
       pageHeading.classList.remove('w-dyn-bind-empty');
     }
 
-    setPageMeta(`${data.nazev} | BikeSkills`, data.popis, data.imageUrl);
+    setPageMeta(`${data.nazev} | BikeSkills`, data.popis, data.imageUrl, 'website');
+    injectJsonLd({
+      '@context': 'https://schema.org',
+      '@type': 'Event',
+      'name': data.nazev || '',
+      'description': (data.popis || '').replace(/<[^>]*>/g, '').trim().substring(0, 200),
+      'image': data.imageUrl ? resolveUrl(data.imageUrl) : 'https://bikeskills.cz/images/webclip.png',
+      'url': window.location.href,
+      'organizer': { '@type': 'Organization', 'name': 'BikeSkills', 'url': 'https://bikeskills.cz' }
+    });
 
     toggleEmpty(emptyEl, true);
     itemsList.innerHTML = '';
@@ -916,7 +937,18 @@ async function loadClanekDetail(slug) {
       ? data.galerie.filter(Boolean)
       : [data.galerie1, data.galerie2, data.galerie3, data.galerie4].filter(Boolean);
 
-    setPageMeta(`${data.titulek} | BikeSkills`, data.popis || data.perex, galerie[0] || data.imageUrl);
+    setPageMeta(`${data.titulek} | BikeSkills`, data.popis || data.perex, galerie[0] || data.imageUrl, 'article');
+    injectJsonLd({
+      '@context': 'https://schema.org',
+      '@type': 'Article',
+      'headline': data.titulek || '',
+      'description': (data.popis || data.perex || '').replace(/<[^>]*>/g, '').trim().substring(0, 200),
+      'image': (galerie[0] || data.imageUrl) ? resolveUrl(galerie[0] || data.imageUrl) : 'https://bikeskills.cz/images/webclip.png',
+      'datePublished': datum,
+      'author': { '@type': 'Person', 'name': data.autor || 'BikeSkills' },
+      'publisher': { '@type': 'Organization', 'name': 'BikeSkills', 'url': 'https://bikeskills.cz', 'logo': { '@type': 'ImageObject', 'url': 'https://bikeskills.cz/images/webclip.png' } },
+      'url': window.location.href
+    });
 
     // Nadpis
     const titleEl = document.querySelector('[item="title"].heading-83, .div-block-325 [item="title"]');
@@ -1098,7 +1130,18 @@ async function loadTeamDetail(slug) {
       ? data.galerie.filter(Boolean)
       : [];
 
-    setPageMeta(`${data.jmeno} | BikeSkills Team`, data.bio, data.imageUrl);
+    setPageMeta(`${data.jmeno} | BikeSkills Team`, data.bio || data.popis, data.imageUrl, 'profile');
+    injectJsonLd({
+      '@context': 'https://schema.org',
+      '@type': 'Person',
+      'name': data.jmeno || '',
+      'description': (data.bio || data.popis || '').replace(/<[^>]*>/g, '').trim().substring(0, 200),
+      'image': data.imageUrl ? resolveUrl(data.imageUrl) : 'https://bikeskills.cz/images/webclip.png',
+      'url': window.location.href,
+      'memberOf': { '@type': 'Organization', 'name': 'BikeSkills', 'url': 'https://bikeskills.cz' }
+    });
+    const h1El = container.querySelector('h1.page-heading');
+    if (h1El) h1El.textContent = data.jmeno || '';
 
     // Jméno
     const titleEl = container.querySelector('[item="title"]');
