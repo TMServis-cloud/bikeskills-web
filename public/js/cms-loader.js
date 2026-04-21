@@ -266,11 +266,11 @@ function renderAkceItem(template, data) {
   if (imgEl) {
     if (data.imageUrl) {
       imgEl.src = resolveUrl(data.imageUrl); imgEl.alt = data.nazev || '';
-      imgEl.onerror = function() { const b = this.closest('.akce-image-blok'); if (b) b.style.display = 'none'; else this.style.display = 'none'; };
+      imgEl.onerror = makeImgErrorHandler('.akce-image-blok');
       imgEl.classList.remove('w-dyn-bind-empty');
     } else {
       const imgBlock = imgEl.closest('.akce-image-blok');
-      if (imgBlock) imgBlock.style.display = 'none';
+      if (imgBlock) imgBlock.style.background = 'rgba(255,255,255,0.06)';
     }
   }
 
@@ -473,6 +473,40 @@ function resolveUrl(url) {
   try { return '/' + decodeURIComponent(m[1]); } catch(e) { return url; }
 }
 
+/** Vrátí původní Storage URL pro fallback (wp-content) */
+function storageUrlFallback(hostingPath) {
+  if (!hostingPath || !hostingPath.startsWith('/wp-content/')) return null;
+  const encoded = hostingPath.slice(1).split('/').map(encodeURIComponent).join('%2F');
+  return `https://firebasestorage.googleapis.com/v0/b/bikeskills-web.firebasestorage.app/o/${encoded}?alt=media`;
+}
+
+/** Onerror s fallback: Hosting → Storage → placeholder */
+function makeImgErrorHandler(containerSelector, containerEl) {
+  return function() {
+    const src = this.src || '';
+    if (src.startsWith(location.origin + '/wp-content/') || src.startsWith('/wp-content/')) {
+      // zkus Storage fallback
+      const fallback = storageUrlFallback(src.replace(location.origin, ''));
+      if (fallback && this.src !== fallback) {
+        this.onerror = function() { showImgPlaceholder(this, containerSelector, containerEl); };
+        this.src = fallback;
+        return;
+      }
+    }
+    showImgPlaceholder(this, containerSelector, containerEl);
+  };
+}
+
+function showImgPlaceholder(imgEl, containerSelector, containerEl) {
+  const el = containerEl || (containerSelector ? imgEl.closest(containerSelector) : null);
+  if (el) {
+    imgEl.style.display = 'none';
+    el.style.background = 'rgba(255,255,255,0.06)';
+  } else {
+    imgEl.style.display = 'none';
+  }
+}
+
 /** Přepíše všechny Storage URL v HTML obsahu na Hosting cesty */
 function resolveContentUrls(html) {
   if (!html) return html;
@@ -653,7 +687,7 @@ async function loadAkceDetail(slug) {
       if (data.imageUrl) {
         imgEl.src = resolveUrl(data.imageUrl);
         imgEl.alt = data.nazev || '';
-        imgEl.onerror = function() { this.closest('.akce-grid') ? this.style.display = 'none' : (this.closest('.akce-image-blok') || this).style.display = 'none'; };
+        imgEl.onerror = makeImgErrorHandler(null);
         imgEl.classList.remove('w-dyn-bind-empty');
       } else {
         imgEl.style.display = 'none';
@@ -746,11 +780,11 @@ function renderClanekItem(template, data) {
   if (imgEl) {
     if (data.imageUrl) {
       imgEl.src = resolveUrl(data.imageUrl); imgEl.alt = data.titulek || '';
-      imgEl.onerror = function() { const w = this.closest('.card-blog__wrapper-image'); if (w) w.style.display = 'none'; else this.style.display = 'none'; };
+      imgEl.onerror = makeImgErrorHandler('.card-blog__wrapper-image');
       imgEl.classList.remove('w-dyn-bind-empty');
     } else {
       const imgWrap = imgEl.closest('.card-blog__wrapper-image');
-      if (imgWrap) imgWrap.style.display = 'none';
+      if (imgWrap) imgWrap.style.background = 'rgba(255,255,255,0.06)';
     }
   }
 
@@ -909,7 +943,7 @@ async function loadClanekDetail(slug) {
     if (imgEl) {
       if (data.imageUrl) {
         imgEl.src = resolveUrl(data.imageUrl); imgEl.alt = data.titulek || '';
-        imgEl.onerror = function() { const w = this.parentElement; if (w) w.style.display = 'none'; };
+        imgEl.onerror = makeImgErrorHandler(null);
         imgEl.classList.remove('w-dyn-bind-empty');
         const wrap = imgEl.parentElement;
         if (wrap) wrap.style.display = '';
@@ -1025,7 +1059,7 @@ function renderTeamItem(template, data) {
   const imgEl = item.querySelector('[item="featured-image"], .image-49');
   if (imgEl && data.imageUrl) {
     imgEl.src = resolveUrl(data.imageUrl); imgEl.alt = data.jmeno || '';
-    imgEl.onerror = function() { this.style.display = 'none'; };
+    imgEl.onerror = makeImgErrorHandler(null);
     imgEl.classList.remove('w-dyn-bind-empty');
   }
 
@@ -1079,7 +1113,7 @@ async function loadTeamDetail(slug) {
     if (imgEl) {
       if (data.imageUrl) {
         imgEl.src = resolveUrl(data.imageUrl); imgEl.alt = data.jmeno || '';
-        imgEl.onerror = function() { this.style.display = 'none'; };
+        imgEl.onerror = makeImgErrorHandler(null);
         imgEl.classList.remove('w-dyn-bind-empty');
       } else {
         imgEl.style.display = 'none';
@@ -1111,6 +1145,7 @@ async function loadTeamDetail(slug) {
       if (imgSlot && url) {
         imgSlot.src = resolveUrl(url);
         imgSlot.alt = data.jmeno || '';
+        imgSlot.onerror = makeImgErrorHandler(null);
         if (block) block.style.display = '';
       } else if (block) {
         block.style.display = 'none';

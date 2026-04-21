@@ -1,5 +1,6 @@
 {
   "hosting": {
+    "site": "bikeskills-web",
     "public": "public",
     "ignore": [
       "firebase.json",
