@@ -1,5 +1,6 @@
 # Dependencies
 node_modules/
+functions/node_modules/
 
 # Firebase
 .firebase/
@@ -24,6 +25,7 @@ scripts/serviceAccountKey.json
 # Environment
 .env
 .env.local
+functions/.env
 
 # Media (deployed via Firebase CLI, not git)
 public/wp-content/

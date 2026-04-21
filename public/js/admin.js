@@ -756,7 +756,7 @@ async function loadTeam() {
       row.innerHTML = `
         <td>
           <div style="width:40px;height:40px;border-radius:50%;overflow:hidden;background:#eee;">
-            ${data.imageUrl ? `<img src="${escapeHtml(data.imageUrl)}" style="width:100%;height:100%;object-fit:cover;">` : ''}
+            ${data.imageUrl ? `<img src="${escapeHtml(data.imageUrl)}" alt="" style="width:100%;height:100%;object-fit:cover;">` : ''}
           </div>
         </td>
         <td><strong>${escapeHtml(data.jmeno || '')}</strong></td>
