@@ -62,14 +62,28 @@ function normalizeTypAkce(val) {
 }
 
 
-function injectJsonLd(schema) {
-  const existing = document.getElementById('json-ld-schema');
+function injectJsonLd(schema, id) {
+  const elId = id || 'json-ld-schema';
+  const existing = document.getElementById(elId);
   if (existing) existing.remove();
   const s = document.createElement('script');
-  s.id = 'json-ld-schema';
+  s.id = elId;
   s.type = 'application/ld+json';
   s.textContent = JSON.stringify(schema);
   document.head.appendChild(s);
+}
+
+function injectBreadcrumb(items) {
+  injectJsonLd({
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    'itemListElement': items.map((item, i) => ({
+      '@type': 'ListItem',
+      'position': i + 1,
+      'name': item.name,
+      'item': item.item
+    }))
+  }, 'json-ld-breadcrumb');
 }
 
 function setPageMeta(title, description, imageUrl, ogType) {
@@ -677,6 +691,11 @@ async function loadAkceDetail(slug) {
       'url': window.location.href,
       'organizer': { '@type': 'Organization', 'name': 'BikeSkills', 'url': 'https://bikeskills.cz' }
     });
+    injectBreadcrumb([
+      { name: 'Domů', item: 'https://bikeskills.cz/' },
+      { name: 'Akce', item: 'https://bikeskills.cz/akce-archive.html' },
+      { name: data.nazev || 'Akce', item: window.location.href }
+    ]);
 
     toggleEmpty(emptyEl, true);
     itemsList.innerHTML = '';
@@ -708,6 +727,7 @@ async function loadAkceDetail(slug) {
       if (data.imageUrl) {
         imgEl.src = resolveUrl(data.imageUrl);
         imgEl.alt = data.nazev || '';
+        imgEl.width = 1280; imgEl.height = 720;
         imgEl.onerror = makeImgErrorHandler(null);
         imgEl.classList.remove('w-dyn-bind-empty');
       } else {
@@ -949,6 +969,11 @@ async function loadClanekDetail(slug) {
       'publisher': { '@type': 'Organization', 'name': 'BikeSkills', 'url': 'https://bikeskills.cz', 'logo': { '@type': 'ImageObject', 'url': 'https://bikeskills.cz/images/webclip.png' } },
       'url': window.location.href
     });
+    injectBreadcrumb([
+      { name: 'Domů', item: 'https://bikeskills.cz/' },
+      { name: 'Blog', item: 'https://bikeskills.cz/blog.html' },
+      { name: data.titulek || 'Článek', item: window.location.href }
+    ]);
 
     // Nadpis
     const titleEl = document.querySelector('[item="title"].heading-83, .div-block-325 [item="title"]');
@@ -975,6 +1000,7 @@ async function loadClanekDetail(slug) {
     if (imgEl) {
       if (data.imageUrl) {
         imgEl.src = resolveUrl(data.imageUrl); imgEl.alt = data.titulek || '';
+        imgEl.width = 1280; imgEl.height = 720;
         imgEl.onerror = makeImgErrorHandler(null);
         imgEl.classList.remove('w-dyn-bind-empty');
         const wrap = imgEl.parentElement;
@@ -1140,6 +1166,11 @@ async function loadTeamDetail(slug) {
       'url': window.location.href,
       'memberOf': { '@type': 'Organization', 'name': 'BikeSkills', 'url': 'https://bikeskills.cz' }
     });
+    injectBreadcrumb([
+      { name: 'Domů', item: 'https://bikeskills.cz/' },
+      { name: 'Tým', item: 'https://bikeskills.cz/team.html' },
+      { name: data.jmeno || 'Člen týmu', item: window.location.href }
+    ]);
     const h1El = container.querySelector('h1.page-heading');
     if (h1El) h1El.textContent = data.jmeno || '';
 
@@ -1156,6 +1187,7 @@ async function loadTeamDetail(slug) {
     if (imgEl) {
       if (data.imageUrl) {
         imgEl.src = resolveUrl(data.imageUrl); imgEl.alt = data.jmeno || '';
+        imgEl.width = 800; imgEl.height = 800;
         imgEl.onerror = makeImgErrorHandler(null);
         imgEl.classList.remove('w-dyn-bind-empty');
       } else {

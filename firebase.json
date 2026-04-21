@@ -2,11 +2,11 @@
   "hosting": {
     "site": "bikeskills-web",
     "public": "public",
+    "predeploy": ["node scripts/generate-sitemap.js"],
     "ignore": [
       "firebase.json",
       "**/.*",
-      "**/node_modules/**",
-      "wp-content/**"
+      "**/node_modules/**"
     ],
     "redirects": [
       { "source": "/projekt-startuje/", "destination": "/blog/projekt-startuje/", "type": 301 },
