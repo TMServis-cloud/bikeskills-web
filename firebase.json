@@ -83,10 +83,9 @@
       { "source": "/galavecer-bigmat/", "destination": "/blog/galavecer-bigmat/", "type": 301 }
     ],
     "rewrites": [
-      { "source": "/sitemap.xml", "function": "sitemap" },
-      { "source": "/blog/**", "function": "prerender" },
-      { "source": "/akce/**", "function": "prerender" },
-      { "source": "/team/**", "function": "prerender" }
+      { "source": "/blog/**", "destination": "/detail_post.html" },
+      { "source": "/akce/**", "destination": "/detail_akce.html" },
+      { "source": "/team/**", "destination": "/detail_archive-team.html" }
     ],
     "headers": [
       {
@@ -106,9 +105,6 @@
         "headers": [{ "key": "Cache-Control", "value": "public, max-age=3600" }]
       }
     ]
-  },
-  "functions": {
-    "source": "functions"
   },
   "firestore": {
     "rules": "firestore.rules",
