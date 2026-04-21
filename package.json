@@ -6,7 +6,7 @@
   "scripts": {
     "serve": "firebase emulators:start",
     "deploy": "firebase deploy",
-    "deploy:hosting": "firebase deploy --only hosting",
+    "deploy:hosting": "node scripts/generate-sitemap.js; firebase deploy --only hosting",
     "deploy:rules": "firebase deploy --only firestore:rules,storage",
     "import": "node scripts/wp-import.js",
     "sitemap": "node scripts/generate-sitemap.js"
