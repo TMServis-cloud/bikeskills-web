@@ -9,11 +9,16 @@
 
 const fs = require('fs');
 const path = require('path');
-const admin = require('firebase-admin');
 
 const SERVICE_ACCOUNT_PATH = process.env.GOOGLE_APPLICATION_CREDENTIALS
   || path.join(__dirname, 'serviceAccountKey.json');
 
+if (!fs.existsSync(SERVICE_ACCOUNT_PATH)) {
+  console.log('⚠️  serviceAccountKey.json nenalezen — sitemap generation přeskočena (CI prostředí)');
+  process.exit(0);
+}
+
+const admin = require('firebase-admin');
 try {
   const serviceAccount = require(SERVICE_ACCOUNT_PATH);
   admin.initializeApp({ credential: admin.credential.cert(serviceAccount) });
