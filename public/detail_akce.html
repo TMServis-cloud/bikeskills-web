@@ -556,7 +556,7 @@ button:hover {
   display: block;
 }
 /* Lobster pro H1, H2 a vybrané nadpisové třídy */
-h1, h2, .heading-section, .akce-item-header, .page-heading,
+h1, h2, .heading-section, .page-heading,
 .related-header, .heading-81 {
   font-family: Lobster, sans-serif !important;
   font-weight: 400 !important;
@@ -565,6 +565,16 @@ h1, h2, .heading-section, .akce-item-header, .page-heading,
 h3, h4 {
   font-family: proxima-nova, sans-serif !important;
   font-weight: 600 !important;
+}
+/* Název akce — proxima-nova, 2x větší */
+.akce-item-header {
+  font-family: proxima-nova, sans-serif !important;
+  font-weight: 700 !important;
+  font-size: 3.75rem !important;
+}
+/* Napište nám — 2x větší */
+.heading-81 {
+  font-size: 3.125rem !important;
 }
 /* akce-text-all-blok: padding, zarovnání doleva */
 .akce-text-all-blok {
@@ -631,7 +641,7 @@ h3, h4 {
 }
 /* Modal karta — žlutý styl jako Webflow Akce-formular */
 .rez-modal-inner {
-  background: var(--zluta, #efc101); border-radius: 0.5rem;
+  background: var(--zluta, #efc101); border-radius: 0;
   max-width: 600px; width: 100%;
   padding: 2.5rem 2rem 2rem;
   position: relative; margin: auto;
@@ -663,8 +673,8 @@ h3, h4 {
 .rez-modal-subtitle a { color: var(--tmave-seda, #333); font-weight: 700; text-decoration: underline; transition: color 0.2s; }
 .rez-modal-subtitle a:hover { color: var(--modra, #2d60ab); }
 .rez-modal-camp {
-  color: var(--tmave-seda, #333); font-weight: 700; font-size: 1.2rem;
-  margin: 0 0 1.2rem; font-family: proxima-nova, sans-serif;
+  color: var(--tmave-seda, #333); font-weight: 700; font-size: 1.5rem;
+  margin: 1.4rem 0 1.2rem; font-family: proxima-nova, sans-serif;
   text-transform: uppercase; letter-spacing: 0.04em;
 }
 /* Formulář — 2 sloupce jako form-akce */
@@ -726,23 +736,22 @@ h3, h4 {
 /* Submit button — styl jako banner-button, přizpůsobeno formuláři */
 .rez-submit-wrap { grid-column: 1 / -1; text-align: center; margin-top: 0.6rem; }
 .rez-modal-inner button.rez-submit {
-  background: none; border: none; border-radius: 0;
-  color: var(--tmave-seda, #333);
-  height: auto !important; min-height: 0 !important;
-  margin: 0 !important; padding: 0;
-  font-family: proxima-nova, sans-serif; font-size: 1rem; font-weight: 600;
-  letter-spacing: 0.08em; text-transform: uppercase;
-  cursor: pointer; display: inline-flex; flex-direction: column;
-  align-items: center; overflow: hidden;
+  border: 2px solid var(--black, #111);
+  background-color: var(--black, #111);
+  color: var(--white, #fff);
+  height: 2.7rem !important; min-height: 2.7rem !important;
+  margin: 0 !important; padding: 0 2rem;
+  font-family: proxima-nova, sans-serif; font-size: 1rem; font-weight: 500;
+  letter-spacing: 0.05em; text-transform: uppercase;
+  white-space: nowrap; border-radius: 4rem;
+  cursor: pointer; display: inline-flex;
+  align-items: center; justify-content: center;
+  transition: all .3s ease-in-out;
 }
-.rez-modal-inner button.rez-submit .rez-submit-line {
-  display: block; width: 100%; height: 2px;
-  background: var(--tmave-seda, #333);
-  transform: translateX(-101%);
-  transition: transform 0.3s ease-out;
-  margin-top: 3px;
+.rez-modal-inner button.rez-submit:hover {
+  background-color: var(--black-darkgreen, #2e302c);
+  color: var(--white, #fff);
 }
-.rez-modal-inner button.rez-submit:hover .rez-submit-line { transform: translateX(0); }
 .rez-modal-inner button.rez-submit:disabled { opacity: 0.45; cursor: not-allowed; }
 .rez-error-msg {
   color: #c0001a; font-size: 0.8rem; margin: 0 0 0.5rem;
@@ -1074,7 +1083,7 @@ Cookies.set(cookieName, 'ok', { expires: 31 });
             </label>
             <p class="rez-error-msg" id="rez-error"></p>
             <div class="rez-submit-wrap">
-              <button type="submit" class="rez-submit" id="rez-submit"><span>ODESLAT</span><span class="rez-submit-line"></span></button>
+              <button type="submit" class="rez-submit" id="rez-submit">ODESLAT</button>
             </div>
           </div>
         </form>

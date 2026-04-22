@@ -6279,6 +6279,7 @@ blockquote {
   font-size: 15px;
   font-weight: 400;
   line-height: 23px;
+  text-transform: none;
 }
 
 .info-text-light.bold {
@@ -6286,6 +6287,7 @@ blockquote {
   padding-left: 10px;
   font-weight: 600;
   text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
 .info-text-light.black {
