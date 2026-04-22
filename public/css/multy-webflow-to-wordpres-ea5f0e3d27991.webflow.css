@@ -11583,9 +11583,23 @@ body[page="blog"] .section-wrapper.kurzy-campy {
     flex-direction: column;
     align-items: center;
     margin-top: 0;
-    padding-left: 0;
-    padding-right: 0;
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
     display: flex;
+  }
+  .cta-section {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  /* Mohlo by vás zaujmout — články na střed */
+  .collection-list-blog {
+    flex-direction: column;
+    align-items: center;
+  }
+  /* quick-contact-wrapper-buttony — menší výška */
+  .quick-contact-wrapper-buttony {
+    margin-top: 1.5rem;
+    margin-bottom: 1.5rem;
   }
 
   .padding-vertical {
