@@ -11614,6 +11614,13 @@ body[page="blog"] .section-wrapper.kurzy-campy {
   .hero-slider-wrapper._2 {
     justify-content: center;
     justify-items: center;
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+  }
+  .hero-button-container {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
   }
 
   .banner-button-2 {
