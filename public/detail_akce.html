@@ -555,40 +555,69 @@ button:hover {
   border-radius: .25rem;
   display: block;
 }
+/* akce-text-all-blok: padding a flex layout */
+.akce-text-all-blok {
+  padding-top: 2rem !important;
+  padding-bottom: 2rem !important;
+  justify-content: flex-start !important;
+}
+/* Všechen text levé části: stejná velikost jako datum */
+.akce-item-name {
+  font-size: 1.1rem !important;
+}
+/* Hvězdičkový text — spodní část bloku */
+.akce-text-all-blok .rezervace-button-pokyny {
+  margin-top: auto;
+  padding-top: 1.5rem;
+  font-size: 0.8rem;
+  color: rgba(255,255,255,0.55);
+  font-style: italic;
+}
 /* Rezervační tlačítka */
-.rezervace-button-wrapper { margin-top: 2rem; }
+.rezervace-button-wrapper { margin-top: 1.5rem; }
 .rezervace-buttons-row {
-  display: flex; flex-wrap: wrap; gap: 0.75rem;
-  align-items: center; margin-bottom: 0.5rem;
+  display: flex; flex-wrap: nowrap; gap: 0.6rem;
+  align-items: center; margin-bottom: 0;
 }
 .rezervace-buttons-row .banner-button {
-  margin: 0 !important; height: 2.7rem; min-height: 2.7rem;
-  padding: 9px 20px; font-size: 0.9rem;
+  margin: 0 !important; height: 2.2rem; min-height: 2.2rem;
+  padding: 5px 14px; font-size: 0.82rem; white-space: nowrap;
 }
 .rezervace-buttons-row .main-button {
   margin: 0 !important; width: auto; max-width: none;
-  height: 2.7rem; min-height: 2.7rem; padding: 0 20px;
-  font-size: 0.9rem; text-decoration: none;
+  height: 2.2rem; min-height: 2.2rem; padding: 0 14px;
+  font-size: 0.82rem; text-decoration: none; white-space: nowrap;
+  display: flex; align-items: center;
 }
-/* Modal overlay */
+@media (max-width: 479px) {
+  .rezervace-buttons-row { flex-wrap: wrap; }
+}
+/* Modal overlay — vystředěný */
 #rezervace-modal {
   display: none; position: fixed; inset: 0;
   background: rgba(0,0,0,0.78); z-index: 99999;
-  overflow-y: auto; align-items: flex-start;
+  overflow-y: auto; align-items: center;
   justify-content: center; padding: 2rem 1rem; box-sizing: border-box;
 }
 .rez-modal-inner {
-  background: #222528; border-radius: 0.5rem;
+  background: #222528; border-radius: 0.75rem;
   max-width: 480px; width: 100%;
-  padding: 2.5rem 2rem 1.5rem;
-  position: relative; margin: 0 auto;
+  padding: 3rem 2.25rem 2rem;
+  position: relative; margin: auto;
+  box-shadow: 0 8px 48px rgba(0,0,0,0.7);
 }
 .rez-modal-inner .pop-up-close-button {
-  inset: 0.75rem 0.75rem auto auto; left: auto;
-  width: 2rem; height: 2rem; padding: 0.35rem;
+  position: absolute; inset: 0.85rem 0.85rem auto auto; left: auto;
+  width: 2.2rem; height: 2.2rem; padding: 0.4rem;
   background: rgba(255,255,255,0.08); border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; border: none;
+  transition: background 0.2s ease, transform 0.3s ease;
 }
-.rez-modal-inner .pop-up-close-button:hover { background: rgba(255,255,255,0.18); }
+.rez-modal-inner .pop-up-close-button:hover {
+  background: rgba(255,255,255,0.2);
+  transform: scale(1.15) rotate(90deg);
+}
 .rez-modal-title {
   color: #ebe4da; font-size: 1.2rem; font-weight: 700;
   margin: 0 0 0.35rem; font-family: proxima-nova, sans-serif;
@@ -740,8 +769,8 @@ h1 { font-weight: 400 !important; }
                       <button type="button" class="banner-button" onclick="document.getElementById('rezervace-modal').style.display='flex'">Rezervační formulář</button>
                       <a id="rez-mail-link" href="mailto:cihi@bikeskills.cz?subject=Registrace%20campy" class="main-button rezervace">Rezervace mailem</a>
                     </div>
-                    <div class="rezervace-button-pokyny">*do mailu uveďte prosím jméno / telefonní spojení - budeme vás obratem kontaktovat s doplňujícím dotazem</div>
                   </div>
+                  <div class="rezervace-button-pokyny">*do mailu uveďte prosím jméno / telefonní spojení - budeme vás obratem kontaktovat s doplňujícím dotazem</div>
                 </div><img item="featured-image" loading="lazy" id="w-node-_910af733-d7eb-e361-e24f-8b27642a62c7-19f13da9" src="" alt="" sym-bind="{&quot;img&quot;:{&quot;type&quot;:&quot;Call&quot;,&quot;val&quot;:{&quot;fun&quot;:{&quot;type&quot;:&quot;Variable&quot;,&quot;val&quot;:[&quot;DynamoGateway&quot;,&quot;dynamoImageToImage&quot;]},&quot;arg&quot;:{&quot;type&quot;:&quot;Select&quot;,&quot;val&quot;:{&quot;from&quot;:{&quot;type&quot;:&quot;Variable&quot;,&quot;val&quot;:&quot;Dynamo&quot;},&quot;prop&quot;:&quot;uvodni-foto&quot;}}}}}" class="image-61 w-dyn-bind-empty">
                 <div sym-bind="{&quot;children&quot;:{&quot;type&quot;:&quot;Call&quot;,&quot;val&quot;:{&quot;fun&quot;:{&quot;type&quot;:&quot;Variable&quot;,&quot;val&quot;:[&quot;DynamoGateway&quot;,&quot;dynamoRichTextToRichTextChildren&quot;]},&quot;arg&quot;:{&quot;type&quot;:&quot;Select&quot;,&quot;val&quot;:{&quot;from&quot;:{&quot;type&quot;:&quot;Variable&quot;,&quot;val&quot;:&quot;Dynamo&quot;},&quot;prop&quot;:&quot;detailni-popis-kurzu-ci-akce&quot;}}}}}" item="content" id="w-node-d276f07d-2126-3529-4e7e-bcafee0ea0c0-19f13da9" class="rich-text-block-4 w-dyn-bind-empty w-richtext"></div>
                 <div bind="be54d460-308f-8c6f-962c-2e06a24e1325" acf:oembed="akce-video" sym-bind="{&quot;video&quot;:{&quot;type&quot;:&quot;Call&quot;,&quot;val&quot;:{&quot;fun&quot;:{&quot;type&quot;:&quot;Variable&quot;,&quot;val&quot;:[&quot;DynamoGateway&quot;,&quot;dynamoVideoLinkToVideo&quot;]},&quot;arg&quot;:{&quot;type&quot;:&quot;Select&quot;,&quot;val&quot;:{&quot;from&quot;:{&quot;type&quot;:&quot;Variable&quot;,&quot;val&quot;:&quot;Dynamo&quot;},&quot;prop&quot;:&quot;video-trailer-na-akci&quot;}}}}}" id="w-node-be54d460-308f-8c6f-962c-2e06a24e1325-19f13da9" class="video-4 w-dyn-bind-empty w-video w-embed"></div>
