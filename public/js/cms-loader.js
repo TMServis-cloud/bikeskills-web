@@ -659,6 +659,13 @@ async function loadAkceDetail(slug) {
       ? data.galerie.filter(Boolean)
       : [data.galerie1, data.galerie2, data.galerie3, data.galerie4].filter(Boolean);
 
+    // Nastav název akce do rezervačního modalu
+    const rezCamp = document.getElementById('rez-modal-camp');
+    if (rezCamp) rezCamp.textContent = data.nazev || '';
+    const rezMailLink = document.getElementById('rez-mail-link');
+    if (rezMailLink) rezMailLink.href = `mailto:cihi@bikeskills.cz?subject=${encodeURIComponent('Registrace: ' + (data.nazev || 'akce'))}`;
+    window._akceNazev = data.nazev || '';
+
     const pageHeading = document.querySelector('.page-heading[acf\\:text="typ-akce"]');
     if (pageHeading) {
       pageHeading.textContent = normalizeTypAkce(data.typAkce) || data.nazev || '';
@@ -1262,3 +1269,103 @@ window.addEventListener('load', function() {
     });
   }, 800);
 });
+
+// ============================================================
+// REZERVAČNÍ FORMULÁŘ
+// ============================================================
+(function() {
+  const SEND_URL = 'https://europe-west1-bikeskills-web.cloudfunctions.net/sendReservation';
+
+  function closeModal() {
+    const m = document.getElementById('rezervace-modal');
+    if (m) m.style.display = 'none';
+  }
+
+  function showError(msg) {
+    const el = document.getElementById('rez-error');
+    if (!el) return;
+    el.textContent = msg;
+    el.style.display = msg ? 'block' : 'none';
+  }
+
+  function val(id) {
+    const el = document.getElementById(id);
+    return el ? el.value.trim() : '';
+  }
+
+  function checked(id) {
+    const el = document.getElementById(id);
+    return el ? el.checked : false;
+  }
+
+  function resetForm() {
+    const form = document.getElementById('rezervace-form');
+    if (form) form.reset();
+    showError('');
+    const wrap = document.getElementById('rez-form-wrap');
+    const dekuji = document.getElementById('rez-dekuji');
+    if (wrap) wrap.style.display = '';
+    if (dekuji) dekuji.style.display = 'none';
+    const btn = document.getElementById('rez-submit');
+    if (btn) { btn.disabled = false; btn.textContent = 'Odeslat přihlášku'; }
+  }
+
+  document.addEventListener('click', function(e) {
+    const modal = document.getElementById('rezervace-modal');
+    if (modal && e.target === modal) { resetForm(); closeModal(); }
+  });
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') { resetForm(); closeModal(); }
+  });
+
+  document.addEventListener('submit', async function(e) {
+    if (!e.target || e.target.id !== 'rezervace-form') return;
+    e.preventDefault();
+
+    const jmeno = val('rez-jmeno');
+    const prijmeni = val('rez-prijmeni');
+    const email = val('rez-email');
+    const telefon = val('rez-telefon');
+    const pedaly = checked('rez-pedaly');
+    const gdpr = checked('rez-gdpr');
+    const nazevAkce = window._akceNazev || document.getElementById('rez-modal-camp')?.textContent || '';
+
+    if (!jmeno) { showError('Vyplňte prosím jméno.'); return; }
+    if (!prijmeni) { showError('Vyplňte prosím příjmení.'); return; }
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showError('Zadejte platný e-mail.'); return; }
+    if (!gdpr) { showError('Pro odeslání přihlášky je nutný souhlas se zásadami ochrany osobních údajů.'); return; }
+    showError('');
+
+    const btn = document.getElementById('rez-submit');
+    if (btn) { btn.disabled = true; btn.textContent = 'Odesílám…'; }
+
+    try {
+      const resp = await fetch(SEND_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ jmeno, prijmeni, email, telefon, pedaly, nazevAkce }),
+      });
+
+      if (!resp.ok) throw new Error('server error');
+
+      const wrap = document.getElementById('rez-form-wrap');
+      const dekuji = document.getElementById('rez-dekuji');
+      const textEl = document.getElementById('rez-dekuji-text');
+
+      if (textEl) textEl.innerHTML =
+        `Děkujeme za přihlášení na <strong>${nazevAkce || 'camp'}</strong>.<br><br>` +
+        `Po zpracování přihlášky vás kontaktujeme s detaily. ` +
+        `Na zadaný mail vám také posíláme potvrzení. ` +
+        `Pokud byste jej nedostali, kontaktujte nás na ` +
+        `<a href="mailto:info@bikeskills.cz">info@bikeskills.cz</a>.`;
+
+      if (wrap) wrap.style.display = 'none';
+      if (dekuji) dekuji.style.display = 'block';
+    } catch (err) {
+      console.error('Rezervace error:', err);
+      if (btn) { btn.disabled = false; btn.textContent = 'Odeslat přihlášku'; }
+      showError('Nepodařilo se odeslat přihlášku. Zkuste to prosím znovu nebo nás kontaktujte na info@bikeskills.cz.');
+    }
+  });
+})();

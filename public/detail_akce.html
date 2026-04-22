@@ -1,6 +1,12 @@
 <!DOCTYPE html><!--  This site was created in Webflow. https://webflow.com  --><!--  Last Published: Wed Apr 15 2026 08:37:28 GMT+0000 (Coordinated Universal Time)  -->
 <html data-wf-page="657df3baa7b4c74f19f13da9" data-wf-site="6540e603edffe757afe3932d" lang="cs">
 <head>
+  <!-- Google Analytics GA4 -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-DG5KF7PX48"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-DG5KF7PX48');</script>
+  <!-- Meta Pixel (Facebook) -->
+  <script>!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');fbq('init','537412813575132');fbq('track','PageView');</script>
+  <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=537412813575132&ev=PageView&noscript=1" alt=""></noscript>
   <meta charset="utf-8">
   <base href="/">
   <title>Akce | BikeSkills — MTB škola kola</title>
@@ -549,6 +555,86 @@ button:hover {
   border-radius: .25rem;
   display: block;
 }
+/* Rezervační tlačítka */
+.rezervace-button-wrapper { margin-top: 2rem; }
+.rezervace-buttons-row {
+  display: flex; flex-wrap: wrap; gap: 0.75rem;
+  align-items: center; margin-bottom: 0.5rem;
+}
+.rezervace-buttons-row .banner-button {
+  margin: 0 !important; height: 2.7rem; min-height: 2.7rem;
+  padding: 9px 20px; font-size: 0.9rem;
+}
+.rezervace-buttons-row .main-button {
+  margin: 0 !important; width: auto; max-width: none;
+  height: 2.7rem; min-height: 2.7rem; padding: 0 20px;
+  font-size: 0.9rem; text-decoration: none;
+}
+/* Modal overlay */
+#rezervace-modal {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.78); z-index: 99999;
+  overflow-y: auto; align-items: flex-start;
+  justify-content: center; padding: 2rem 1rem; box-sizing: border-box;
+}
+.rez-modal-inner {
+  background: #222528; border-radius: 0.5rem;
+  max-width: 480px; width: 100%;
+  padding: 2.5rem 2rem 1.5rem;
+  position: relative; margin: 0 auto;
+}
+.rez-modal-inner .pop-up-close-button {
+  inset: 0.75rem 0.75rem auto auto; left: auto;
+  width: 2rem; height: 2rem; padding: 0.35rem;
+  background: rgba(255,255,255,0.08); border-radius: 50%;
+}
+.rez-modal-inner .pop-up-close-button:hover { background: rgba(255,255,255,0.18); }
+.rez-modal-title {
+  color: #ebe4da; font-size: 1.2rem; font-weight: 700;
+  margin: 0 0 0.35rem; font-family: proxima-nova, sans-serif;
+}
+.rez-modal-camp {
+  color: #efc101; font-weight: 600; font-size: 0.92rem;
+  margin: 0 0 1.5rem; min-height: 1rem; font-family: proxima-nova, sans-serif;
+}
+.rez-modal-inner .text-field-contact.w-input {
+  margin-bottom: 0.7rem; border: 1.5px solid #545a4f;
+  -webkit-appearance: none; appearance: none; background-image: none;
+}
+.rez-modal-inner .text-field-contact.w-input:focus { border-color: #efc101; outline: none; }
+.rez-check-label {
+  display: flex; align-items: flex-start; gap: 0.55rem;
+  color: #ebe4da; font-size: 0.84rem; margin-bottom: 0.8rem;
+  cursor: pointer; line-height: 1.45; font-family: proxima-nova, sans-serif;
+}
+.rez-check-label .checkbox-formular {
+  margin-top: 0.15rem; flex-shrink: 0; cursor: pointer;
+  accent-color: #efc101; min-height: auto !important;
+  height: 15px !important; padding: 0 !important;
+  margin-left: 0 !important; margin-right: 0 !important;
+}
+.rez-check-label a { color: #efc101; text-decoration: underline; }
+.rez-modal-inner .banner-button.rez-submit {
+  width: 100%; margin: 0.5rem 0 0 !important;
+  height: 2.7rem; min-height: 2.7rem; padding: 9px 20px; box-sizing: border-box;
+}
+.rez-modal-inner .banner-button.rez-submit:disabled { opacity: 0.55; cursor: not-allowed; }
+.rez-error-msg {
+  color: #e52027; font-size: 0.8rem; margin: -0.4rem 0 0.7rem;
+  display: none; font-family: proxima-nova, sans-serif;
+}
+.rez-dekuji { display: none; text-align: center; padding: 1rem 0 0.5rem; }
+.rez-dekuji-icon { font-size: 2.5rem; margin-bottom: 0.6rem; }
+.rez-dekuji-nadpis {
+  color: #efc101; font-size: 1.05rem; font-weight: 700;
+  margin-bottom: 1rem; font-family: proxima-nova, sans-serif;
+}
+.rez-dekuji-text {
+  color: #ebe4da; font-size: 0.86rem; line-height: 1.65;
+  font-family: proxima-nova, sans-serif;
+}
+.rez-dekuji-text a { color: #efc101; }
+h1 { font-weight: 400 !important; }
 </style>
   <link rel="canonical" href="https://bikeskills.cz/detail_akce.html">
 </head>
@@ -650,7 +736,10 @@ button:hover {
                     <div sym-bind="{&quot;children&quot;:{&quot;type&quot;:&quot;Call&quot;,&quot;val&quot;:{&quot;fun&quot;:{&quot;type&quot;:&quot;Variable&quot;,&quot;val&quot;:[&quot;DynamoGateway&quot;,&quot;dynamoPlainTextToListOfElements&quot;]},&quot;arg&quot;:{&quot;type&quot;:&quot;Select&quot;,&quot;val&quot;:{&quot;from&quot;:{&quot;type&quot;:&quot;Variable&quot;,&quot;val&quot;:&quot;Dynamo&quot;},&quot;prop&quot;:&quot;level-jezdcu&quot;}}}}}" acf:text="akce-level" class="akce-item-text-field w-dyn-bind-empty"></div>
                   </div>
                   <div class="rezervace-button-wrapper">
-                    <a href="mailto:cihi@bikeskills.cz?subject=Registrace%20campy" class="main-button rezervace w-button">rezervace mailem</a>
+                    <div class="rezervace-buttons-row">
+                      <button type="button" class="banner-button" onclick="document.getElementById('rezervace-modal').style.display='flex'">Rezervační formulář</button>
+                      <a id="rez-mail-link" href="mailto:cihi@bikeskills.cz?subject=Registrace%20campy" class="main-button rezervace">Rezervace mailem</a>
+                    </div>
                     <div class="rezervace-button-pokyny">*do mailu uveďte prosím jméno / telefonní spojení - budeme vás obratem kontaktovat s doplňujícím dotazem</div>
                   </div>
                 </div><img item="featured-image" loading="lazy" id="w-node-_910af733-d7eb-e361-e24f-8b27642a62c7-19f13da9" src="" alt="" sym-bind="{&quot;img&quot;:{&quot;type&quot;:&quot;Call&quot;,&quot;val&quot;:{&quot;fun&quot;:{&quot;type&quot;:&quot;Variable&quot;,&quot;val&quot;:[&quot;DynamoGateway&quot;,&quot;dynamoImageToImage&quot;]},&quot;arg&quot;:{&quot;type&quot;:&quot;Select&quot;,&quot;val&quot;:{&quot;from&quot;:{&quot;type&quot;:&quot;Variable&quot;,&quot;val&quot;:&quot;Dynamo&quot;},&quot;prop&quot;:&quot;uvodni-foto&quot;}}}}}" class="image-61 w-dyn-bind-empty">
@@ -814,10 +903,47 @@ Cookies.set(cookieName, 'ok', { expires: 31 });
 })
 </script>
 
+  <!-- Rezervační formulář — modal -->
+  <div id="rezervace-modal" role="dialog" aria-modal="true" aria-labelledby="rez-modal-title" onclick="if(event.target===this){this.style.display='none'}">
+    <div class="rez-modal-inner">
+      <button class="pop-up-close-button" aria-label="Zavřít" onclick="document.getElementById('rezervace-modal').style.display='none'">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1.5 1.5L16.5 16.5M16.5 1.5L1.5 16.5" stroke="#ebe4da" stroke-width="2.5" stroke-linecap="round"/></svg>
+      </button>
+      <div id="rez-form-wrap">
+        <p class="rez-modal-title" id="rez-modal-title">Rezervační formulář</p>
+        <p class="rez-modal-camp" id="rez-modal-camp"></p>
+        <form id="rezervace-form" novalidate>
+          <input class="text-field-contact w-input" type="text" id="rez-jmeno" placeholder="Jméno *" autocomplete="given-name">
+          <input class="text-field-contact w-input" type="text" id="rez-prijmeni" placeholder="Příjmení *" autocomplete="family-name">
+          <input class="text-field-contact w-input" type="email" id="rez-email" placeholder="E-mail *" autocomplete="email">
+          <input class="text-field-contact w-input" type="tel" id="rez-telefon" placeholder="Telefon" autocomplete="tel">
+          <label class="rez-check-label">
+            <input type="checkbox" id="rez-pedaly" class="checkbox-formular">
+            <span>
+              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="10" viewBox="0 0 22 10" fill="currentColor" style="vertical-align:middle;margin-right:3px;opacity:0.85"><rect x="0" y="2.5" width="22" height="5" rx="1.5"/><rect x="2" y="0" width="4" height="10" rx="1.5"/><rect x="16" y="0" width="4" height="10" rx="1.5"/><circle cx="5" cy="5" r="1.2"/><circle cx="17" cy="5" r="1.2"/></svg>
+              Pedály mám platformy (flat)
+            </span>
+          </label>
+          <label class="rez-check-label">
+            <input type="checkbox" id="rez-gdpr" class="checkbox-formular">
+            <span>Souhlasím se <a href="/zasady-ochrany-osobnich-udaju.html" target="_blank" rel="noopener">zásadami ochrany osobních údajů</a> *</span>
+          </label>
+          <p class="rez-error-msg" id="rez-error"></p>
+          <button type="submit" class="banner-button rez-submit" id="rez-submit">Odeslat přihlášku</button>
+        </form>
+      </div>
+      <div class="rez-dekuji" id="rez-dekuji">
+        <div class="rez-dekuji-icon">✓</div>
+        <p class="rez-dekuji-nadpis">Přihláška odeslána!</p>
+        <p class="rez-dekuji-text" id="rez-dekuji-text"></p>
+      </div>
+    </div>
+  </div>
+
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-  
+
   <!-- Bikeskills CMS Loader -->
   <script src="/js/cms-loader.js"></script>
 </body>
