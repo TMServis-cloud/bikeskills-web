@@ -290,14 +290,10 @@ function renderAkceItem(template, data) {
 
   const imgEl = item.querySelector('[item="featured-image"], img.image-55');
   if (imgEl) {
-    if (data.imageUrl) {
-      imgEl.src = resolveUrl(data.imageUrl); imgEl.alt = data.nazev || '';
-      imgEl.onerror = makeImgErrorHandler('.akce-image-blok');
-      imgEl.classList.remove('w-dyn-bind-empty');
-    } else {
-      const imgBlock = imgEl.closest('.akce-image-blok');
-      if (imgBlock) imgBlock.style.background = 'rgba(255,255,255,0.06)';
-    }
+    imgEl.src = data.imageUrl ? resolveUrl(data.imageUrl) : PLACEHOLDER_URL;
+    imgEl.alt = data.nazev || '';
+    imgEl.onerror = makeImgErrorHandler();
+    imgEl.classList.remove('w-dyn-bind-empty');
   }
 
   const excerptEl = item.querySelector('.paragraph-2, [item="excerpt"]');
@@ -500,21 +496,17 @@ function resolveUrl(url) {
   return `https://firebasestorage.googleapis.com/v0/b/${m[1]}/o/${m[2]}?alt=media`;
 }
 
+const PLACEHOLDER_URL = 'https://firebasestorage.googleapis.com/v0/b/bikeskills-web.firebasestorage.app/o/images%2Fplaceholder.webp?alt=media';
+
 /** Onerror → placeholder (Storage URL selhala) */
-function makeImgErrorHandler(containerSelector, containerEl) {
-  return function() {
-    showImgPlaceholder(this, containerSelector, containerEl);
-  };
+function makeImgErrorHandler() {
+  return function() { showImgPlaceholder(this); };
 }
 
-function showImgPlaceholder(imgEl, containerSelector, containerEl) {
-  const el = containerEl || (containerSelector ? imgEl.closest(containerSelector) : null);
-  if (el) {
-    imgEl.style.display = 'none';
-    el.style.background = 'rgba(255,255,255,0.06)';
-  } else {
-    imgEl.style.display = 'none';
-  }
+function showImgPlaceholder(imgEl) {
+  imgEl.onerror = null;
+  imgEl.src = PLACEHOLDER_URL;
+  imgEl.style.display = '';
 }
 
 /** Přepíše Storage URL v HTML obsahu na čisté Storage URL bez tokenu */
@@ -715,15 +707,11 @@ async function loadAkceDetail(slug) {
 
     const imgEl = item.querySelector('img[item="featured-image"]');
     if (imgEl) {
-      if (data.imageUrl) {
-        imgEl.src = resolveUrl(data.imageUrl);
-        imgEl.alt = data.nazev || '';
-        imgEl.width = 1280; imgEl.height = 720;
-        imgEl.onerror = makeImgErrorHandler(null);
-        imgEl.classList.remove('w-dyn-bind-empty');
-      } else {
-        imgEl.style.display = 'none';
-      }
+      imgEl.src = data.imageUrl ? resolveUrl(data.imageUrl) : PLACEHOLDER_URL;
+      imgEl.alt = data.nazev || '';
+      imgEl.width = 1280; imgEl.height = 720;
+      imgEl.onerror = makeImgErrorHandler();
+      imgEl.classList.remove('w-dyn-bind-empty');
     }
 
     const contentEl = item.querySelector('[item="content"]');
@@ -810,14 +798,10 @@ function renderClanekItem(template, data) {
 
   const imgEl = item.querySelector('[item="featured-image"], .wrapper-image__img');
   if (imgEl) {
-    if (data.imageUrl) {
-      imgEl.src = resolveUrl(data.imageUrl); imgEl.alt = data.titulek || '';
-      imgEl.onerror = makeImgErrorHandler('.card-blog__wrapper-image');
-      imgEl.classList.remove('w-dyn-bind-empty');
-    } else {
-      const imgWrap = imgEl.closest('.card-blog__wrapper-image');
-      if (imgWrap) imgWrap.style.background = 'rgba(255,255,255,0.06)';
-    }
+    imgEl.src = data.imageUrl ? resolveUrl(data.imageUrl) : PLACEHOLDER_URL;
+    imgEl.alt = data.titulek || '';
+    imgEl.onerror = makeImgErrorHandler();
+    imgEl.classList.remove('w-dyn-bind-empty');
   }
 
   return item;
@@ -992,7 +976,7 @@ async function loadClanekDetail(slug) {
       if (data.imageUrl) {
         imgEl.src = resolveUrl(data.imageUrl); imgEl.alt = data.titulek || '';
         imgEl.width = 1280; imgEl.height = 720;
-        imgEl.onerror = makeImgErrorHandler(null);
+        imgEl.onerror = makeImgErrorHandler();
         imgEl.classList.remove('w-dyn-bind-empty');
         const wrap = imgEl.parentElement;
         if (wrap) wrap.style.display = '';
@@ -1106,9 +1090,10 @@ function renderTeamItem(template, data) {
   }
 
   const imgEl = item.querySelector('[item="featured-image"], .image-49');
-  if (imgEl && data.imageUrl) {
-    imgEl.src = resolveUrl(data.imageUrl); imgEl.alt = data.jmeno || '';
-    imgEl.onerror = makeImgErrorHandler(null);
+  if (imgEl) {
+    imgEl.src = data.imageUrl ? resolveUrl(data.imageUrl) : PLACEHOLDER_URL;
+    imgEl.alt = data.jmeno || '';
+    imgEl.onerror = makeImgErrorHandler();
     imgEl.classList.remove('w-dyn-bind-empty');
   }
 
@@ -1176,14 +1161,11 @@ async function loadTeamDetail(slug) {
     // Hlavní fotka
     const imgEl = container.querySelector('img[item="featured-image"]');
     if (imgEl) {
-      if (data.imageUrl) {
-        imgEl.src = resolveUrl(data.imageUrl); imgEl.alt = data.jmeno || '';
-        imgEl.width = 800; imgEl.height = 800;
-        imgEl.onerror = makeImgErrorHandler(null);
-        imgEl.classList.remove('w-dyn-bind-empty');
-      } else {
-        imgEl.style.display = 'none';
-      }
+      imgEl.src = data.imageUrl ? resolveUrl(data.imageUrl) : PLACEHOLDER_URL;
+      imgEl.alt = data.jmeno || '';
+      imgEl.width = 800; imgEl.height = 800;
+      imgEl.onerror = makeImgErrorHandler();
+      imgEl.classList.remove('w-dyn-bind-empty');
     }
 
     // Sociální sítě
@@ -1211,7 +1193,7 @@ async function loadTeamDetail(slug) {
       if (imgSlot && url) {
         imgSlot.src = resolveUrl(url);
         imgSlot.alt = data.jmeno || '';
-        imgSlot.onerror = makeImgErrorHandler(null);
+        imgSlot.onerror = makeImgErrorHandler();
         if (block) block.style.display = '';
       } else if (block) {
         block.style.display = 'none';

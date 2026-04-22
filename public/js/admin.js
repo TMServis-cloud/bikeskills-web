@@ -472,6 +472,7 @@ document.getElementById('form-akce').addEventListener('submit', async (e) => {
     if (fileInput.files.length > 0) {
       imageUrl = await uploadImage(fileInput.files[0], 'akce');
     }
+    if (!imageUrl) imageUrl = PLACEHOLDER_URL;
 
     const nazev = document.getElementById('akce-nazev').value.trim();
     const slug = document.getElementById('akce-slug').value.trim() || generateSlug(nazev);
@@ -654,6 +655,7 @@ document.getElementById('form-clanek').addEventListener('submit', async (e) => {
     if (fileInput.files.length > 0) {
       imageUrl = await uploadImage(fileInput.files[0], 'blog');
     }
+    if (!imageUrl) imageUrl = PLACEHOLDER_URL;
 
     const titulek = document.getElementById('clanek-titulek').value.trim();
     const slug = document.getElementById('clanek-slug').value.trim() || generateSlug(titulek);
@@ -852,6 +854,7 @@ document.getElementById('form-team').addEventListener('submit', async (e) => {
     if (fileInput.files.length > 0) {
       imageUrl = await uploadImage(fileInput.files[0], 'team');
     }
+    if (!imageUrl) imageUrl = PLACEHOLDER_URL;
 
     const jmeno = document.getElementById('team-jmeno').value.trim();
     const slug = document.getElementById('team-slug').value.trim() || generateSlug(jmeno);
@@ -900,6 +903,8 @@ function confirmDeleteTeam(id, name) {
 // ============================================================
 // IMAGE COMPRESSION + UPLOAD
 // ============================================================
+
+const PLACEHOLDER_URL = 'https://firebasestorage.googleapis.com/v0/b/bikeskills-web.firebasestorage.app/o/images%2Fplaceholder.webp?alt=media';
 
 /** Zmenší obrázek na max. maxDim px a převede na WebP */
 async function compressToWebP(file, maxDim = 1920, quality = 0.85) {
