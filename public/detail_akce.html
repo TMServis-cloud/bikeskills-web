@@ -583,17 +583,21 @@ h3, h4 {
   justify-content: flex-start !important;
   text-align: left !important;
 }
-/* Popisky vlevo — jednořádkové, bílé, verzálky */
+/* Popisky vlevo — jednořádkové, bílé, sentence case */
 .akce-item-name {
   font-size: 1.05rem !important;
   white-space: nowrap !important;
   color: #ffffff !important;
   flex-shrink: 0 !important;
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+}
+/* Hodnoty — žluté, verzálky */
+.akce-item-text-field {
+  font-size: 1.05rem;
   text-transform: uppercase !important;
   letter-spacing: 0.04em !important;
 }
-/* Hodnoty datumu atd. */
-.akce-item-text-field { font-size: 1.05rem; }
 /* Fotka — stejná výška jako text blok */
 .image-61 {
   width: 100%; height: 100%;
