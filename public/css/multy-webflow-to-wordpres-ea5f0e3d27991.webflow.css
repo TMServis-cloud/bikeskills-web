@@ -6285,6 +6285,7 @@ blockquote {
   color: var(--zluta);
   padding-left: 10px;
   font-weight: 600;
+  text-transform: uppercase;
 }
 
 .info-text-light.black {

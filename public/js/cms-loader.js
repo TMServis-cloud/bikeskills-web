@@ -1307,7 +1307,7 @@ window.addEventListener('load', function() {
     if (wrap) wrap.style.display = '';
     if (dekuji) dekuji.style.display = 'none';
     const btn = document.getElementById('rez-submit');
-    if (btn) { btn.disabled = false; btn.textContent = 'ODESLAT'; }
+    if (btn) { btn.disabled = false; btn.innerHTML = '<span>ODESLAT</span><span class="rez-submit-line"></span>'; }
   }
 
   document.addEventListener('click', function(e) {
@@ -1339,7 +1339,7 @@ window.addEventListener('load', function() {
     showError('');
 
     const btn = document.getElementById('rez-submit');
-    if (btn) { btn.disabled = true; btn.textContent = 'Odesílám…'; }
+    if (btn) { btn.disabled = true; btn.innerHTML = 'Odesílám…'; }
 
     try {
       const resp = await fetch(SEND_URL, {
@@ -1365,7 +1365,7 @@ window.addEventListener('load', function() {
       if (dekuji) dekuji.style.display = 'block';
     } catch (err) {
       console.error('Rezervace error:', err);
-      if (btn) { btn.disabled = false; btn.textContent = 'ODESLAT'; }
+      if (btn) { btn.disabled = false; btn.innerHTML = '<span>ODESLAT</span><span class="rez-submit-line"></span>'; }
       showError('Nepodařilo se odeslat. Zkuste to prosím znovu nebo nás kontaktujte na info@bikeskills.cz.');
     }
   });
