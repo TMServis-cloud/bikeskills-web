@@ -491,34 +491,18 @@ function ensureHtml(text) {
   return text.split(/\n{2,}/).map(p => `<p>${p.replace(/\n/g, '<br>')}</p>`).join('');
 }
 
-/** Storage URL → Firebase Hosting cesta (pro wp-content/uploads) */
+/** Storage URL → čistá Storage URL bez tokenu (storage rules povolují public read) */
 function resolveUrl(url) {
   if (!url) return url;
-  const m = url.match(/firebasestorage\.googleapis\.com\/v0\/b\/[^/]+\/o\/(wp-content[^?]*)\?/);
+  // wp-content URLs: odstraň expirující token, nech ?alt=media (storage rules: allow read: if true)
+  const m = url.match(/firebasestorage\.googleapis\.com\/v0\/b\/([^/]+)\/o\/(wp-content[^?]*)\?/);
   if (!m) return url;
-  try { return '/' + decodeURIComponent(m[1]); } catch(e) { return url; }
+  return `https://firebasestorage.googleapis.com/v0/b/${m[1]}/o/${m[2]}?alt=media`;
 }
 
-/** Vrátí původní Storage URL pro fallback (wp-content) */
-function storageUrlFallback(hostingPath) {
-  if (!hostingPath || !hostingPath.startsWith('/wp-content/')) return null;
-  const encoded = hostingPath.slice(1).split('/').map(encodeURIComponent).join('%2F');
-  return `https://firebasestorage.googleapis.com/v0/b/bikeskills-web.firebasestorage.app/o/${encoded}?alt=media`;
-}
-
-/** Onerror s fallback: Hosting → Storage → placeholder */
+/** Onerror → placeholder (Storage URL selhala) */
 function makeImgErrorHandler(containerSelector, containerEl) {
   return function() {
-    const src = this.src || '';
-    if (src.startsWith(location.origin + '/wp-content/') || src.startsWith('/wp-content/')) {
-      // zkus Storage fallback
-      const fallback = storageUrlFallback(src.replace(location.origin, ''));
-      if (fallback && this.src !== fallback) {
-        this.onerror = function() { showImgPlaceholder(this, containerSelector, containerEl); };
-        this.src = fallback;
-        return;
-      }
-    }
     showImgPlaceholder(this, containerSelector, containerEl);
   };
 }
@@ -533,12 +517,12 @@ function showImgPlaceholder(imgEl, containerSelector, containerEl) {
   }
 }
 
-/** Přepíše všechny Storage URL v HTML obsahu na Hosting cesty */
+/** Přepíše Storage URL v HTML obsahu na čisté Storage URL bez tokenu */
 function resolveContentUrls(html) {
   if (!html) return html;
   return html.replace(
-    /https:\/\/firebasestorage\.googleapis\.com\/v0\/b\/[^/]+\/o\/(wp-content[^?"'\s<>]*)\?alt=media/g,
-    (_, enc) => { try { return '/' + decodeURIComponent(enc); } catch(e) { return _; } }
+    /https:\/\/firebasestorage\.googleapis\.com\/v0\/b\/([^/]+)\/o\/(wp-content[^?"'\s<>]*)\?[^"'\s<>]*/g,
+    (_, bucket, enc) => `https://firebasestorage.googleapis.com/v0/b/${bucket}/o/${enc}?alt=media`
   );
 }
 
