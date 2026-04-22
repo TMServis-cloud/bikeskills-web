@@ -1307,7 +1307,7 @@ window.addEventListener('load', function() {
     if (wrap) wrap.style.display = '';
     if (dekuji) dekuji.style.display = 'none';
     const btn = document.getElementById('rez-submit');
-    if (btn) { btn.disabled = false; btn.textContent = 'Odeslat přihlášku'; }
+    if (btn) { btn.disabled = false; btn.textContent = 'ODESLAT'; }
   }
 
   document.addEventListener('click', function(e) {
@@ -1323,18 +1323,19 @@ window.addEventListener('load', function() {
     if (!e.target || e.target.id !== 'rezervace-form') return;
     e.preventDefault();
 
-    const jmeno = val('rez-jmeno');
-    const prijmeni = val('rez-prijmeni');
+    const jmenoPrijmeni = val('rez-jmeno-prijmeni');
     const email = val('rez-email');
     const telefon = val('rez-telefon');
-    const pedaly = checked('rez-pedaly');
+    const termin = val('rez-termin');
+    const typKola = val('rez-typ-kola');
+    const pocet = val('rez-pocet');
+    const poznamka = val('rez-poznamka');
     const gdpr = checked('rez-gdpr');
     const nazevAkce = window._akceNazev || document.getElementById('rez-modal-camp')?.textContent || '';
 
-    if (!jmeno) { showError('Vyplňte prosím jméno.'); return; }
-    if (!prijmeni) { showError('Vyplňte prosím příjmení.'); return; }
+    if (!jmenoPrijmeni) { showError('Vyplňte prosím jméno a příjmení.'); return; }
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showError('Zadejte platný e-mail.'); return; }
-    if (!gdpr) { showError('Pro odeslání přihlášky je nutný souhlas se zásadami ochrany osobních údajů.'); return; }
+    if (!gdpr) { showError('Pro odeslání je nutný souhlas se zásadami ochrany osobních údajů.'); return; }
     showError('');
 
     const btn = document.getElementById('rez-submit');
@@ -1344,7 +1345,7 @@ window.addEventListener('load', function() {
       const resp = await fetch(SEND_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ jmeno, prijmeni, email, telefon, pedaly, nazevAkce }),
+        body: JSON.stringify({ jmenoPrijmeni, email, telefon, termin, typKola, pocet, poznamka, nazevAkce }),
       });
 
       if (!resp.ok) throw new Error('server error');
@@ -1364,8 +1365,8 @@ window.addEventListener('load', function() {
       if (dekuji) dekuji.style.display = 'block';
     } catch (err) {
       console.error('Rezervace error:', err);
-      if (btn) { btn.disabled = false; btn.textContent = 'Odeslat přihlášku'; }
-      showError('Nepodařilo se odeslat přihlášku. Zkuste to prosím znovu nebo nás kontaktujte na info@bikeskills.cz.');
+      if (btn) { btn.disabled = false; btn.textContent = 'ODESLAT'; }
+      showError('Nepodařilo se odeslat. Zkuste to prosím znovu nebo nás kontaktujte na info@bikeskills.cz.');
     }
   });
 })();

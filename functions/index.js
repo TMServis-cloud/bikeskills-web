@@ -94,9 +94,9 @@ exports.sendReservation = functions
     if (req.method === 'OPTIONS') { res.status(204).send(''); return; }
     if (req.method !== 'POST') { res.status(405).json({ error: 'Method Not Allowed' }); return; }
 
-    const { jmeno, prijmeni, email, telefon, pedaly, nazevAkce } = req.body || {};
+    const { jmenoPrijmeni, email, telefon, termin, typKola, pocet, poznamka, nazevAkce } = req.body || {};
 
-    if (!jmeno || !prijmeni || !email || !nazevAkce) {
+    if (!jmenoPrijmeni || !email) {
       res.status(400).json({ error: 'Chybějí povinné údaje' });
       return;
     }
@@ -117,22 +117,40 @@ exports.sendReservation = functions
       },
     });
 
-    const pedalyText = pedaly ? 'Ano (platformy / flat)' : 'Ne (ne-flat / klipsy)';
-    const adminBody = `Nová přihláška na akci: ${nazevAkce}\n\nJméno: ${jmeno} ${prijmeni}\nE-mail: ${email}\nTelefon: ${telefon || '—'}\nPedály flat: ${pedalyText}`;
-    const clientBody = `Dobrý den ${jmeno},\n\nVaše přihláška na akci „${nazevAkce}" byla úspěšně odeslána.\nObratem se vám ozveme s dalšími informacemi.\n\nTým BikeSkills\nhttps://bikeskills.cz`;
+    const adminBody = [
+      `Nová přihláška / dotaz: ${nazevAkce || '(neuvedeno)'}`,
+      ``,
+      `Jméno a příjmení: ${jmenoPrijmeni}`,
+      `E-mail: ${email}`,
+      `Telefon: ${telefon || '—'}`,
+      `Termín kurzu / campu: ${termin || '—'}`,
+      `Typ kola: ${typKola || '—'}`,
+      `Počet účastníků: ${pocet || '—'}`,
+      `Poznámka / dotaz: ${poznamka || '—'}`,
+    ].join('\n');
+
+    const clientBody = [
+      `Dobrý den ${jmenoPrijmeni.split(' ')[0]},`,
+      ``,
+      `Váš dotaz / přihláška na akci „${nazevAkce || 'BikeSkills'}" byla úspěšně odeslána.`,
+      `Obratem se vám ozveme s dalšími informacemi.`,
+      ``,
+      `Tým BikeSkills`,
+      `https://bikeskills.cz`,
+    ].join('\n');
 
     try {
       await Promise.all([
         transporter.sendMail({
           from: `"BikeSkills rezervace" <${process.env.EMAIL_FROM}>`,
           to: 'cihi@bikeskills.cz',
-          subject: `Přihláška: ${nazevAkce} — ${jmeno} ${prijmeni}`,
+          subject: `Přihláška: ${nazevAkce || 'akce'} — ${jmenoPrijmeni}`,
           text: adminBody,
         }),
         transporter.sendMail({
           from: `"BikeSkills" <${process.env.EMAIL_FROM}>`,
           to: email,
-          subject: `Potvrzení přihlášky: ${nazevAkce}`,
+          subject: `Potvrzení přihlášky: ${nazevAkce || 'BikeSkills'}`,
           text: clientBody,
         }),
       ]);
