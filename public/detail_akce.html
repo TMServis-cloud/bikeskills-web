@@ -617,10 +617,12 @@ h3, h4 {
   font-style: normal;
   font-weight: 400;
 }
+/* Popisky — zarovnat nahoře, ne dole */
+.akce-item-text-block { align-items: flex-start !important; }
 /* Rezervační tlačítka */
 .rezervace-button-wrapper { margin-top: 1.5rem; }
 .rezervace-buttons-row {
-  display: flex; flex-wrap: nowrap; gap: 0.6rem;
+  display: flex; flex-wrap: nowrap; gap: 1.25rem;
   align-items: center; margin-bottom: 0;
 }
 .rezervace-buttons-row .banner-button,
@@ -633,8 +635,21 @@ h3, h4 {
 .rezervace-buttons-row .main-button {
   width: auto; max-width: none; text-decoration: none;
 }
-@media (max-width: 479px) {
-  .rezervace-buttons-row { flex-wrap: wrap; }
+@media (max-width: 767px) {
+  /* Info box: label a hodnota pod sebou */
+  .akce-item-text-block { flex-direction: column !important; gap: 0.15rem; }
+  /* Tlačítka pod sebou */
+  .rezervace-buttons-row {
+    flex-direction: column !important; align-items: flex-start !important;
+    gap: 0.75rem !important;
+  }
+  .rezervace-buttons-row .banner-button,
+  .rezervace-buttons-row .main-button {
+    width: auto !important;
+  }
+  /* Formulář: 1 sloupec */
+  .rez-form-grid { grid-template-columns: 1fr !important; }
+  .rez-form-grid .rez-pocet { grid-column: 1 !important; }
 }
 /* Modal overlay — vystředěný */
 #rezervace-modal {
@@ -658,7 +673,7 @@ h3, h4 {
   padding: 10px; margin: 0 !important;
   transition: all .2s ease-out;
   display: flex; background: none; border: none; border-radius: 0;
-  position: absolute; top: 0; right: 0;
+  position: absolute; top: 10px; right: 10px;
   height: auto; min-height: 0;
 }
 .rez-close-btn:hover {
@@ -875,7 +890,7 @@ h3, h4 {
                   </div>
                   <div class="rezervace-button-wrapper">
                     <div class="rezervace-buttons-row">
-                      <button type="button" class="banner-button" onclick="document.getElementById('rezervace-modal').style.display='flex'">Rezervační formulář</button>
+                      <button type="button" class="banner-button" onclick="openRezModal()">Rezervační formulář</button>
                       <a id="rez-mail-link" href="mailto:cihi@bikeskills.cz?subject=Registrace%20campy" class="main-button rezervace">Rezervace mailem</a>
                     </div>
                   </div>
@@ -1100,6 +1115,15 @@ Cookies.set(cookieName, 'ok', { expires: 31 });
     </div>
   </div>
   <script>
+  function openRezModal() {
+    var m = document.getElementById('rezervace-modal');
+    if (m) m.style.display = 'flex';
+    var terminEl = document.getElementById('rez-termin');
+    if (terminEl && !terminEl.value) {
+      var datumEl = document.querySelector('[acf\\:text="datum"]');
+      if (datumEl) terminEl.value = datumEl.textContent.trim();
+    }
+  }
   function closeRezModal() {
     var m = document.getElementById('rezervace-modal');
     if (m) m.style.display = 'none';
