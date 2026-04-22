@@ -494,8 +494,8 @@ function ensureHtml(text) {
 /** Storage URL → čistá Storage URL bez tokenu (storage rules povolují public read) */
 function resolveUrl(url) {
   if (!url) return url;
-  // wp-content URLs: odstraň expirující token, nech ?alt=media (storage rules: allow read: if true)
-  const m = url.match(/firebasestorage\.googleapis\.com\/v0\/b\/([^/]+)\/o\/(wp-content[^?]*)\?/);
+  // Libovolná Firebase Storage URL: odstraň expirující token, nech ?alt=media
+  const m = url.match(/firebasestorage\.googleapis\.com\/v0\/b\/([^/]+)\/o\/([^?]*)\?/);
   if (!m) return url;
   return `https://firebasestorage.googleapis.com/v0/b/${m[1]}/o/${m[2]}?alt=media`;
 }
@@ -521,7 +521,7 @@ function showImgPlaceholder(imgEl, containerSelector, containerEl) {
 function resolveContentUrls(html) {
   if (!html) return html;
   return html.replace(
-    /https:\/\/firebasestorage\.googleapis\.com\/v0\/b\/([^/]+)\/o\/(wp-content[^?"'\s<>]*)\?[^"'\s<>]*/g,
+    /https:\/\/firebasestorage\.googleapis\.com\/v0\/b\/([^/]+)\/o\/([^?"'\s<>]*)\?[^"'\s<>]*/g,
     (_, bucket, enc) => `https://firebasestorage.googleapis.com/v0/b/${bucket}/o/${enc}?alt=media`
   );
 }
