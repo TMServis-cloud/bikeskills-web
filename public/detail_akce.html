@@ -603,15 +603,15 @@ h1 { font-weight: 400 !important; }
   display: flex; flex-wrap: nowrap; gap: 0.6rem;
   align-items: center; margin-bottom: 0;
 }
-.rezervace-buttons-row .banner-button {
-  margin: 0 !important; height: 2.2rem; min-height: 2.2rem;
-  padding: 5px 14px; font-size: 0.82rem; white-space: nowrap;
+.rezervace-buttons-row .banner-button,
+.rezervace-buttons-row .main-button {
+  margin: 0 !important; height: 2.2rem !important; min-height: 2.2rem !important;
+  padding: 0 14px !important; font-size: 0.82rem !important; white-space: nowrap;
+  display: inline-flex !important; align-items: center !important;
+  line-height: 1 !important; box-sizing: border-box;
 }
 .rezervace-buttons-row .main-button {
-  margin: 0 !important; width: auto; max-width: none;
-  height: 2.2rem; min-height: 2.2rem; padding: 0 14px;
-  font-size: 0.82rem; text-decoration: none; white-space: nowrap;
-  display: flex; align-items: center;
+  width: auto; max-width: none; text-decoration: none;
 }
 @media (max-width: 479px) {
   .rezervace-buttons-row { flex-wrap: wrap; }
@@ -631,15 +631,18 @@ h1 { font-weight: 400 !important; }
   position: relative; margin: auto;
   box-shadow: 0 12px 60px rgba(0,0,0,0.7);
 }
-.rez-modal-inner .pop-up-close-button {
-  position: absolute; top: 0.85rem; right: 0.85rem;
-  width: auto; height: auto; padding: 6px;
-  background: none; border-radius: 0; border: none;
-  display: flex; align-items: center; justify-content: center;
-  cursor: pointer; transition: transform 0.2s ease-out;
+/* Zavírací tlačítko — styl jako banner-close-card, přejmenováno */
+.rez-close-btn {
+  opacity: 1; cursor: pointer;
+  justify-content: center; align-self: flex-start; align-items: center;
+  padding: 10px; margin: 0 !important;
+  transition: all .2s ease-out;
+  display: flex; background: none; border: none; border-radius: 0;
+  position: absolute; top: 0; right: 0;
+  height: auto; min-height: 0;
 }
-.rez-modal-inner .pop-up-close-button:hover {
-  background: none;
+.rez-close-btn:hover {
+  opacity: 1;
   transform: scale(1.3) rotate(180deg);
 }
 .rez-modal-title {
@@ -700,28 +703,23 @@ h1 { font-weight: 400 !important; }
   margin-left: 0 !important; margin-right: 0 !important;
 }
 .rez-check-label a { color: #333; text-decoration: underline; }
-/* Submit button — sekundární styl (text + animovaná linka) */
+/* Submit button — styl jako banner-button, přizpůsobeno formuláři */
 .rez-submit-wrap { grid-column: 1 / -1; text-align: center; margin-top: 0.6rem; }
 .rez-modal-inner button.rez-submit {
-  background: none; color: var(--tmave-seda, #333);
-  border: none; border-radius: 0;
-  height: auto; min-height: 0; margin: 0 !important;
-  padding: 6px 0 0 0; font-size: 1rem; font-weight: 600;
-  letter-spacing: 0.08em; text-transform: uppercase;
-  font-family: proxima-nova, sans-serif;
-  cursor: pointer;
-  display: inline-flex; flex-direction: column; align-items: center;
-  overflow: hidden; position: relative;
+  border: 2px solid var(--tmave-seda, #333);
+  background-color: var(--tmave-seda, #333);
+  color: #fff;
+  height: 2.7rem; min-height: 2.7rem;
+  text-align: center; letter-spacing: .025rem; text-transform: uppercase;
+  white-space: nowrap; cursor: pointer; border-radius: 4rem;
+  margin: 0 !important; padding: 0 2rem;
+  font-family: proxima-nova, sans-serif; font-size: 1rem; font-weight: 600;
+  line-height: 25px; transition: all .3s ease-in-out;
+  display: inline-flex; align-items: center; justify-content: center;
 }
-.rez-modal-inner button.rez-submit .rez-submit-line {
-  display: block; width: 100%; height: 2px;
-  background: var(--tmave-seda, #333);
-  transform: translateX(-101%);
-  transition: transform 0.3s ease-out;
-  margin-top: 4px;
+.rez-modal-inner button.rez-submit:hover {
+  background-color: var(--black, #111); color: #fff;
 }
-.rez-modal-inner button.rez-submit:hover .rez-submit-line { transform: translateX(0); }
-.rez-modal-inner button.rez-submit:hover { color: var(--tmave-seda, #333); }
 .rez-modal-inner button.rez-submit:disabled { opacity: 0.45; cursor: not-allowed; }
 .rez-error-msg {
   color: #c0001a; font-size: 0.8rem; margin: 0 0 0.5rem;
@@ -1010,8 +1008,8 @@ Cookies.set(cookieName, 'ok', { expires: 31 });
   <!-- Rezervační formulář — modal (Akce-formular) -->
   <div id="rezervace-modal" role="dialog" aria-modal="true" aria-labelledby="rez-modal-title" onclick="if(event.target===this){closeRezModal()}">
     <div class="rez-modal-inner">
-      <button class="pop-up-close-button" aria-label="Zavřít" onclick="closeRezModal()">
-        <img src="images/close-bold.svg" width="17" height="17" alt="zavřít">
+      <button class="rez-close-btn" aria-label="Zavřít" onclick="closeRezModal()">
+        <img src="images/close-bold.svg" width="17" height="17" alt="zavřít" class="banner-exit">
       </button>
       <div id="rez-form-wrap">
         <p class="rez-modal-title" id="rez-modal-title">Formulář pro dotaz či rezervaci</p>
@@ -1053,10 +1051,7 @@ Cookies.set(cookieName, 'ok', { expires: 31 });
             </label>
             <p class="rez-error-msg" id="rez-error"></p>
             <div class="rez-submit-wrap">
-              <button type="submit" class="rez-submit" id="rez-submit">
-                <span>ODESLAT</span>
-                <span class="rez-submit-line"></span>
-              </button>
+              <button type="submit" class="rez-submit" id="rez-submit">ODESLAT</button>
             </div>
           </div>
         </form>
