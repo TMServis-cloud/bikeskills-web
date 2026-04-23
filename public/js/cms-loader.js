@@ -1252,7 +1252,7 @@ function renderTeamItem(template, data) {
 
   const excerptEl = item.querySelector('[item="excerpt"], .text-block-136');
   if (excerptEl) {
-    const bio = data.popis || '';
+    const bio = (data.popis || '').replace(/<[^>]*>/g, '').trim();
     excerptEl.textContent = bio.length > 120 ? bio.substring(0, 120) + '…' : bio;
     excerptEl.classList.remove('w-dyn-bind-empty');
   }
