@@ -93,7 +93,7 @@ function showSkeleton(itemsList, count) {
 }
 .collection-list-15 .image-60 {
   width: 100% !important;
-  height: 220px !important;
+  height: 440px !important;
   object-fit: cover !important;
   display: block !important;
   margin: 0 !important;
@@ -109,12 +109,12 @@ function showSkeleton(itemsList, count) {
   .collection-list-15.akce-gal-1 .collection-item-8 { grid-column: span 2; }
   .collection-list-15.akce-gal-2 .collection-item-8 { grid-column: span 1; }
   .collection-list-15.akce-gal-3 .collection-item-8:nth-child(3) { grid-column: span 2; }
-  .collection-list-15 .image-60 { height: 160px !important; }
+  .collection-list-15 .image-60 { height: 280px !important; }
 }
 @media (max-width: 479px) {
   .collection-list-15 { grid-template-columns: 1fr !important; }
   .collection-list-15 .collection-item-8 { grid-column: span 1 !important; }
-  .collection-list-15 .image-60 { height: 200px !important; }
+  .collection-list-15 .image-60 { height: 260px !important; }
 }
 `;
   document.head.appendChild(s);
