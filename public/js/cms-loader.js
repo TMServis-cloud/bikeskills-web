@@ -1333,7 +1333,7 @@ async function loadTeamDetail(slug) {
     if (imgEl) {
       imgEl.src = data.imageUrl ? resolveUrl(data.imageUrl) : PLACEHOLDER_URL;
       imgEl.alt = data.jmeno || '';
-      imgEl.width = 800; imgEl.height = 800;
+      imgEl.removeAttribute('width'); imgEl.removeAttribute('height');
       imgEl.onerror = makeImgErrorHandler();
       imgEl.classList.remove('w-dyn-bind-empty');
     }

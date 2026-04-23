@@ -61,6 +61,19 @@
   content: "";
   margin-top: 0.8em;
 }
+/* Hlavní fotka jezdce — object-fit, aby se nedeformovala */
+.fotografie-block img.image-62 {
+  width: 100%;
+  height: auto;
+  max-height: 600px;
+  object-fit: cover;
+  display: block;
+}
+/* Jméno jezdce — o 50 % větší než h2 (30px × 1.5 = 45px) */
+#Team-member-Section [item="title"] {
+  font-size: 45px !important;
+  line-height: 1.15 !important;
+}
 /* Team galerie — čtvercové fotky */
 .photo-team-block {
   aspect-ratio: 1 / 1;
