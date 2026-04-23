@@ -74,11 +74,15 @@
   font-size: 45px !important;
   line-height: 1.15 !important;
 }
-/* Team galerie — čtvercové fotky */
+/* Team galerie — 4 sloupce, čtvercové fotky, menší zaoblení */
+.collection-photos {
+  grid-template-columns: 1fr 1fr 1fr 1fr !important;
+}
 .photo-team-block {
   aspect-ratio: 1 / 1;
   max-height: none;
   overflow: hidden;
+  border-radius: 2px !important;
 }
 .photo-gallerie-image {
   width: 100%;

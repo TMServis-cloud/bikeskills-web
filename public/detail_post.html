@@ -568,6 +568,11 @@ button:hover {
 }
 @media (max-width: 767px) {
   /* Galerie 3 sloupce */
+  .wp-block-gallery.has-nested-images.columns-default.is-cropped,
+  .wp-block-gallery.has-nested-images.is-cropped {
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 6px !important;
+  }
   .collection-list-13 {
     grid-template-columns: 1fr 1fr 1fr !important;
     grid-column-gap: 6px !important;
