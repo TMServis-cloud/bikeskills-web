@@ -567,7 +567,7 @@ button:hover {
   font-weight: 700 !important;
 }
 @media (max-width: 767px) {
-  /* Galerie 3 sloupce + poloviční zaoblení */
+  /* Galerie 3 sloupce */
   .collection-list-13 {
     grid-template-columns: 1fr 1fr 1fr !important;
     grid-column-gap: 6px !important;
@@ -576,12 +576,18 @@ button:hover {
   .collection-list-13 img {
     border-radius: 2px !important;
   }
-  /* Mohlo by vás zaujmout — 1 sloupec na středu, větší název */
+  /* Mohlo by vás zaujmout — 1 sloupec na středu, větší název, bez zaoblení */
   .collection-blog-grid.related {
     grid-template-columns: 1fr !important;
     max-width: 380px !important;
     margin-left: auto !important;
     margin-right: auto !important;
+  }
+  .related-posts .collection-blog-item,
+  .related-posts .collection-item__card-blog,
+  .related-posts .card-blog__wrapper-image,
+  .related-posts .card-blog__wrapper-text {
+    border-radius: 0 !important;
   }
   .related-posts .wrapper--text__title {
     font-family: proxima-nova, sans-serif !important;

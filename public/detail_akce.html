@@ -640,12 +640,23 @@ h3, h4 {
   width: auto; max-width: none; text-decoration: none;
 }
 @media (max-width: 767px) {
-  /* Video půl šířky (levý sloupec), galerie pod ním plná šířka */
-  #w-node-be54d460-308f-8c6f-962c-2e06a24e1325-19f13da9 {
-    grid-area: 9 / 1 / 10 / 2 !important;
+  /* 1-sloupec grid */
+  .akce-grid {
+    grid-template-columns: 1fr !important;
   }
+  /* Reset w-node grid-area na auto — items se skládají v DOM pořadí */
+  #w-node-_5978f2ea-db9f-b70b-0b8a-58be16614719-19f13da9,
+  #w-node-_910af733-d7eb-e361-e24f-8b27642a62c7-19f13da9,
+  #w-node-d276f07d-2126-3529-4e7e-bcafee0ea0c0-19f13da9,
+  #w-node-be54d460-308f-8c6f-962c-2e06a24e1325-19f13da9,
   #w-node-_18ab7331-4d7c-7ce8-c386-e937e9bed978-19f13da9 {
-    grid-area: 10 / 1 / 11 / 3 !important;
+    grid-area: auto !important;
+  }
+  /* Video na střed, půl šířky */
+  .video-4 {
+    max-width: 50% !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
   }
   /* Nadpis akce menší */
   .akce-item-header { font-size: 2rem !important; }
