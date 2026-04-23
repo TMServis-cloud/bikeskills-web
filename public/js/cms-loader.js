@@ -656,6 +656,36 @@ function resolveUrl(url) {
 
 const PLACEHOLDER_URL = 'https://firebasestorage.googleapis.com/v0/b/bikeskills-web.firebasestorage.app/o/images%2Fplaceholder.webp?alt=media';
 
+/**
+ * Transformuje Storage URL na thumbnail generovaný Firebase Extension "Resize Images".
+ * Výstup: {dir}/thumbs/{name}_{size}.webp — public read, bez tokenu.
+ * Pokud thumb neexistuje, onerror handler nastaví src zpět na originál.
+ */
+function toThumbUrl(resolvedUrl, size = '800x600') {
+  const m = resolvedUrl.match(/(https:\/\/firebasestorage\.googleapis\.com\/v0\/b\/[^/]+\/o\/)([^?]+)(\?alt=media)/);
+  if (!m) return resolvedUrl;
+  const path = decodeURIComponent(m[2]);
+  const lastSlash = path.lastIndexOf('/');
+  const dir = lastSlash >= 0 ? path.slice(0, lastSlash) : '';
+  const file = lastSlash >= 0 ? path.slice(lastSlash + 1) : path;
+  const dot = file.lastIndexOf('.');
+  const base = dot >= 0 ? file.slice(0, dot) : file;
+  const thumbPath = (dir ? dir + '/thumbs/' : 'thumbs/') + base + '_' + size + '.webp';
+  const encoded = thumbPath.split('/').map(encodeURIComponent).join('%2F');
+  return m[1] + encoded + m[3];
+}
+
+/** Nastaví img src na thumbnail; při chybě se přepne na originál a pak na placeholder. */
+function setImgWithThumb(imgEl, origUrl) {
+  const thumbUrl = toThumbUrl(origUrl);
+  imgEl.src = thumbUrl;
+  imgEl.setAttribute('data-full-url', origUrl);
+  imgEl.onerror = function() {
+    if (this.src !== origUrl) { this.src = origUrl; this.onerror = makeImgErrorHandler(); }
+    else showImgPlaceholder(this);
+  };
+}
+
 /** Onerror → placeholder (Storage URL selhala) */
 function makeImgErrorHandler() {
   return function() { showImgPlaceholder(this); };
@@ -906,9 +936,9 @@ async function loadAkceDetail(slug) {
             const gi = galTemplate.cloneNode(true);
             const gImg = gi.querySelector('img');
             if (gImg) {
-              gImg.src = resolveUrl(url);
               gImg.alt = data.nazev || '';
               gImg.loading = 'lazy';
+              setImgWithThumb(gImg, resolveUrl(url));
             }
             galItems.appendChild(gi);
           });
@@ -1184,9 +1214,10 @@ async function loadClanekDetail(slug) {
           if (innerDiv) innerDiv.style.minWidth = '0';
           const gImg = gi.querySelector('img.image-54, img');
           if (gImg) {
-            gImg.src = resolveUrl(url); gImg.alt = data.titulek || '';
+            gImg.alt = data.titulek || '';
             gImg.style.cssText = 'width:100%;aspect-ratio:4/3;object-fit:cover;display:block;min-width:0;';
             gImg.classList.remove('w-dyn-bind-empty');
+            setImgWithThumb(gImg, resolveUrl(url));
           }
           galItems.appendChild(gi);
         });
@@ -1361,9 +1392,8 @@ async function loadTeamDetail(slug) {
       const block = imgSlot ? imgSlot.closest('.photo-team-block') : null;
       const url = galerie[i - 1];
       if (imgSlot && url) {
-        imgSlot.src = resolveUrl(url);
         imgSlot.alt = data.jmeno || '';
-        imgSlot.onerror = makeImgErrorHandler();
+        setImgWithThumb(imgSlot, resolveUrl(url));
         if (block) block.style.display = '';
       } else if (block) {
         block.style.display = 'none';
