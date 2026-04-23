@@ -617,6 +617,10 @@ h3, h4 {
   font-style: normal;
   font-weight: 400;
 }
+/* Galerie pod videem — plná šířka (desktop i mobil) */
+#w-node-_18ab7331-4d7c-7ce8-c386-e937e9bed978-19f13da9 {
+  grid-area: 9 / 1 / 10 / 3 !important;
+}
 /* Popisky — zarovnat nahoře, ne dole */
 .akce-item-text-block { align-items: flex-start !important; }
 /* Rezervační tlačítka */
@@ -636,9 +640,9 @@ h3, h4 {
   width: auto; max-width: none; text-decoration: none;
 }
 @media (max-width: 767px) {
-  /* Video plná šířka, galerie pod videem */
+  /* Video půl šířky (levý sloupec), galerie pod ním plná šířka */
   #w-node-be54d460-308f-8c6f-962c-2e06a24e1325-19f13da9 {
-    grid-area: 9 / 1 / 10 / 3 !important;
+    grid-area: 9 / 1 / 10 / 2 !important;
   }
   #w-node-_18ab7331-4d7c-7ce8-c386-e937e9bed978-19f13da9 {
     grid-area: 10 / 1 / 11 / 3 !important;
