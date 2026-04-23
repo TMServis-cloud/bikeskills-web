@@ -4186,7 +4186,7 @@ blockquote {
 }
 
 .top-bar_link.footer {
-  padding-left: 10px;
+  padding-left: 0;
 }
 
 .top-bar_link.hidden {
