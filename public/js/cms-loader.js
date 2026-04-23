@@ -23,6 +23,104 @@ if (!firebase.apps.length) {
 const db = firebase.firestore();
 
 // ============================================================
+// SKELETON LOADER
+// ============================================================
+(function injectSkeletonCSS() {
+  if (document.getElementById('cms-skeleton-css')) return;
+  const s = document.createElement('style');
+  s.id = 'cms-skeleton-css';
+  s.textContent = `
+@keyframes cms-shimmer {
+  0%   { background-position: -600px 0; }
+  100% { background-position:  600px 0; }
+}
+.cms-skeleton-item {
+  pointer-events: none;
+  border-radius: 6px;
+  overflow: hidden;
+}
+.cms-skeleton-img {
+  width: 100%; aspect-ratio: 4/3; border-radius: 4px;
+  background: linear-gradient(90deg, #2a2e31 25%, #353b3f 50%, #2a2e31 75%);
+  background-size: 600px 100%;
+  animation: cms-shimmer 1.4s infinite linear;
+}
+.cms-skeleton-line {
+  border-radius: 3px; margin-top: 10px;
+  background: linear-gradient(90deg, #2a2e31 25%, #353b3f 50%, #2a2e31 75%);
+  background-size: 600px 100%;
+  animation: cms-shimmer 1.4s infinite linear;
+}
+.cms-skeleton-line.wide  { height: 14px; width: 90%; }
+.cms-skeleton-line.short { height: 11px; width: 60%; margin-top: 6px; }
+`;
+  document.head.appendChild(s);
+})();
+
+function buildSkeletonItem(count) {
+  const frag = document.createDocumentFragment();
+  for (let i = 0; i < count; i++) {
+    const div = document.createElement('div');
+    div.className = 'cms-skeleton-item w-dyn-item';
+    div.innerHTML = `
+      <div class="cms-skeleton-img"></div>
+      <div class="cms-skeleton-line wide"></div>
+      <div class="cms-skeleton-line short"></div>`;
+    frag.appendChild(div);
+  }
+  return frag;
+}
+
+function showSkeleton(itemsList, count) {
+  if (!itemsList) return;
+  itemsList.innerHTML = '';
+  itemsList.appendChild(buildSkeletonItem(count));
+}
+
+// ============================================================
+// AKCE GALLERY GRID CSS
+// ============================================================
+(function injectAkceGalleryCSS() {
+  if (document.getElementById('cms-akce-gallery-css')) return;
+  const s = document.createElement('style');
+  s.id = 'cms-akce-gallery-css';
+  s.textContent = `
+.collection-list-15 {
+  display: grid !important;
+  grid-template-columns: repeat(4, 1fr) !important;
+  grid-template-rows: auto !important;
+  gap: 8px !important;
+}
+.collection-list-15 .image-60 {
+  width: 100% !important;
+  height: 220px !important;
+  object-fit: cover !important;
+  display: block !important;
+  margin: 0 !important;
+}
+/* 1 obrázek — přes celou šířku */
+.collection-list-15.akce-gal-1 .collection-item-8 { grid-column: span 4; }
+/* 2 obrázky — každý přes 2 sloupce */
+.collection-list-15.akce-gal-2 .collection-item-8 { grid-column: span 2; }
+/* 3 obrázky — první 2 normálně, třetí přes 2 sloupce */
+.collection-list-15.akce-gal-3 .collection-item-8:nth-child(3) { grid-column: span 2; }
+@media (max-width: 767px) {
+  .collection-list-15 { grid-template-columns: repeat(2, 1fr) !important; }
+  .collection-list-15.akce-gal-1 .collection-item-8 { grid-column: span 2; }
+  .collection-list-15.akce-gal-2 .collection-item-8 { grid-column: span 1; }
+  .collection-list-15.akce-gal-3 .collection-item-8:nth-child(3) { grid-column: span 2; }
+  .collection-list-15 .image-60 { height: 160px !important; }
+}
+@media (max-width: 479px) {
+  .collection-list-15 { grid-template-columns: 1fr !important; }
+  .collection-list-15 .collection-item-8 { grid-column: span 1 !important; }
+  .collection-list-15 .image-60 { height: 200px !important; }
+}
+`;
+  document.head.appendChild(s);
+})();
+
+// ============================================================
 // HELPERS
 // ============================================================
 function escapeHtml(text) {
@@ -61,6 +159,23 @@ function normalizeTypAkce(val) {
   return val.charAt(0).toUpperCase() + val.slice(1);
 }
 
+const KATEGORIE_LABELS = {
+  'camp':     'Camp',
+  'kurz':     'Kurz',
+  'trialovy': 'Trialový kurz',
+  'deti':     'Dětský kurz',
+  'workshop': 'Workshop',
+  'jine':     'Jiné',
+};
+
+/** Vrátí zobrazovaný typ akce — primárně z kategorie, pak z typAkce (starý WP import). */
+function resolveAkceLabel(d) {
+  if (d.kategorie && KATEGORIE_LABELS[d.kategorie]) return KATEGORIE_LABELS[d.kategorie];
+  const typ = (d.typAkce || '').toLowerCase().trim().normalize('NFD').replace(/[̀-ͯ]/g, '');
+  if (typ === 'pro deti' || typ === 'detsky kurz') return 'Dětský kurz';
+  return normalizeTypAkce(d.typAkce || '');
+}
+
 
 function injectJsonLd(schema, id) {
   const elId = id || 'json-ld-schema';
@@ -84,6 +199,45 @@ function injectBreadcrumb(items) {
       'item': item.item
     }))
   }, 'json-ld-breadcrumb');
+}
+
+const PATH_TO_SEO_KEY = {
+  '/':                    'homepage',
+  '/index.html':          'homepage',
+  '/blog.html':           'blog',
+  '/blog':                'blog',
+  '/akce-archive.html':   'akce',
+  '/akce-archive':        'akce',
+  '/akce-archive/':       'akce',
+  '/team.html':           'team',
+  '/team':                'team',
+  '/team/':               'team',
+};
+
+async function applySeoFromSettings(path) {
+  const key = PATH_TO_SEO_KEY[path];
+  if (!key) return;
+  try {
+    const snap = await db.collection('settings').doc('seo').get();
+    if (!snap.exists) return;
+    const cfg = (snap.data() || {})[key];
+    if (!cfg) return;
+    const setM = (sel, val) => { const el = document.querySelector(sel); if (el && val) el.setAttribute('content', val); };
+    if (cfg.title) {
+      document.title = cfg.title;
+      setM('meta[property="og:title"]', cfg.title);
+      setM('meta[property="twitter:title"]', cfg.title);
+    }
+    if (cfg.description) {
+      setM('meta[name="description"]', cfg.description);
+      setM('meta[property="og:description"]', cfg.description);
+      setM('meta[property="twitter:description"]', cfg.description);
+    }
+    if (cfg.ogImage) {
+      setM('meta[property="og:image"]', cfg.ogImage);
+      setM('meta[property="twitter:image"]', cfg.ogImage);
+    }
+  } catch (_) {}
 }
 
 function setPageMeta(title, description, imageUrl, ogType) {
@@ -236,6 +390,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const path = window.location.pathname;
 
+  // Aplikovat SEO z Firestore (nepřepisuje meta dynamicky generovaná pro detail stránky)
+  applySeoFromSettings(path);
+
   if (path === '/' || path === '/index.html' || path === '/index') {
     loadAkcePreview();
     loadClankyPreview();
@@ -332,6 +489,7 @@ async function loadAkcePreview() {
   if (!wfl) return;
   const { itemsList, template, emptyEl } = wfl;
 
+  showSkeleton(itemsList, 4);
   try {
     const snapshot = await db.collection('akce').get();
     const today = new Date();
@@ -385,7 +543,7 @@ function injectFilterBar(id, beforeEl) {
   if (!bar) {
     bar = document.createElement('div');
     bar.id = id;
-    bar.style.cssText = 'display:flex;flex-wrap:wrap;gap:0.5rem;align-items:center;padding:1rem 0 1.5rem;';
+    bar.style.cssText = 'display:flex;flex-wrap:wrap;gap:0.5rem;align-items:center;padding:1rem 0 15px;';
     beforeEl.parentNode.insertBefore(bar, beforeEl);
   }
   return bar;
@@ -448,7 +606,7 @@ function buildAkceFilterBar(bar, years, typy) {
 
   bar.appendChild(makeYearSelect(years, akceYearFilter, v => { akceYearFilter = v; currentAkcePage = 1; renderAkceListPage(); }));
 
-  const zamereniOpts = [['all', 'Všechna zaměření'], ...typy.map(t => [t, t])];
+  const zamereniOpts = [['all', 'Typ akce'], ...typy.map(t => [t, t])];
   bar.appendChild(makeGenericSelect(zamereniOpts, akceZamereniFilter, v => { akceZamereniFilter = v; currentAkcePage = 1; renderAkceListPage(); }));
 
   const cenaOpts = [['all', 'Jakákoliv cena'], ['scena', 'S cenou'], ['zdarma', 'Zdarma / ind.']];
@@ -557,7 +715,7 @@ function getFilteredAkce() {
   return allAkceData.filter(d => {
     const year = getYearFromDatumSort(d.datumSort);
     if (akceYearFilter !== 'all' && year !== akceYearFilter) return false;
-    if (akceZamereniFilter !== 'all' && normalizeTypAkce(d.typAkce || '') !== akceZamereniFilter) return false;
+    if (akceZamereniFilter !== 'all' && resolveAkceLabel(d) !== akceZamereniFilter) return false;
     if (akceCenaFilter === 'scena' && !d.cena) return false;
     if (akceCenaFilter === 'zdarma' && d.cena) return false;
     return true;
@@ -610,6 +768,7 @@ async function loadAkceList() {
     renderAkceListPage
   );
 
+  showSkeleton(itemsList, 8);
   try {
     // Bez orderBy — Firestore vylučuje dokumenty bez indexovaného pole
     const snapshot = await db.collection('akce').get();
@@ -622,7 +781,8 @@ async function loadAkceList() {
     allAkceData.forEach(d => {
       const y = getYearFromDatumSort(d.datumSort);
       if (y) yearSet.add(y);
-      if (d.typAkce) typSet.add(normalizeTypAkce(d.typAkce));
+      const label = resolveAkceLabel(d);
+      if (label) typSet.add(label);
     });
     _akceYears = Array.from(yearSet).sort((a, b) => b - a);
     _akceTypy = Array.from(typSet).sort();
@@ -660,7 +820,7 @@ async function loadAkceDetail(slug) {
 
     const pageHeading = document.querySelector('.page-heading[acf\\:text="typ-akce"]');
     if (pageHeading) {
-      pageHeading.textContent = normalizeTypAkce(data.typAkce) || data.nazev || '';
+      pageHeading.textContent = resolveAkceLabel(data) || data.nazev || '';
       pageHeading.classList.remove('w-dyn-bind-empty');
     }
 
@@ -697,7 +857,7 @@ async function loadAkceDetail(slug) {
     }
 
     const dobaEl = item.querySelector('[acf\\:text="doba-trvani"]');
-    if (dobaEl) { dobaEl.textContent = normalizeTypAkce(data.typAkce || ''); dobaEl.classList.remove('w-dyn-bind-empty'); }
+    if (dobaEl) { dobaEl.textContent = resolveAkceLabel(data); dobaEl.classList.remove('w-dyn-bind-empty'); }
 
     const ridersEl = item.querySelector('[acf\\:text="riders-number"]');
     if (ridersEl) { ridersEl.textContent = data.stavLabel || data.stav || ''; ridersEl.classList.remove('w-dyn-bind-empty'); }
@@ -740,10 +900,16 @@ async function loadAkceDetail(slug) {
         const galTemplate = galleryBlock.querySelector('.collection-item-8.w-dyn-item');
         if (galItems && galTemplate) {
           galItems.innerHTML = '';
+          galItems.classList.remove('akce-gal-1', 'akce-gal-2', 'akce-gal-3');
+          if (galerie.length <= 3) galItems.classList.add(`akce-gal-${galerie.length}`);
           galerie.forEach(url => {
             const gi = galTemplate.cloneNode(true);
             const gImg = gi.querySelector('img');
-            if (gImg) { gImg.src = resolveUrl(url); gImg.alt = data.nazev || ''; }
+            if (gImg) {
+              gImg.src = resolveUrl(url);
+              gImg.alt = data.nazev || '';
+              gImg.loading = 'lazy';
+            }
             galItems.appendChild(gi);
           });
         }
@@ -812,6 +978,7 @@ async function loadClankyPreview() {
   if (!wfl) return;
   const { itemsList, template, emptyEl } = wfl;
 
+  showSkeleton(itemsList, 4);
   try {
     const snapshot = await db.collection('clanky').orderBy('datum', 'desc').limit(4).get();
     const docs = snapshot.docs.map(d => d.data()).filter(d => d.publikovano !== false);
@@ -902,6 +1069,7 @@ async function loadClankyList() {
     renderClankyListPage
   );
 
+  showSkeleton(itemsList, 8);
   try {
     const snapshot = await db.collection('clanky').orderBy('datum', 'desc').get();
     allClankyData = snapshot.docs.map(d => d.data()).filter(d => d.publikovano !== false);
@@ -1104,6 +1272,8 @@ async function loadTeamList() {
   const wfl = getWebflowList('.collection-list-wrapper-3');
   if (!wfl) return;
   const { itemsList, template, emptyEl } = wfl;
+
+  showSkeleton(itemsList, 6);
 
   try {
     const snapshot = await db.collection('team').orderBy('poradi', 'asc').get();

@@ -64,6 +64,10 @@
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
           Tým
         </a>
+        <a href="#" class="nav-item" data-section="seo">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          SEO
+        </a>
       </nav>
       <div class="sidebar-footer">
         <div class="user-info">
@@ -143,6 +147,7 @@
                     <option value="camp">Camp</option>
                     <option value="kurz">Kurz</option>
                     <option value="trialovy">Trialový kurz</option>
+                    <option value="deti">Dětský kurz</option>
                     <option value="workshop">Workshop</option>
                     <option value="jine">Jiné</option>
                   </select>
@@ -188,7 +193,7 @@
               </div>
 
               <div class="form-group">
-                <label>Galerie fotografií <span class="label-hint">(max. 20, automaticky převedeno na WebP)</span></label>
+                <label>Fotografie pod textem <span class="label-hint">(max. 20 — zobrazí se pod popisem akce na detailu)</span></label>
                 <div id="akce-gallery-items" class="gallery-dynamic-list"></div>
                 <div class="gallery-add-row">
                   <input type="file" id="akce-gallery-file" accept="image/*" multiple class="file-input" style="display:none">
@@ -480,6 +485,91 @@
             </form>
           </div>
         </div>
+      </section>
+
+      <!-- SEO Section -->
+      <section id="section-seo" class="content-section" style="display:none;">
+        <div class="section-header">
+          <h1>SEO nastavení</h1>
+        </div>
+        <form id="form-seo">
+
+          <div class="seo-page-block">
+            <h3 class="seo-page-heading">Hlavní stránka <span class="seo-url">bikeskills.cz/</span></h3>
+            <div class="form-group">
+              <label for="seo-hp-title">Title stránky</label>
+              <input type="text" id="seo-hp-title" maxlength="70" placeholder="Zlepšete svou techniku jízdy na kole | Bikeskills.cz">
+              <small class="form-hint seo-counter" data-for="seo-hp-title">0 / 70 znaků</small>
+            </div>
+            <div class="form-group">
+              <label for="seo-hp-desc">Meta description</label>
+              <textarea id="seo-hp-desc" rows="3" maxlength="160" placeholder="Krátký popis stránky pro vyhledávače…"></textarea>
+              <small class="form-hint seo-counter" data-for="seo-hp-desc">0 / 160 znaků</small>
+            </div>
+            <div class="form-group">
+              <label for="seo-hp-image">OG Image URL</label>
+              <input type="text" id="seo-hp-image" placeholder="https://bikeskills.cz/images/…">
+            </div>
+          </div>
+
+          <div class="seo-page-block">
+            <h3 class="seo-page-heading">Blog — archiv článků <span class="seo-url">bikeskills.cz/blog.html</span></h3>
+            <div class="form-group">
+              <label for="seo-blog-title">Title stránky</label>
+              <input type="text" id="seo-blog-title" maxlength="70">
+              <small class="form-hint seo-counter" data-for="seo-blog-title">0 / 70 znaků</small>
+            </div>
+            <div class="form-group">
+              <label for="seo-blog-desc">Meta description</label>
+              <textarea id="seo-blog-desc" rows="3" maxlength="160"></textarea>
+              <small class="form-hint seo-counter" data-for="seo-blog-desc">0 / 160 znaků</small>
+            </div>
+            <div class="form-group">
+              <label for="seo-blog-image">OG Image URL</label>
+              <input type="text" id="seo-blog-image" placeholder="https://bikeskills.cz/images/…">
+            </div>
+          </div>
+
+          <div class="seo-page-block">
+            <h3 class="seo-page-heading">Akce — přehled <span class="seo-url">bikeskills.cz/akce-archive.html</span></h3>
+            <div class="form-group">
+              <label for="seo-akce-title">Title stránky</label>
+              <input type="text" id="seo-akce-title" maxlength="70">
+              <small class="form-hint seo-counter" data-for="seo-akce-title">0 / 70 znaků</small>
+            </div>
+            <div class="form-group">
+              <label for="seo-akce-desc">Meta description</label>
+              <textarea id="seo-akce-desc" rows="3" maxlength="160"></textarea>
+              <small class="form-hint seo-counter" data-for="seo-akce-desc">0 / 160 znaků</small>
+            </div>
+            <div class="form-group">
+              <label for="seo-akce-image">OG Image URL</label>
+              <input type="text" id="seo-akce-image" placeholder="https://bikeskills.cz/images/…">
+            </div>
+          </div>
+
+          <div class="seo-page-block">
+            <h3 class="seo-page-heading">Tým <span class="seo-url">bikeskills.cz/team.html</span></h3>
+            <div class="form-group">
+              <label for="seo-team-title">Title stránky</label>
+              <input type="text" id="seo-team-title" maxlength="70">
+              <small class="form-hint seo-counter" data-for="seo-team-title">0 / 70 znaků</small>
+            </div>
+            <div class="form-group">
+              <label for="seo-team-desc">Meta description</label>
+              <textarea id="seo-team-desc" rows="3" maxlength="160"></textarea>
+              <small class="form-hint seo-counter" data-for="seo-team-desc">0 / 160 znaků</small>
+            </div>
+            <div class="form-group">
+              <label for="seo-team-image">OG Image URL</label>
+              <input type="text" id="seo-team-image" placeholder="https://bikeskills.cz/images/…">
+            </div>
+          </div>
+
+          <div class="modal-actions" style="margin-top:2rem;justify-content:flex-start;">
+            <button type="submit" class="btn btn-primary" id="btn-save-seo">Uložit SEO</button>
+          </div>
+        </form>
       </section>
 
     </main>

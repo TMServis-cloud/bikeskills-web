@@ -34,11 +34,21 @@ let akceGalerieUrls = [];   // pole URL fotek pro galerii akce
 let clanekGalerieUrls = []; // pole URL fotek pro galerii článku
 let teamGalerieUrls = [];   // pole URL fotek pro galerii člena týmu
 const GALLERY_MAX = 20;
+const AKCE_GALLERY_MAX = 20;
 const STATUS_LABELS = {
   otevreno: 'Otevřeno',
   prihlasujte: 'Přihlašujte se',
   obsazeno: 'Obsazeno',
   odjeto: 'Odjeto'
+};
+
+const KATEGORIE_LABELS = {
+  camp:     'Camp',
+  kurz:     'Kurz',
+  trialovy: 'Trialový kurz',
+  deti:     'Dětský kurz',
+  workshop: 'Workshop',
+  jine:     'Jiné',
 };
 
 // ============================================================
@@ -127,6 +137,8 @@ function showDashboard(user) {
   loadAkce();
   loadClanky();
   loadTeam();
+  loadSeoSettings();
+  initSeoCounters();
 }
 
 // Login form - Email
@@ -248,7 +260,8 @@ async function loadAkce() {
 // ============================================================
 
 /** Vyrendruje dynamickou galerii do containeru */
-function renderGallery(containerId, urls) {
+function renderGallery(containerId, urls, max) {
+  max = max || GALLERY_MAX;
   const container = document.getElementById(containerId);
   if (!container) return;
   container.innerHTML = '';
@@ -265,10 +278,14 @@ function renderGallery(containerId, urls) {
   // Disable upload button at max
   const prefix = containerId.replace('-gallery-items', '');
   const fileLabel = document.getElementById(`${prefix}-gallery-file-label`);
-  if (fileLabel) fileLabel.style.opacity = urls.length >= GALLERY_MAX ? '0.4' : '';
+  const addUrlBtn = document.getElementById(`${prefix}-gallery-add-url`);
+  const atMax = urls.length >= max;
+  if (fileLabel) fileLabel.style.opacity = atMax ? '0.4' : '';
+  if (addUrlBtn) addUrlBtn.disabled = atMax;
 }
 
-function renderAkceGallery() { renderGallery('akce-gallery-items', akceGalerieUrls); }
+function renderAkceGallery() { renderGallery('akce-gallery-items', akceGalerieUrls, AKCE_GALLERY_MAX); }
+
 function renderClanekGallery() { renderGallery('clanek-gallery-items', clanekGalerieUrls); }
 function renderTeamGallery() { renderGallery('team-gallery-items', teamGalerieUrls); }
 
@@ -311,7 +328,7 @@ document.getElementById('team-gallery-items').addEventListener('click', (e) => {
 document.getElementById('akce-gallery-file').addEventListener('change', async (e) => {
   const files = Array.from(e.target.files);
   e.target.value = '';
-  const remaining = GALLERY_MAX - akceGalerieUrls.length;
+  const remaining = AKCE_GALLERY_MAX - akceGalerieUrls.length;
   const toUpload = files.slice(0, remaining);
   if (!toUpload.length) return;
   showToast(`Nahrávám ${toUpload.length} fotek...`);
@@ -366,7 +383,7 @@ document.getElementById('team-gallery-file').addEventListener('change', async (e
 document.getElementById('akce-gallery-add-url').addEventListener('click', () => {
   const input = document.getElementById('akce-gallery-url-input');
   const url = input.value.trim();
-  if (!url || akceGalerieUrls.length >= GALLERY_MAX) return;
+  if (!url || akceGalerieUrls.length >= AKCE_GALLERY_MAX) return;
   akceGalerieUrls.push(url);
   input.value = '';
   renderAkceGallery();
@@ -478,11 +495,13 @@ document.getElementById('form-akce').addEventListener('submit', async (e) => {
     const slug = document.getElementById('akce-slug').value.trim() || generateSlug(nazev);
     const popis = quillAkcePopis ? quillAkcePopis.root.innerHTML : '';
 
+    const kategorie = document.getElementById('akce-kategorie').value;
     const data = {
       nazev: nazev,
       datumText: document.getElementById('akce-datum').value.trim(),
       datumSort: document.getElementById('akce-datum-sort').value || null,
-      kategorie: document.getElementById('akce-kategorie').value,
+      kategorie: kategorie,
+      typAkce: KATEGORIE_LABELS[kategorie] || kategorie,
       uroven: document.getElementById('akce-uroven').value.trim(),
       cena: parseInt(document.getElementById('akce-cena').value) || null,
       mena: 'CZK',
@@ -494,6 +513,10 @@ document.getElementById('form-akce').addEventListener('submit', async (e) => {
       videoUrl: document.getElementById('akce-video-url').value.trim() || null,
       instagramUrl: document.getElementById('akce-instagram-url').value.trim() || null,
       galerie: akceGalerieUrls.filter(Boolean),
+      galerie1: akceGalerieUrls[0] || null,
+      galerie2: akceGalerieUrls[1] || null,
+      galerie3: akceGalerieUrls[2] || null,
+      galerie4: akceGalerieUrls[3] || null,
       aktivni: document.getElementById('akce-aktivni').checked,
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     };
@@ -1047,6 +1070,81 @@ document.getElementById('akce-nazev').addEventListener('blur', (e) => {
   if (!slugField.value && e.target.value) {
     slugField.value = generateSlug(e.target.value);
   }
+});
+
+// ============================================================
+// SEO NASTAVENÍ
+// ============================================================
+
+const SEO_FIELDS = [
+  { page: 'homepage', prefix: 'hp' },
+  { page: 'blog',     prefix: 'blog' },
+  { page: 'akce',    prefix: 'akce' },
+  { page: 'team',    prefix: 'team' },
+];
+
+function initSeoCounters() {
+  document.querySelectorAll('.seo-counter[data-for]').forEach(counter => {
+    const inputId = counter.dataset.for;
+    const input = document.getElementById(inputId);
+    if (!input) return;
+    const max = parseInt(input.getAttribute('maxlength') || '160');
+    const update = () => {
+      const len = input.value.length;
+      counter.textContent = `${len} / ${max} znaků`;
+      counter.classList.toggle('warn', len > max * 0.85 && len <= max);
+      counter.classList.toggle('over', len > max);
+    };
+    input.addEventListener('input', update);
+    update();
+  });
+}
+
+async function loadSeoSettings() {
+  try {
+    const doc = await db.collection('settings').doc('seo').get();
+    if (!doc.exists) return;
+    const data = doc.data();
+    SEO_FIELDS.forEach(({ page, prefix }) => {
+      const cfg = data[page] || {};
+      const t = document.getElementById(`seo-${prefix}-title`);
+      const d = document.getElementById(`seo-${prefix}-desc`);
+      const i = document.getElementById(`seo-${prefix}-image`);
+      if (t) { t.value = cfg.title || ''; t.dispatchEvent(new Event('input')); }
+      if (d) { d.value = cfg.description || ''; d.dispatchEvent(new Event('input')); }
+      if (i) i.value = cfg.ogImage || '';
+    });
+  } catch (e) {
+    console.warn('SEO load error:', e);
+  }
+}
+
+document.getElementById('form-seo').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const btn = document.getElementById('btn-save-seo');
+  btn.disabled = true;
+  btn.textContent = 'Ukládám…';
+
+  try {
+    const data = {};
+    SEO_FIELDS.forEach(({ page, prefix }) => {
+      const t = document.getElementById(`seo-${prefix}-title`);
+      const d = document.getElementById(`seo-${prefix}-desc`);
+      const i = document.getElementById(`seo-${prefix}-image`);
+      data[page] = {
+        title:       t ? t.value.trim() : '',
+        description: d ? d.value.trim() : '',
+        ogImage:     i ? i.value.trim() : '',
+      };
+    });
+    await db.collection('settings').doc('seo').set(data, { merge: true });
+    showToast('SEO uloženo ✓');
+  } catch (err) {
+    showToast('Chyba ukládání SEO: ' + err.message, 'error');
+  }
+
+  btn.disabled = false;
+  btn.textContent = 'Uložit SEO';
 });
 
 document.getElementById('clanek-titulek').addEventListener('blur', (e) => {

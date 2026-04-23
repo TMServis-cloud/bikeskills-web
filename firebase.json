@@ -8,6 +8,7 @@
       "**/node_modules/**"
     ],
     "redirects": [
+      { "source": "/blog/", "destination": "/blog.html", "type": 301 },
       { "source": "/projekt-startuje/", "destination": "/blog/projekt-startuje/", "type": 301 },
       { "source": "/nas-obchod/", "destination": "/blog/nas-obchod/", "type": 301 },
       { "source": "/organizujeme/", "destination": "/blog/organizujeme/", "type": 301 },

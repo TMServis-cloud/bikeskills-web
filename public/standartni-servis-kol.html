@@ -541,6 +541,36 @@ button:hover {
     color: #fff200;
     transition: all .3s ease-out;
 	}
+/* Objednávkový formulář — square corners */
+#objednavkovy-formular .text-field-contact,
+#objednavkovy-formular .textarea-contact {
+  border-radius: 0 !important;
+}
+/* GDPR checkbox */
+.servis-gdpr-label {
+  display: flex; align-items: flex-start; gap: 0.55rem;
+  color: var(--tmave-seda, #333); font-size: 0.8rem; margin: 0.8rem 0;
+  cursor: pointer; line-height: 1.45; font-family: proxima-nova, sans-serif;
+  font-weight: 400;
+}
+.servis-gdpr-label .checkbox-servis {
+  -webkit-appearance: none; appearance: none;
+  flex-shrink: 0; cursor: pointer;
+  width: 15px !important; height: 15px !important;
+  min-height: auto !important; padding: 0 !important;
+  margin-top: 0.15rem; margin-left: 0 !important; margin-right: 0 !important;
+  border: 2px solid #333; border-radius: 0; background: #fff;
+  transition: background 0.15s;
+}
+.servis-gdpr-label .checkbox-servis:checked {
+  background: #333;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 15 15' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M2.5 7.5l3.5 3.5 6.5-6.5' stroke='%23fff' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: center;
+}
+#servis-form-error {
+  color: #c0001a; font-size: 0.8rem; margin: 0.4rem 0 0;
+  display: none; font-family: proxima-nova, sans-serif;
+}
 </style>
   <link rel="canonical" href="https://bikeskills.cz/standartni-servis-kol.html">
 </head>
@@ -710,7 +740,7 @@ button:hover {
           <div class="important-text block">IDENTIFIKAČNÍ ČÍSLO: 69181888<br>BANKOVNÍ SPOJENÍ ČSOB: 1002003007 / 0300<br>NEPLÁTCE DPH<br>FYZICKÁ OSOBA PODNIKAJÍCÍ DLE ŽIVNOSTENSKÉHO ZÁKONA NEZAPSANÁ V OBCHODNÍM REJSTŘÍKU</div>
         </div>
         <div id="w-node-_6cb39172-713d-ca50-3b0e-981cdeea8c3b-deea8c21" class="wprapper-form">
-          <div bind="6cb39172-713d-ca50-3b0e-981cdeea8c3c" wordpress="form" class="form-contact w-form">
+          <div bind="6cb39172-713d-ca50-3b0e-981cdeea8c3c" wordpress="form" class="form-contact">
             <form id="wf-form-Kontakt-formular" name="wf-form-Kontakt-formular" data-name="Kontakt formular" method="get" class="form-contact-us" data-wf-page-id="657df3baa7b4c74f19f13e1d" data-wf-element-id="6cb39172-713d-ca50-3b0e-981cdeea8c3d">
               <div id="w-node-_6cb39172-713d-ca50-3b0e-981cdeea8c3e-deea8c21">
                 <div class="form-item-header">Jméno a příjmení *</div><input class="text-field-contact w-input" maxlength="256" name="Jmeno-a-prijmeni-2" data-name="Jmeno A Prijmeni 2" placeholder="Vaše celé jméno" type="text" id="Jmeno-a-prijmeni-2" required="">
@@ -731,8 +761,13 @@ button:hover {
               </div>
               <div id="w-node-_6cb39172-713d-ca50-3b0e-981cdeea8c4e-deea8c21">
                 <div class="form-item-header">Popište stručně s čím vám můžeme pomoci</div><textarea data-name="Field 2" maxlength="5000" id="field-2" name="field-2" placeholder="Informace či dotaz k požadovanému servisu" required="" class="textarea-contact servis w-input"></textarea>
-              </div><label id="w-node-_6cb39172-713d-ca50-3b0e-981cdeea8c52-deea8c21" class="w-checkbox"><input type="checkbox" id="checkbox-2" name="checkbox-2" data-name="Checkbox 2" required="" class="w-checkbox-input"><span class="checkbox-labels w-form-label" for="checkbox-2">Souhlasím se správou, zpracováním a uchováním svých osobních údajů, ve smyslu ustanovení §5 odst. 2 písm. a) zákona č. 101/200 Sb. o ochraně osobních údajů, ve znění pozdějších předpisů.</span></label>
-              <div id="w-node-_6cb39172-713d-ca50-3b0e-981cdeea8c56-deea8c21"><input type="submit" data-wait="Odesíláme ..." class="white-button kontakt w-button" value="odeslat"></div>
+              </div>
+              <label class="servis-gdpr-label">
+                <input type="checkbox" id="servis-gdpr" class="checkbox-servis">
+                <span>*Souhlasím se správou, zpracováním a uchováním svých osobních údajů, ve smyslu ustanovení §5 odst. 2 písm. a) zákona č. 101/200 Sb. o ochraně osobních údajů, ve znění pozdějších předpisů.</span>
+              </label>
+              <p id="servis-form-error"></p>
+              <div id="w-node-_6cb39172-713d-ca50-3b0e-981cdeea8c56-deea8c21"><input type="submit" id="servis-submit" data-wait="Odesíláme ..." class="white-button kontakt w-button" value="odeslat"></div>
             </form>
             <div class="success w-form-done">
               <div class="empty-text">Děkujeme za Vaši zprávu! Jak slezeme s kola, tak Vám odpovíme.</div>
@@ -867,5 +902,42 @@ Cookies.set(cookieName, 'ok', { expires: 31 });
   
   <!-- Bikeskills CMS Loader -->
   <script src="/js/cms-loader.js"></script>
+  <script>
+  (function() {
+    var SEND_URL = 'https://europe-west1-bikeskills-web.cloudfunctions.net/sendServisForm';
+    var form = document.getElementById('wf-form-Kontakt-formular');
+    if (!form) return;
+    function showError(msg) {
+      var el = document.getElementById('servis-form-error');
+      if (!el) return;
+      el.textContent = msg;
+      el.style.display = msg ? 'block' : 'none';
+    }
+    form.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      var jmenoPrijmeni = ((form.querySelector('[name="Jmeno-a-prijmeni-2"]') || {}).value || '').trim();
+      var email = ((form.querySelector('[name="E-mail-2"]') || {}).value || '').trim();
+      var telefon = (form.querySelector('[name="Telefon-2"]') || {}).value || '';
+      var typServisu = (form.querySelector('[name="typ-servisu-2"]') || {}).value || '';
+      var zprava = (form.querySelector('[name="field-2"]') || {}).value || '';
+      var gdpr = document.getElementById('servis-gdpr');
+      if (!jmenoPrijmeni) { showError('Vyplňte prosím jméno a příjmení.'); return; }
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showError('Zadejte platný e-mail.'); return; }
+      if (!gdpr || !gdpr.checked) { showError('Pro odeslání je nutný souhlas se zásadami ochrany osobních údajů.'); return; }
+      showError('');
+      var btn = document.getElementById('servis-submit');
+      if (btn) { btn.disabled = true; btn.value = 'Odesíláme…'; }
+      try {
+        var resp = await fetch(SEND_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ jmenoPrijmeni: jmenoPrijmeni, email: email, telefon: telefon, typServisu: typServisu, zprava: zprava }) });
+        if (!resp.ok) throw new Error('server error');
+        var successDiv = form.closest('.form-contact').querySelector('.w-form-done');
+        if (successDiv) { form.style.display = 'none'; successDiv.style.display = 'block'; }
+      } catch (err) {
+        if (btn) { btn.disabled = false; btn.value = 'odeslat'; }
+        showError('Nepodařilo se odeslat. Zkuste to prosím znovu nebo nás kontaktujte na info@bikeskills.cz.');
+      }
+    });
+  })();
+  </script>
 </body>
 </html>

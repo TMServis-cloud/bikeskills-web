@@ -160,3 +160,78 @@ exports.sendReservation = functions
       res.status(500).json({ error: 'Nepodařilo se odeslat e-mail' });
     }
   });
+
+// ============================================================
+// SEND SERVIS FORM (objednávkový formulář — servis.html)
+// ============================================================
+exports.sendServisForm = functions
+  .region('europe-west1')
+  .runWith({ memory: '256MB', timeoutSeconds: 30 })
+  .https.onRequest(async (req, res) => {
+    setCors(req, res);
+    if (req.method === 'OPTIONS') { res.status(204).send(''); return; }
+    if (req.method !== 'POST') { res.status(405).json({ error: 'Method Not Allowed' }); return; }
+
+    const { jmenoPrijmeni, email, telefon, typServisu, zprava } = req.body || {};
+
+    if (!jmenoPrijmeni || !email) {
+      res.status(400).json({ error: 'Chybějí povinné údaje' });
+      return;
+    }
+
+    const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRe.test(email)) {
+      res.status(400).json({ error: 'Neplatný e-mail' });
+      return;
+    }
+
+    const transporter = nodemailer.createTransport({
+      host: 'smtp.mail.me.com',
+      port: 587,
+      secure: false,
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
+
+    const adminBody = [
+      `Nová zpráva z objednávkového formuláře servis.html`,
+      ``,
+      `Jméno a příjmení: ${jmenoPrijmeni}`,
+      `E-mail: ${email}`,
+      `Telefon: ${telefon || '—'}`,
+      `Typ servisu: ${typServisu || '—'}`,
+      `Zpráva: ${zprava || '—'}`,
+    ].join('\n');
+
+    const clientBody = [
+      `Dobrý den ${jmenoPrijmeni.split(' ')[0]},`,
+      ``,
+      `Váš dotaz byl úspěšně odeslán. Jak slezeme z kola, ozveme se vám!`,
+      ``,
+      `Tým BikeSkills`,
+      `https://bikeskills.cz`,
+    ].join('\n');
+
+    try {
+      await Promise.all([
+        transporter.sendMail({
+          from: `"BikeSkills servis" <${process.env.EMAIL_FROM}>`,
+          to: 'cihi@bikeskills.cz',
+          subject: `Objednávkový formulář: ${typServisu || 'dotaz'} — ${jmenoPrijmeni}`,
+          text: adminBody,
+        }),
+        transporter.sendMail({
+          from: `"BikeSkills" <${process.env.EMAIL_FROM}>`,
+          to: email,
+          subject: `Potvrzení dotazu — BikeSkills servis`,
+          text: clientBody,
+        }),
+      ]);
+      res.status(200).json({ ok: true });
+    } catch (err) {
+      console.error('Email error:', err);
+      res.status(500).json({ error: 'Nepodařilo se odeslat e-mail' });
+    }
+  });
