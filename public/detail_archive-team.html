@@ -84,7 +84,33 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-}  
+}
+@media (max-width: 991px) {
+  /* Foto jezdce nad jménem — auto-placement, order -1 */
+  #w-node-_2ec11579-7443-73f2-94d3-99e01519343d-19f13daa {
+    grid-area: auto !important;
+    order: -1 !important;
+  }
+  #w-node-_4c86c9f2-4b97-b0f1-6863-d5726ceff340-19f13daa,
+  #w-node-_38e8d2ed-5763-d8b0-d028-e595e1b7cb5d-19f13daa {
+    grid-area: auto !important;
+  }
+  /* Videa na celou šířku */
+  #w-node-_486443b1-e207-1fb2-2822-763a5e0341c7-19f13daa,
+  #w-node-_44483584-6ffb-c766-d950-756d0164932c-19f13daa,
+  #w-node-_05ed5e08-f56f-0d3b-b1d2-efef501eeafc-19f13daa {
+    grid-area: auto !important;
+    grid-column: 1 / -1 !important;
+  }
+  /* Galerie — menší mezery a poloviční zaoblení */
+  .collection-photos {
+    grid-column-gap: 6px !important;
+    grid-row-gap: 6px !important;
+  }
+  .photo-team-block {
+    border-radius: 2px !important;
+  }
+}
 /* Product mizení velikosti co není skladem */ 
   .variations-label.disabled {
 	background-color: #222528;

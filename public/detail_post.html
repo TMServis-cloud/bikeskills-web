@@ -553,6 +553,30 @@ button:hover {
   border-radius: .25rem;
   display: block;
 }
+@media (max-width: 767px) {
+  /* Galerie 3 sloupce + poloviční zaoblení */
+  .collection-list-13 {
+    grid-template-columns: 1fr 1fr 1fr !important;
+    grid-column-gap: 6px !important;
+    grid-row-gap: 6px !important;
+  }
+  .collection-list-13 img {
+    border-radius: 2px !important;
+  }
+  /* Mohlo by vás zaujmout — 1 sloupec na středu, větší název */
+  .collection-blog-grid.related {
+    grid-template-columns: 1fr !important;
+    max-width: 380px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+  .related-posts .wrapper--text__title {
+    font-family: proxima-nova, sans-serif !important;
+    font-size: 1.15rem !important;
+    font-weight: 700 !important;
+    line-height: 1.3 !important;
+  }
+}
 </style>
   <link rel="canonical" href="https://bikeskills.cz/detail_post.html">
 </head>
