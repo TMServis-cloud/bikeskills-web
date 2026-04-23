@@ -78,6 +78,18 @@
 .collection-photos {
   grid-template-columns: 1fr 1fr 1fr 1fr !important;
 }
+/* Reset explicitních grid-area z Webflow — auto-placement do 4 sloupců */
+#w-node-_58e0ea73-c549-fa9a-6100-30b3a6d11bb3-19f13daa,
+#w-node-_35695d52-3e02-e5b0-07f3-6da752bddd21-19f13daa,
+#w-node-c40190d0-acd9-ef35-5abb-1864bde4c8c9-19f13daa,
+#w-node-c855ceba-0229-a4d0-11a8-dafd0c12284f-19f13daa,
+#w-node-_775f56f9-dbff-b9ba-2909-849c37861ea2-19f13daa,
+#w-node-b5ed469e-ee58-87e7-f0c1-685d1f51d9d9-19f13daa,
+#w-node-_14ae018e-8292-a0ec-278a-550931478aa4-19f13daa,
+#w-node-_79bd108f-e387-6c3b-aef6-2d93d05f174b-19f13daa {
+  grid-area: auto !important;
+  place-self: start stretch !important;
+}
 .photo-team-block {
   aspect-ratio: 1 / 1;
   max-height: none;
