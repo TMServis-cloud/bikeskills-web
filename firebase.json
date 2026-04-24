@@ -8,102 +8,542 @@
       "**/node_modules/**"
     ],
     "redirects": [
-      { "source": "/blog/", "destination": "/blog.html", "type": 301 },
-      { "source": "/projekt-startuje/", "destination": "/blog/projekt-startuje/", "type": 301 },
-      { "source": "/nas-obchod/", "destination": "/blog/nas-obchod/", "type": 301 },
-      { "source": "/organizujeme/", "destination": "/blog/organizujeme/", "type": 301 },
-      { "source": "/vibrocore-test/", "destination": "/blog/vibrocore-test/", "type": 301 },
-      { "source": "/vyukova-lekce-pro-klub/", "destination": "/blog/vyukova-lekce-pro-klub/", "type": 301 },
-      { "source": "/levelsportkoncept-testing-by-bikeskills/", "destination": "/blog/levelsportkoncept-testing-by-bikeskills/", "type": 301 },
-      { "source": "/dvo-testovani-na-spicaku/", "destination": "/blog/dvo-testovani-na-spicaku/", "type": 301 },
-      { "source": "/je-libo-traily/", "destination": "/blog/je-libo-traily/", "type": 301 },
-      { "source": "/kdyz-sjezd-vyhraje-trialista/", "destination": "/blog/kdyz-sjezd-vyhraje-trialista/", "type": 301 },
-      { "source": "/milada-run-2020/", "destination": "/blog/milada-run-2020/", "type": 301 },
-      { "source": "/exhibicni-maraton-kluku-z-bikeskills/", "destination": "/blog/exhibicni-maraton-kluku-z-bikeskills/", "type": 301 },
-      { "source": "/holky-ladi-bikeskills-vol-2/", "destination": "/blog/holky-ladi-bikeskills-vol-2/", "type": 301 },
-      { "source": "/spolupracujeme-s-cdst/", "destination": "/blog/spolupracujeme-s-cdst/", "type": 301 },
-      { "source": "/nove-moznosti-platby-na-nasem-e-shopu/", "destination": "/blog/nove-moznosti-platby-na-nasem-e-shopu/", "type": 301 },
-      { "source": "/terminy-akci-2021/", "destination": "/blog/terminy-akci-2021/", "type": 301 },
-      { "source": "/podporte-katarinu-a-jeji-knihu/", "destination": "/blog/podporte-katarinu-a-jeji-knihu/", "type": 301 },
-      { "source": "/holky-ladi-bikeskills-semberske-stezky/", "destination": "/blog/holky-ladi-bikeskills-semberske-stezky/", "type": 301 },
-      { "source": "/chlapi-ladi-bikeskills-no-2/", "destination": "/blog/chlapi-ladi-bikeskills-no-2/", "type": 301 },
-      { "source": "/trenujeme-lvicata/", "destination": "/blog/trenujeme-lvicata/", "type": 301 },
-      { "source": "/otevreni-cube-store-karlovy-vary/", "destination": "/blog/otevreni-cube-store-karlovy-vary/", "type": 301 },
-      { "source": "/otevirali-jsme-pumptrack-v-brandyse/", "destination": "/blog/otevirali-jsme-pumptrack-v-brandyse/", "type": 301 },
-      { "source": "/krteni-motorek-a-jilove-u-decina/", "destination": "/blog/krteni-motorek-a-jilove-u-decina/", "type": 301 },
-      { "source": "/olympiada-skolek/", "destination": "/blog/olympiada-skolek/", "type": 301 },
-      { "source": "/ricansky-busking-food-festival/", "destination": "/blog/ricansky-busking-food-festival/", "type": 301 },
-      { "source": "/den-mestske-policie-most/", "destination": "/blog/den-mestske-policie-most/", "type": 301 },
-      { "source": "/sraz-veteranu-horni-police-a-mestske-slavnosti-stare-krecany/", "destination": "/blog/sraz-veteranu-horni-police-a-mestske-slavnosti-stare-krecany/", "type": 301 },
-      { "source": "/bikefestival-ricanske-slapacky-2022/", "destination": "/blog/bikefestival-ricanske-slapacky-2022/", "type": 301 },
-      { "source": "/cervencova-sleva/", "destination": "/blog/cervencova-sleva/", "type": 301 },
-      { "source": "/martin-simunek-v-milovicich-a-struharove/", "destination": "/blog/martin-simunek-v-milovicich-a-struharove/", "type": 301 },
-      { "source": "/cestlicky-pumptrack-otevren/", "destination": "/blog/cestlicky-pumptrack-otevren/", "type": 301 },
-      { "source": "/exhibicni-den-kunratice-skvorec-a-jablonec-nad-nisou/", "destination": "/blog/exhibicni-den-kunratice-skvorec-a-jablonec-nad-nisou/", "type": 301 },
-      { "source": "/podzimni-den-mlada-boleslav/", "destination": "/blog/podzimni-den-mlada-boleslav/", "type": 301 },
-      { "source": "/listopadova-sleva-bikeskills/", "destination": "/blog/listopadova-sleva-bikeskills/", "type": 301 },
-      { "source": "/produkty-kine-max-na-nasem-shopu/", "destination": "/blog/produkty-kine-max-na-nasem-shopu/", "type": 301 },
-      { "source": "/nove-u-nas-naleznete-znacku-ethirteen/", "destination": "/blog/nove-u-nas-naleznete-znacku-ethirteen/", "type": 301 },
-      { "source": "/exhibicni-vystoupeni-bikes4life-sosnova/", "destination": "/blog/exhibicni-vystoupeni-bikes4life-sosnova/", "type": 301 },
-      { "source": "/nataceni-tv-poradu-lvicata/", "destination": "/blog/nataceni-tv-poradu-lvicata/", "type": 301 },
-      { "source": "/ples-zemedelske-university-v-praze/", "destination": "/blog/ples-zemedelske-university-v-praze/", "type": 301 },
-      { "source": "/zehnani-kol-svatba-bikeru-a-dny-bezpecnosti/", "destination": "/blog/zehnani-kol-svatba-bikeru-a-dny-bezpecnosti/", "type": 301 },
-      { "source": "/kulovy-blesk-1-pradedeckuv-traktor-a-pisek-u-jablunkova/", "destination": "/blog/kulovy-blesk-1-pradedeckuv-traktor-a-pisek-u-jablunkova/", "type": 301 },
-      { "source": "/kulovy-blesk-2-caslav-bratronice-chotec-suchdol-bojkovice/", "destination": "/blog/kulovy-blesk-2-caslav-bratronice-chotec-suchdol-bojkovice/", "type": 301 },
-      { "source": "/melnicky-festival-dny-lesu-v-ralsku-a-javornicky-den/", "destination": "/blog/melnicky-festival-dny-lesu-v-ralsku-a-javornicky-den/", "type": 301 },
-      { "source": "/detsky-den-na-ladronce-a-cykloden-brezno/", "destination": "/blog/detsky-den-na-ladronce-a-cykloden-brezno/", "type": 301 },
-      { "source": "/exhibicni-serie-na-zaver-prazdnin/", "destination": "/blog/exhibicni-serie-na-zaver-prazdnin/", "type": 301 },
-      { "source": "/tour-de-zelenak/", "destination": "/blog/tour-de-zelenak/", "type": 301 },
-      { "source": "/sedm-statecnych-napric-republikou/", "destination": "/blog/sedm-statecnych-napric-republikou/", "type": 301 },
-      { "source": "/radeni-na-it-konferenci/", "destination": "/blog/radeni-na-it-konferenci/", "type": 301 },
-      { "source": "/otevirani-loucovicke-cyklostezky-loucovice-u-lipna/", "destination": "/blog/otevirani-loucovicke-cyklostezky-loucovice-u-lipna/", "type": 301 },
-      { "source": "/den-prazskych-sluzeb-a-cykloden/", "destination": "/blog/den-prazskych-sluzeb-a-cykloden/", "type": 301 },
-      { "source": "/cyklisticky-zavod-skol-memorial-ferdinanda-busty/", "destination": "/blog/cyklisticky-zavod-skol-memorial-ferdinanda-busty/", "type": 301 },
-      { "source": "/mcr-masters-v-cyklistice-prazske-sluzby-otovicke-slavnosti-a-slavnosti-v-prznu/", "destination": "/blog/mcr-masters-v-cyklistice-prazske-sluzby-otovicke-slavnosti-a-slavnosti-v-prznu/", "type": 301 },
-      { "source": "/slavnosti-vysni-lhota/", "destination": "/blog/slavnosti-vysni-lhota/", "type": 301 },
-      { "source": "/sraz-americkych-aut-a-motorek-na-zamku-pacov/", "destination": "/blog/sraz-americkych-aut-a-motorek-na-zamku-pacov/", "type": 301 },
-      { "source": "/zaver-prazdnin-na-cestach/", "destination": "/blog/zaver-prazdnin-na-cestach/", "type": 301 },
-      { "source": "/toyota-motors-tht-cz-a-zakupy-firemni-akce/", "destination": "/blog/toyota-motors-tht-cz-a-zakupy-firemni-akce/", "type": 301 },
-      { "source": "/trial-a-pump-jam-tehov/", "destination": "/blog/trial-a-pump-jam-tehov/", "type": 301 },
-      { "source": "/sidekick-od-e-13-novinka-pro-2025/", "destination": "/blog/sidekick-od-e-13-novinka-pro-2025/", "type": 301 },
-      { "source": "/ples-spolku-obci-v-ceprovicich/", "destination": "/blog/ples-spolku-obci-v-ceprovicich/", "type": 301 },
-      { "source": "/tradicni-sestrih-2024-by-vlasta/", "destination": "/blog/tradicni-sestrih-2024-by-vlasta/", "type": 301 },
-      { "source": "/kalendar-bikeskills-2025/", "destination": "/blog/kalendar-bikeskills-2025/", "type": 301 },
-      { "source": "/tj-sokol-dynamo-moravany-ples/", "destination": "/blog/tj-sokol-dynamo-moravany-ples/", "type": 301 },
-      { "source": "/beneficni-ples-podnikatelu-bublava/", "destination": "/blog/beneficni-ples-podnikatelu-bublava/", "type": 301 },
-      { "source": "/ples-motocyklistu-vysoka/", "destination": "/blog/ples-motocyklistu-vysoka/", "type": 301 },
-      { "source": "/harfa-sport-zahajeni-bikove-sezony/", "destination": "/blog/harfa-sport-zahajeni-bikove-sezony/", "type": 301 },
-      { "source": "/oteviracka-bikepark-jahodnice-praha/", "destination": "/blog/oteviracka-bikepark-jahodnice-praha/", "type": 301 },
-      { "source": "/vlasta-vyskakal-199-schodu-na-rozhlednu/", "destination": "/blog/vlasta-vyskakal-199-schodu-na-rozhlednu/", "type": 301 },
-      { "source": "/festival-rekordu-pelhrimov-a-firemni-akce/", "destination": "/blog/festival-rekordu-pelhrimov-a-firemni-akce/", "type": 301 },
-      { "source": "/letape-vitani-leta-lesnicky-den-a-detsky-den/", "destination": "/blog/letape-vitani-leta-lesnicky-den-a-detsky-den/", "type": 301 },
-      { "source": "/naplavka-dobrocinny-festival-kostelec-nad-orlici/", "destination": "/blog/naplavka-dobrocinny-festival-kostelec-nad-orlici/", "type": 301 },
-      { "source": "/251062-2/", "destination": "/blog/251062-2/", "type": 301 },
-      { "source": "/exhibicni-vystoupeni-lipova-u-chebu/", "destination": "/blog/exhibicni-vystoupeni-lipova-u-chebu/", "type": 301 },
-      { "source": "/season-mix-2025-z-cihiho-telefonu/", "destination": "/blog/season-mix-2025-z-cihiho-telefonu/", "type": 301 },
-      { "source": "/galavecer-bigmat/", "destination": "/blog/galavecer-bigmat/", "type": 301 }
+      {
+        "source": "/shop.html",
+        "destination": "https://shop.bikeskills.cz/",
+        "type": 301
+      },
+      {
+        "source": "/shop-category.html",
+        "destination": "https://shop.bikeskills.cz/",
+        "type": 301
+      },
+      {
+        "source": "/detail_product.html",
+        "destination": "https://shop.bikeskills.cz/",
+        "type": 301
+      },
+      {
+        "source": "/detail_category.html",
+        "destination": "https://shop.bikeskills.cz/",
+        "type": 301
+      },
+      {
+        "source": "/detail_sku.html",
+        "destination": "https://shop.bikeskills.cz/",
+        "type": 301
+      },
+      {
+        "source": "/kosik.html",
+        "destination": "https://shop.bikeskills.cz/",
+        "type": 301
+      },
+      {
+        "source": "/checkout.html",
+        "destination": "https://shop.bikeskills.cz/",
+        "type": 301
+      },
+      {
+        "source": "/order-confirmation.html",
+        "destination": "https://shop.bikeskills.cz/",
+        "type": 301
+      },
+      {
+        "source": "/paypal-checkout.html",
+        "destination": "https://shop.bikeskills.cz/",
+        "type": 301
+      },
+      {
+        "source": "/search.html",
+        "destination": "https://shop.bikeskills.cz/",
+        "type": 301
+      },
+      {
+        "source": "/account.html",
+        "destination": "https://shop.bikeskills.cz/muj-ucet",
+        "type": 301
+      },
+      {
+        "source": "/user-account.html",
+        "destination": "https://shop.bikeskills.cz/muj-ucet",
+        "type": 301
+      },
+      {
+        "source": "/login.html",
+        "destination": "https://shop.bikeskills.cz/cs/p%C5%99ihl%C3%A1sit",
+        "type": 301
+      },
+      {
+        "source": "/log-in.html",
+        "destination": "https://shop.bikeskills.cz/cs/p%C5%99ihl%C3%A1sit",
+        "type": 301
+      },
+      {
+        "source": "/register.html",
+        "destination": "https://shop.bikeskills.cz/cs/p%C5%99ihl%C3%A1sit",
+        "type": 301
+      },
+      {
+        "source": "/sign-up.html",
+        "destination": "https://shop.bikeskills.cz/cs/p%C5%99ihl%C3%A1sit",
+        "type": 301
+      },
+      {
+        "source": "/password-reset.html",
+        "destination": "https://shop.bikeskills.cz/cs/obnova-hesla",
+        "type": 301
+      },
+      {
+        "source": "/reset-password.html",
+        "destination": "https://shop.bikeskills.cz/cs/obnova-hesla",
+        "type": 301
+      },
+      {
+        "source": "/update-password.html",
+        "destination": "https://shop.bikeskills.cz/cs/obnova-hesla",
+        "type": 301
+      },
+      {
+        "source": "/access-denied.html",
+        "destination": "https://shop.bikeskills.cz/",
+        "type": 301
+      },
+      {
+        "source": "/setup-guide.html",
+        "destination": "https://bikeskills.cz/",
+        "type": 301
+      },
+      {
+        "source": "/style-guide.html",
+        "destination": "https://bikeskills.cz/",
+        "type": 301
+      },
+      {
+        "source": "/my-account/orders/",
+        "destination": "https://shop.bikeskills.cz/historie-objednavek",
+        "type": 301
+      },
+      {
+        "source": "/blog/",
+        "destination": "/blog.html",
+        "type": 301
+      },
+      {
+        "source": "/projekt-startuje/",
+        "destination": "/blog/projekt-startuje/",
+        "type": 301
+      },
+      {
+        "source": "/nas-obchod/",
+        "destination": "/blog/nas-obchod/",
+        "type": 301
+      },
+      {
+        "source": "/organizujeme/",
+        "destination": "/blog/organizujeme/",
+        "type": 301
+      },
+      {
+        "source": "/vibrocore-test/",
+        "destination": "/blog/vibrocore-test/",
+        "type": 301
+      },
+      {
+        "source": "/vyukova-lekce-pro-klub/",
+        "destination": "/blog/vyukova-lekce-pro-klub/",
+        "type": 301
+      },
+      {
+        "source": "/levelsportkoncept-testing-by-bikeskills/",
+        "destination": "/blog/levelsportkoncept-testing-by-bikeskills/",
+        "type": 301
+      },
+      {
+        "source": "/dvo-testovani-na-spicaku/",
+        "destination": "/blog/dvo-testovani-na-spicaku/",
+        "type": 301
+      },
+      {
+        "source": "/je-libo-traily/",
+        "destination": "/blog/je-libo-traily/",
+        "type": 301
+      },
+      {
+        "source": "/kdyz-sjezd-vyhraje-trialista/",
+        "destination": "/blog/kdyz-sjezd-vyhraje-trialista/",
+        "type": 301
+      },
+      {
+        "source": "/milada-run-2020/",
+        "destination": "/blog/milada-run-2020/",
+        "type": 301
+      },
+      {
+        "source": "/exhibicni-maraton-kluku-z-bikeskills/",
+        "destination": "/blog/exhibicni-maraton-kluku-z-bikeskills/",
+        "type": 301
+      },
+      {
+        "source": "/holky-ladi-bikeskills-vol-2/",
+        "destination": "/blog/holky-ladi-bikeskills-vol-2/",
+        "type": 301
+      },
+      {
+        "source": "/spolupracujeme-s-cdst/",
+        "destination": "/blog/spolupracujeme-s-cdst/",
+        "type": 301
+      },
+      {
+        "source": "/nove-moznosti-platby-na-nasem-e-shopu/",
+        "destination": "/blog/nove-moznosti-platby-na-nasem-e-shopu/",
+        "type": 301
+      },
+      {
+        "source": "/terminy-akci-2021/",
+        "destination": "/blog/terminy-akci-2021/",
+        "type": 301
+      },
+      {
+        "source": "/podporte-katarinu-a-jeji-knihu/",
+        "destination": "/blog/podporte-katarinu-a-jeji-knihu/",
+        "type": 301
+      },
+      {
+        "source": "/holky-ladi-bikeskills-semberske-stezky/",
+        "destination": "/blog/holky-ladi-bikeskills-semberske-stezky/",
+        "type": 301
+      },
+      {
+        "source": "/chlapi-ladi-bikeskills-no-2/",
+        "destination": "/blog/chlapi-ladi-bikeskills-no-2/",
+        "type": 301
+      },
+      {
+        "source": "/trenujeme-lvicata/",
+        "destination": "/blog/trenujeme-lvicata/",
+        "type": 301
+      },
+      {
+        "source": "/otevreni-cube-store-karlovy-vary/",
+        "destination": "/blog/otevreni-cube-store-karlovy-vary/",
+        "type": 301
+      },
+      {
+        "source": "/otevirali-jsme-pumptrack-v-brandyse/",
+        "destination": "/blog/otevirali-jsme-pumptrack-v-brandyse/",
+        "type": 301
+      },
+      {
+        "source": "/krteni-motorek-a-jilove-u-decina/",
+        "destination": "/blog/krteni-motorek-a-jilove-u-decina/",
+        "type": 301
+      },
+      {
+        "source": "/olympiada-skolek/",
+        "destination": "/blog/olympiada-skolek/",
+        "type": 301
+      },
+      {
+        "source": "/ricansky-busking-food-festival/",
+        "destination": "/blog/ricansky-busking-food-festival/",
+        "type": 301
+      },
+      {
+        "source": "/den-mestske-policie-most/",
+        "destination": "/blog/den-mestske-policie-most/",
+        "type": 301
+      },
+      {
+        "source": "/sraz-veteranu-horni-police-a-mestske-slavnosti-stare-krecany/",
+        "destination": "/blog/sraz-veteranu-horni-police-a-mestske-slavnosti-stare-krecany/",
+        "type": 301
+      },
+      {
+        "source": "/bikefestival-ricanske-slapacky-2022/",
+        "destination": "/blog/bikefestival-ricanske-slapacky-2022/",
+        "type": 301
+      },
+      {
+        "source": "/cervencova-sleva/",
+        "destination": "/blog/cervencova-sleva/",
+        "type": 301
+      },
+      {
+        "source": "/martin-simunek-v-milovicich-a-struharove/",
+        "destination": "/blog/martin-simunek-v-milovicich-a-struharove/",
+        "type": 301
+      },
+      {
+        "source": "/cestlicky-pumptrack-otevren/",
+        "destination": "/blog/cestlicky-pumptrack-otevren/",
+        "type": 301
+      },
+      {
+        "source": "/exhibicni-den-kunratice-skvorec-a-jablonec-nad-nisou/",
+        "destination": "/blog/exhibicni-den-kunratice-skvorec-a-jablonec-nad-nisou/",
+        "type": 301
+      },
+      {
+        "source": "/podzimni-den-mlada-boleslav/",
+        "destination": "/blog/podzimni-den-mlada-boleslav/",
+        "type": 301
+      },
+      {
+        "source": "/listopadova-sleva-bikeskills/",
+        "destination": "/blog/listopadova-sleva-bikeskills/",
+        "type": 301
+      },
+      {
+        "source": "/produkty-kine-max-na-nasem-shopu/",
+        "destination": "/blog/produkty-kine-max-na-nasem-shopu/",
+        "type": 301
+      },
+      {
+        "source": "/nove-u-nas-naleznete-znacku-ethirteen/",
+        "destination": "/blog/nove-u-nas-naleznete-znacku-ethirteen/",
+        "type": 301
+      },
+      {
+        "source": "/exhibicni-vystoupeni-bikes4life-sosnova/",
+        "destination": "/blog/exhibicni-vystoupeni-bikes4life-sosnova/",
+        "type": 301
+      },
+      {
+        "source": "/nataceni-tv-poradu-lvicata/",
+        "destination": "/blog/nataceni-tv-poradu-lvicata/",
+        "type": 301
+      },
+      {
+        "source": "/ples-zemedelske-university-v-praze/",
+        "destination": "/blog/ples-zemedelske-university-v-praze/",
+        "type": 301
+      },
+      {
+        "source": "/zehnani-kol-svatba-bikeru-a-dny-bezpecnosti/",
+        "destination": "/blog/zehnani-kol-svatba-bikeru-a-dny-bezpecnosti/",
+        "type": 301
+      },
+      {
+        "source": "/kulovy-blesk-1-pradedeckuv-traktor-a-pisek-u-jablunkova/",
+        "destination": "/blog/kulovy-blesk-1-pradedeckuv-traktor-a-pisek-u-jablunkova/",
+        "type": 301
+      },
+      {
+        "source": "/kulovy-blesk-2-caslav-bratronice-chotec-suchdol-bojkovice/",
+        "destination": "/blog/kulovy-blesk-2-caslav-bratronice-chotec-suchdol-bojkovice/",
+        "type": 301
+      },
+      {
+        "source": "/melnicky-festival-dny-lesu-v-ralsku-a-javornicky-den/",
+        "destination": "/blog/melnicky-festival-dny-lesu-v-ralsku-a-javornicky-den/",
+        "type": 301
+      },
+      {
+        "source": "/detsky-den-na-ladronce-a-cykloden-brezno/",
+        "destination": "/blog/detsky-den-na-ladronce-a-cykloden-brezno/",
+        "type": 301
+      },
+      {
+        "source": "/exhibicni-serie-na-zaver-prazdnin/",
+        "destination": "/blog/exhibicni-serie-na-zaver-prazdnin/",
+        "type": 301
+      },
+      {
+        "source": "/tour-de-zelenak/",
+        "destination": "/blog/tour-de-zelenak/",
+        "type": 301
+      },
+      {
+        "source": "/sedm-statecnych-napric-republikou/",
+        "destination": "/blog/sedm-statecnych-napric-republikou/",
+        "type": 301
+      },
+      {
+        "source": "/radeni-na-it-konferenci/",
+        "destination": "/blog/radeni-na-it-konferenci/",
+        "type": 301
+      },
+      {
+        "source": "/otevirani-loucovicke-cyklostezky-loucovice-u-lipna/",
+        "destination": "/blog/otevirani-loucovicke-cyklostezky-loucovice-u-lipna/",
+        "type": 301
+      },
+      {
+        "source": "/den-prazskych-sluzeb-a-cykloden/",
+        "destination": "/blog/den-prazskych-sluzeb-a-cykloden/",
+        "type": 301
+      },
+      {
+        "source": "/cyklisticky-zavod-skol-memorial-ferdinanda-busty/",
+        "destination": "/blog/cyklisticky-zavod-skol-memorial-ferdinanda-busty/",
+        "type": 301
+      },
+      {
+        "source": "/mcr-masters-v-cyklistice-prazske-sluzby-otovicke-slavnosti-a-slavnosti-v-prznu/",
+        "destination": "/blog/mcr-masters-v-cyklistice-prazske-sluzby-otovicke-slavnosti-a-slavnosti-v-prznu/",
+        "type": 301
+      },
+      {
+        "source": "/slavnosti-vysni-lhota/",
+        "destination": "/blog/slavnosti-vysni-lhota/",
+        "type": 301
+      },
+      {
+        "source": "/sraz-americkych-aut-a-motorek-na-zamku-pacov/",
+        "destination": "/blog/sraz-americkych-aut-a-motorek-na-zamku-pacov/",
+        "type": 301
+      },
+      {
+        "source": "/zaver-prazdnin-na-cestach/",
+        "destination": "/blog/zaver-prazdnin-na-cestach/",
+        "type": 301
+      },
+      {
+        "source": "/toyota-motors-tht-cz-a-zakupy-firemni-akce/",
+        "destination": "/blog/toyota-motors-tht-cz-a-zakupy-firemni-akce/",
+        "type": 301
+      },
+      {
+        "source": "/trial-a-pump-jam-tehov/",
+        "destination": "/blog/trial-a-pump-jam-tehov/",
+        "type": 301
+      },
+      {
+        "source": "/sidekick-od-e-13-novinka-pro-2025/",
+        "destination": "/blog/sidekick-od-e-13-novinka-pro-2025/",
+        "type": 301
+      },
+      {
+        "source": "/ples-spolku-obci-v-ceprovicich/",
+        "destination": "/blog/ples-spolku-obci-v-ceprovicich/",
+        "type": 301
+      },
+      {
+        "source": "/tradicni-sestrih-2024-by-vlasta/",
+        "destination": "/blog/tradicni-sestrih-2024-by-vlasta/",
+        "type": 301
+      },
+      {
+        "source": "/kalendar-bikeskills-2025/",
+        "destination": "/blog/kalendar-bikeskills-2025/",
+        "type": 301
+      },
+      {
+        "source": "/tj-sokol-dynamo-moravany-ples/",
+        "destination": "/blog/tj-sokol-dynamo-moravany-ples/",
+        "type": 301
+      },
+      {
+        "source": "/beneficni-ples-podnikatelu-bublava/",
+        "destination": "/blog/beneficni-ples-podnikatelu-bublava/",
+        "type": 301
+      },
+      {
+        "source": "/ples-motocyklistu-vysoka/",
+        "destination": "/blog/ples-motocyklistu-vysoka/",
+        "type": 301
+      },
+      {
+        "source": "/harfa-sport-zahajeni-bikove-sezony/",
+        "destination": "/blog/harfa-sport-zahajeni-bikove-sezony/",
+        "type": 301
+      },
+      {
+        "source": "/oteviracka-bikepark-jahodnice-praha/",
+        "destination": "/blog/oteviracka-bikepark-jahodnice-praha/",
+        "type": 301
+      },
+      {
+        "source": "/vlasta-vyskakal-199-schodu-na-rozhlednu/",
+        "destination": "/blog/vlasta-vyskakal-199-schodu-na-rozhlednu/",
+        "type": 301
+      },
+      {
+        "source": "/festival-rekordu-pelhrimov-a-firemni-akce/",
+        "destination": "/blog/festival-rekordu-pelhrimov-a-firemni-akce/",
+        "type": 301
+      },
+      {
+        "source": "/letape-vitani-leta-lesnicky-den-a-detsky-den/",
+        "destination": "/blog/letape-vitani-leta-lesnicky-den-a-detsky-den/",
+        "type": 301
+      },
+      {
+        "source": "/naplavka-dobrocinny-festival-kostelec-nad-orlici/",
+        "destination": "/blog/naplavka-dobrocinny-festival-kostelec-nad-orlici/",
+        "type": 301
+      },
+      {
+        "source": "/251062-2/",
+        "destination": "/blog/251062-2/",
+        "type": 301
+      },
+      {
+        "source": "/exhibicni-vystoupeni-lipova-u-chebu/",
+        "destination": "/blog/exhibicni-vystoupeni-lipova-u-chebu/",
+        "type": 301
+      },
+      {
+        "source": "/season-mix-2025-z-cihiho-telefonu/",
+        "destination": "/blog/season-mix-2025-z-cihiho-telefonu/",
+        "type": 301
+      },
+      {
+        "source": "/galavecer-bigmat/",
+        "destination": "/blog/galavecer-bigmat/",
+        "type": 301
+      }
     ],
     "rewrites": [
-      { "source": "/blog/**", "destination": "/detail_post.html" },
-      { "source": "/akce/**", "destination": "/detail_akce.html" },
-      { "source": "/team/**", "destination": "/detail_archive-team.html" }
+      {
+        "source": "/blog/**",
+        "destination": "/detail_post.html"
+      },
+      {
+        "source": "/akce/**",
+        "destination": "/detail_akce.html"
+      },
+      {
+        "source": "/team/**",
+        "destination": "/detail_archive-team.html"
+      }
     ],
     "headers": [
       {
         "source": "**/*.@(jpg|jpeg|gif|png|webp|svg|ico)",
-        "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }]
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "public, max-age=31536000, immutable"
+          }
+        ]
       },
       {
         "source": "**/*.@(css|js)",
-        "headers": [{ "key": "Cache-Control", "value": "public, max-age=604800" }]
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "public, max-age=604800"
+          }
+        ]
       },
       {
         "source": "**/*.@(woff|woff2|ttf|eot)",
-        "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }]
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "public, max-age=31536000, immutable"
+          }
+        ]
       },
       {
         "source": "**/*.html",
-        "headers": [{ "key": "Cache-Control", "value": "public, max-age=3600" }]
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "public, max-age=3600"
+          }
+        ]
       }
     ]
   },

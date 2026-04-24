@@ -6,6 +6,51 @@
 
 ---
 
+## Aktualizace 24. 4. 2026 — vyčištění e-shopu
+
+E-shop přesunut na `shop.bikeskills.cz` (Prestashop). Provedeno:
+
+**Smazáno 22 HTML stránek:**
+- E-shop: `shop.html`, `shop-category.html`, `detail_product.html`, `detail_category.html`, `detail_sku.html`, `kosik.html`, `checkout.html`, `order-confirmation.html`, `paypal-checkout.html`, `search.html`
+- Zákaznické účty: `account.html`, `user-account.html`, `login.html`, `log-in.html`, `register.html`, `sign-up.html`, `password-reset.html`, `reset-password.html`, `update-password.html`, `access-denied.html`
+- Webflow template junk: `setup-guide.html`, `style-guide.html`
+
+Zbylo **22 produkčních HTML** (viz seznam níže).
+
+**Smazáno 65 nepoužívaných obrázků** (3,81 MB): Screenshot-2020-*.png, activate-udesly-plugin*.png, webflow-to-wordpress-error*.png, page-setting*.png, banner2021*.jpg, pack1*.jpg a jejich Webflow responsivní varianty. `public/images/` je nyní 2,6 MB / 100 souborů.
+
+**Patička na 21 stránkách** — 3 odkazy na zákaznický účet přepojené na Prestashop:
+- *"Objednávky"* → `https://shop.bikeskills.cz/historie-objednavek`
+- *"Zapomenuté heslo"* → `https://shop.bikeskills.cz/cs/obnova-hesla`
+- *"Detail účtu"* → `https://shop.bikeskills.cz/muj-ucet`
+
+URL ověřené uživatelem 24. 4. 2026 proti živému Prestashopu. Původní odkaz *"E-shop"* → `https://shop.bikeskills.cz/` zůstal beze změny.
+
+**robots.txt** — zjednodušen, Disallow bloky pro smazané stránky odstraněny:
+
+```
+User-agent: *
+Allow: /
+
+Sitemap: https://bikeskills.cz/sitemap.xml
+```
+
+**firebase.json** — přidáno 23 nových 301 redirectů:
+- 10× e-shop URL → `https://shop.bikeskills.cz/`
+- 10× auth URL → odpovídající Prestashop stránka (`/muj-ucet`, `/cs/přihlásit`, `/cs/obnova-hesla`)
+- 2× template guide → homepage
+- Starý WP odkaz `/my-account/orders/` → `/historie-objednavek`
+
+**sitemap.xml** — odstraněna URL `/shop.html` (z 223 na 222 URL). Skript `scripts/generate-sitemap.js` také vyčištěn, takže příští `npm run sitemap` bude čistý.
+
+**Zbývající produkční HTML stránky (22):** 404, index, blog, detail_post, team, detail_archive-team, kontakt, servis, standartni-servis-kol, kompletni-servis-full, kompletni-servis-hardtail, kompletni-cenik-servisnich-praci, individualni-kurzy, campy, pujcovna, specialni-akce, akce-archive, detail_akce, pojisteni-bikeplan, obchodni-podminky, dodaci-podminky, zasady-ochrany-osobnich-udaju.
+
+**Stav po úklidu:** body z P0 (detail_product, detail_category, zbytky Webflow šablony v meta tagech) jsou vyřešené smazáním. Zbývají P1/P2 nálezy popsané níže v původním auditu (OG images, descriptions na obchodních podmínkách, strukturovaná data pro blog a akce, …).
+
+**Zachováno:** `public/wp-content/uploads/` (3,3 GB) — obrázky článků, akcí a teamu, referencované z CMS obsahu ve Firestore.
+
+---
+
 ## Celkové hodnocení
 
 | Oblast | Skóre | Shrnutí |

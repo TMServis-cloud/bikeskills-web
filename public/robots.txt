@@ -1,22 +1,4 @@
 User-agent: *
 Allow: /
 
-Disallow: /account.html
-Disallow: /checkout.html
-Disallow: /kosik.html
-Disallow: /log-in.html
-Disallow: /login.html
-Disallow: /register.html
-Disallow: /sign-up.html
-Disallow: /password-reset.html
-Disallow: /reset-password.html
-Disallow: /update-password.html
-Disallow: /order-confirmation.html
-Disallow: /paypal-checkout.html
-Disallow: /user-account.html
-Disallow: /access-denied.html
-Disallow: /setup-guide.html
-Disallow: /style-guide.html
-Disallow: /search.html
-
 Sitemap: https://bikeskills.cz/sitemap.xml
