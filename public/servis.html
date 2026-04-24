@@ -577,6 +577,13 @@ button:hover {
   color: #c0001a; font-size: 0.8rem; margin: 0.4rem 0 0;
   display: none; font-family: proxima-nova, sans-serif;
 }
+/* Oprava mobile layoutu — Webflow grid-area pro select překrývá pole Jméno */
+@media (max-width: 767px) {
+  #objednavkovy-formular .form-contact-us {
+    display: flex !important;
+    flex-direction: column !important;
+  }
+}
 </style>
   <link rel="canonical" href="https://bikeskills.cz/servis.html">
 </head>
