@@ -168,7 +168,8 @@
       "Bash(sed -n '8818,8840p' \"/Users/kabelcihiworkstation/Library/CloudStorage/GoogleDrive-cihacek@chytreit.cz/Můj disk/Google Antigravity projekty/bikeskills-web/public/css/multy-webflow-to-wordpres-ea5f0e3d27991.webflow.css\")",
       "Bash(sed -n '7810,7830p' \"/Users/kabelcihiworkstation/Library/CloudStorage/GoogleDrive-cihacek@chytreit.cz/Můj disk/Google Antigravity projekty/bikeskills-web/public/css/multy-webflow-to-wordpres-ea5f0e3d27991.webflow.css\")",
       "Bash(sed -n '7890,7905p' \"/Users/kabelcihiworkstation/Library/CloudStorage/GoogleDrive-cihacek@chytreit.cz/Můj disk/Google Antigravity projekty/bikeskills-web/public/css/multy-webflow-to-wordpres-ea5f0e3d27991.webflow.css\")",
-      "WebFetch(domain:www.googleapis.com)"
+      "WebFetch(domain:www.googleapis.com)",
+      "Bash(node -e \"const CleanCSS = require\\('clean-css'\\); const fs = require\\('fs'\\); const files = ['public/css/multy-webflow-to-wordpres-ea5f0e3d27991.webflow.css','public/css/webflow.css','public/css/normalize.css']; files.forEach\\(f => { const orig = fs.readFileSync\\(f, 'utf8'\\); const result = new CleanCSS\\({level:2}\\).minify\\(orig\\); fs.writeFileSync\\(f, result.styles\\); const pct = Math.round\\(result.styles.length/orig.length*100\\); console.log\\(f.split\\('/'\\).pop\\(\\), Math.round\\(orig.length/1024\\)+'KB →', Math.round\\(result.styles.length/1024\\)+'KB \\('+pct+'%\\)'\\); }\\);\")"
     ],
     "additionalDirectories": [
       "/tmp",
