@@ -97,6 +97,23 @@ Vytvořen nový Open Graph obrázek `public/images/og-image.jpg` (1200×630 px, 
 
 ---
 
+## Aktualizace 24. 4. 2026 — Meta descriptions na 4 zbývajících stránkách
+
+Doplněny chybějící `meta name="description"` (+ `og:description` a `twitter:description` pro konzistenci s ostatními stránkami) na:
+
+| Stránka | Description | Délka |
+|---|---|---|
+| `obchodni-podminky` | *Obchodní podmínky BikeSkills — pravidla nákupu v e-shopu i kurzů, platby, doručení, odstoupení od smlouvy a reklamace. Přečtěte si před objednáním.* | 150 |
+| `dodaci-podminky` | *Dodací podmínky BikeSkills — způsoby dopravy, ceny, termíny doručení a možnosti osobního odběru v Říčanech u Prahy. Informace k zaslání objednávky.* | 150 |
+| `404` | *Hledaná stránka neexistuje nebo byla přesunuta. Vraťte se na úvod BikeSkills nebo si vyberte z nabídky MTB kurzů, servisu kol a e-shopu.* | 138 |
+| `zasady-ochrany-osobnich-udaju` | *Zásady ochrany osobních údajů BikeSkills — jak zpracováváme vaše osobní data, k čemu slouží, jak dlouho je uchováváme a jaká máte práva podle GDPR.* | 150 |
+
+Současně přeloženy dva anglické titulky do češtiny (`Not Found` → *Stránka nenalezena (404) | BikeSkills*, `Privacy Policy` → *Zásady ochrany osobních údajů | BikeSkills*) a na `404.html` přidán `<meta name="robots" content="noindex, follow">`, aby se chybová stránka neindexovala. Všechny čtyři stránky také doplněny o `twitter:card = summary_large_image`.
+
+**Výsledek:** Všech 22 produkčních HTML stránek má nyní unikátní meta description i twitter card. P1 nálezy z auditu *"Chybí meta description"* vyřešeny.
+
+---
+
 ## Celkové hodnocení
 
 | Oblast | Skóre | Shrnutí |
