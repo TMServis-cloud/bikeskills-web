@@ -147,6 +147,28 @@ Současně přeloženy dva anglické titulky do češtiny (`Not Found` → *Str�
 
 ---
 
+## Aktualizace 24. 4. 2026 — width/height na obrázky (CLS)
+
+**Cíl:** snížit Cumulative Layout Shift (CLS) — browser potřebuje explicitní `width` a `height` (nebo CSS `aspect-ratio`), aby si rezervoval prostor před načtením obrázku.
+
+**Baseline:** 43 / 516 img tagů (8.3 %) mělo width + height; 473 je postrádalo.
+
+**Úpravy:**
+
+- Statické HTML: Python script přečetl skutečné rozměry z `public/images/*` (PIL pro WebP/JPG/PNG, viewBox parser pro SVG) a doplnil `width="…" height="…"` do 460 img tagů v 21 stránkách. Dedupe mapa — 35 unikátních src (partner loga v patičce se opakují 42–43× napříč webem). Ruční fix na `images/bikeskills_1bikeskills.webp` (homepage) a `voucher.webp` (individuální kurzy), které měly prázdný nebo relativní src.
+- Dynamické obrázky z CMS (cms-loader.js): 4 místa, kde se injektoval `imgEl.src` bez rozměrů, nyní nastavují explicitní width/height:
+  - `renderAkceItem` list card → 800×600 (4:3)
+  - Blog list card → 800×600 (4:3)
+  - Team list card → 800×1000 (4:5 portrait)
+  - Team detail → 1280×1600 (původně volalo `removeAttribute('width')`, což CLS přímo způsobovalo)
+  - Akce detail a Blog detail už 1280×720 nastaveny měly.
+
+**Výsledek:** 505 / 516 (**97.87 %** pokrytí). Zbývajících 11 imgs jsou Webflow CMS template placeholdery s prázdným `src=""` — skutečné rozměry nastavuje cms-loader dynamicky po načtení dat, CLS tedy není zasažen.
+
+Po deployi změřit PageSpeed pro homepage / servis / blog listing — očekávaný efekt na CLS metriku.
+
+---
+
 ## Celkové hodnocení
 
 | Oblast | Skóre | Shrnutí |

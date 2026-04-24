@@ -449,6 +449,7 @@ function renderAkceItem(template, data) {
   if (imgEl) {
     imgEl.src = data.imageUrl ? resolveUrl(data.imageUrl) : PLACEHOLDER_URL;
     imgEl.alt = data.nazev || '';
+    imgEl.width = 800; imgEl.height = 600;
     imgEl.onerror = makeImgErrorHandler();
     imgEl.classList.remove('w-dyn-bind-empty');
   }
@@ -1033,6 +1034,7 @@ function renderClanekItem(template, data) {
   if (imgEl) {
     imgEl.src = data.imageUrl ? resolveUrl(data.imageUrl) : PLACEHOLDER_URL;
     imgEl.alt = data.titulek || '';
+    imgEl.width = 800; imgEl.height = 600;
     imgEl.onerror = makeImgErrorHandler();
     imgEl.classList.remove('w-dyn-bind-empty');
   }
@@ -1347,6 +1349,7 @@ function renderTeamItem(template, data) {
   if (imgEl) {
     imgEl.src = data.imageUrl ? resolveUrl(data.imageUrl) : PLACEHOLDER_URL;
     imgEl.alt = data.jmeno || '';
+    imgEl.width = 800; imgEl.height = 1000;
     imgEl.onerror = makeImgErrorHandler();
     imgEl.classList.remove('w-dyn-bind-empty');
   }
@@ -1419,7 +1422,7 @@ async function loadTeamDetail(slug) {
     if (imgEl) {
       imgEl.src = data.imageUrl ? resolveUrl(data.imageUrl) : PLACEHOLDER_URL;
       imgEl.alt = data.jmeno || '';
-      imgEl.removeAttribute('width'); imgEl.removeAttribute('height');
+      imgEl.width = 1280; imgEl.height = 1600;
       imgEl.onerror = makeImgErrorHandler();
       imgEl.classList.remove('w-dyn-bind-empty');
     }
