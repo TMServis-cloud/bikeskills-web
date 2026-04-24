@@ -73,6 +73,27 @@ Vytvořen nový Open Graph obrázek `public/images/og-image.jpg` (1200×630 px, 
 2. **LinkedIn Post Inspector** — `https://www.linkedin.com/post-inspector/` pro vynucení refresh.
 3. **Twitter Card Validator** — `https://cards-dev.twitter.com/validator` (pokud stále funguje; X/Twitter validátor byl deprecated).
 
+---
+
+## Aktualizace 24. 4. 2026 — Clean URLs (kritická oprava)
+
+**Nález z Facebook Sharing Debuggeru po deployi:** stránky `/kontakt`, `/blog`, `/servis` vracely HTTP 404 (og:title *"Not Found"*). Příčina: Firebase Hosting neměl zapnutý `cleanUrls`, takže pro požadavek `/kontakt` nenašel soubor (soubor je `kontakt.html`).
+
+**Opraveno:**
+- `firebase.json` — přidáno `"cleanUrls": true` a `"trailingSlash": false`. Firebase teď:
+  - pro `/kontakt` naservíruje `kontakt.html` (status 200)
+  - pro `/kontakt.html` udělá 301 redirect na `/kontakt` (kanonická forma bez přípony)
+- **Canonicals** aktualizovány na 22 HTML stránkách — odstraněn `.html` suffix (např. `https://bikeskills.cz/kontakt.html` → `https://bikeskills.cz/kontakt`). Homepage má `https://bikeskills.cz/`.
+- **og:url** aktualizováno na 4 stránkách, kde bylo vyplněné (zbytek mělo prázdnou hodnotu — teď je doplněno).
+- **Vnitřní odkazy v HTML** — 437 `href="foo.html"` změněno na `href="foo"` ve všech 22 produkčních stránkách. Odstraňuje extra 301 hop při navigaci.
+- **Sitemap.xml** — 17 URL upraveno (odstraněn `.html` suffix u statických stránek). Dynamické (blog/akce/team slugy) zůstávají.
+- **`scripts/generate-sitemap.js`** — staticPages pole upraveno, další regenerace bude čistá.
+
+**Po deployi znovu otestuj:**
+- Facebook Sharing Debugger → *Scrape Again* pro klíčové stránky (homepage, blog, kontakt, servis, team)
+- Response Code má být 200 a og:title má být skutečný titul stránky (ne "Not Found")
+- Znovu odeslat sitemap v Google Search Console (má 222 URL, teď s clean URLs)
+
 
 ---
 
