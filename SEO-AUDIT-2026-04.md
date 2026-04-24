@@ -461,3 +461,34 @@ Kandidáti na smazání (celkem 114 souborů / 4,59 MB):
 - Screenshot-2020-05-14-at-14.42.04-p-2600.png — 74 KB
 
 Úplný seznam lze získat skriptem — zájemce o automatizaci doporučuji vytvořit `scripts/find-unused-images.js` v projektu.
+
+## Aktualizace 24. 4. 2026 — Oprava zoomu/ořezu náhledů Akce (HP)
+
+**Problém:** V sekci „Kurzy, Campy a další akce" na homepage byly náhledové obrázky příliš přiblížené – zobrazovala se pouze horní část snímku, hlavní motiv (text/účastníci) byl oříznutý.
+
+**Příčina (diagnostika CSS):**
+
+- `.akce-image-blok` měl `height: 130px` s `overflow: hidden`
+- `.image-55` měl `position: absolute; bottom: auto; object-fit: cover; max-width: 100%`, ale **bez explicitní výšky**
+- Obrázek tedy zůstal v přirozené velikosti a nadřazený blok mu oříznul spodní část → dojem silného „zoomu"
+
+**Fix:** Scoped CSS override v `<style>` bloku v `public/index.html` (řádky 627–651):
+
+```css
+.kurzy-campy-akce-section .akce-image-blok { height: 240px; }
+.kurzy-campy-akce-section .image-55 {
+    position: absolute; top: 0; left: 0;
+    width: 100%; height: 100%;
+    max-width: none;
+    object-fit: cover; object-position: center center;
+}
+/* responzivní breakpointy: 991px→220px, 767px→210px, 479px→260px */
+```
+
+**Důsledky:**
+
+- Obrázek nyní vyplňuje celý blok přes `object-fit: cover` a zobrazuje střed motivu.
+- Výška bloku zvětšena ze 130 px na 240 px (desktop) / 260 px (mobil ≤479 px, kde je grid 1 sloupec).
+- Rozsah úpravy: **pouze homepage** (scoping přes `.kurzy-campy-akce-section`, která se jinde nevyskytuje).
+- Archiv akcí (`akce-archive.html`) používá stejné třídy bez tohoto wrapperu → nebyl zasažen. V případě potřeby lze úpravu rozšířit i tam.
+- HTML atributy `width="800" height="600"` z `cms-loader.js` (doplněné kvůli CLS) zůstávají — CLS se neřeší přes ně, protože kontejner má teď fixní výšku.

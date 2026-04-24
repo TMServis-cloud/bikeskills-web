@@ -623,6 +623,32 @@ button:hover {
     font-weight: 700 !important;
     line-height: 1.35 !important;
 }
+/* HP Akce (Kurzy, Campy) — oprava zoomu/ořezu náhledů.
+   Původně: .akce-image-blok {height:130px; overflow:hidden} + .image-55 {position:absolute; bottom:auto}
+   bez explicitních rozměrů obrázku → zobrazovala se jen horní část snímku v nat. velikosti.
+   Fix: obrázek vyplní celý blok přes object-fit:cover a blok zvětšíme na čitelnou výšku. */
+.kurzy-campy-akce-section .akce-image-blok {
+    height: 240px;
+}
+.kurzy-campy-akce-section .image-55 {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    object-fit: cover;
+    object-position: center center;
+}
+@media (max-width: 991px) {
+    .kurzy-campy-akce-section .akce-image-blok { height: 220px; }
+}
+@media (max-width: 767px) {
+    .kurzy-campy-akce-section .akce-image-blok { height: 210px; }
+}
+@media (max-width: 479px) {
+    .kurzy-campy-akce-section .akce-image-blok { height: 260px; }
+}
 </style><!--  [Attributes by Finsweet] Custom slider dots  -->
   <script defer="" src="https://cdn.jsdelivr.net/npm/@finsweet/attributes-sliderdots@1/sliderdots.js"></script>
   <link rel="canonical" href="https://bikeskills.cz/">
