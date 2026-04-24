@@ -114,6 +114,39 @@ Současně přeloženy dva anglické titulky do češtiny (`Not Found` → *Str�
 
 ---
 
+## Aktualizace 24. 4. 2026 — Strukturovaná data JSON-LD
+
+**Stav před:** Homepage měla `Organization + LocalBusiness`. `cms-loader.js` injektoval minimální `Article`, `Event`, `Person` schemas na detail stránky + `BreadcrumbList` s `.html` URL (nekonzistentní s clean URLs).
+
+**Úpravy v `public/js/cms-loader.js`:**
+
+- **Event** (detail akce) — doplněno `startDate` (ISO 8601 z `datum` timestamp), `eventStatus = EventScheduled`, `eventAttendanceMode = OfflineEventAttendanceMode`, `location` (PostalAddress Tehov), `offers` s cenou a CZK měnou když je `data.cena` vyplněno, rozšířený `organizer`. `og:type` změněno na `event`.
+- **Article** (detail blog post) — `datePublished` a `dateModified` nyní v ISO 8601 formátu (původně `toLocaleDateString('cs-CZ')` = *"24. 4. 2026"*, což Google neakceptuje). Přidán `mainEntityOfPage`, `publisher.logo` rozšířen o width/height. Fallback obrázku z webclip.png na og-image.jpg (1200×630).
+- **BreadcrumbList** v Event/Article/Person — URL odkazy vyčištěny (`/blog`, `/akce-archive`, `/team` místo `.html`).
+
+**Nové statické JSON-LD bloky:**
+
+- **BreadcrumbList** na 17 top-level stránkách (servis + 4 podsekce, kurzy, campy, specialni-akce, pujcovna, pojisteni-bikeplan, blog listing, akce-archive listing, team listing, kontakt, obchodni-podminky, dodaci-podminky, zasady-ochrany-osobnich-udaju). Hierarchie: *Domů → [Sekce] → [Podsekce]*.
+- **Service** schema na `servis.html` — `serviceType: "Servis jízdních kol"`, `provider` (LocalBusiness s adresou), `hasOfferCatalog` se 3 servisními balíčky (Standardní / Hardtail / Full).
+
+**Celkový stav JSON-LD:**
+
+| Typ | Počet stránek | Kde |
+|---|---|---|
+| `Organization + LocalBusiness` | 1 | `index.html` |
+| `BreadcrumbList` (statický) | 17 | všechny top-level stránky |
+| `Service` | 1 | `servis.html` |
+| `Article` (dynamický) | CMS | `detail_post.html` |
+| `Event` (dynamický) | CMS | `detail_akce.html` |
+| `Person` (dynamický) | CMS | `detail_archive-team.html` |
+
+**Ověření:**
+- `node --check public/js/cms-loader.js` → syntax OK
+- Všech 19 JSON-LD bloků napříč `public/*.html` parsuje jako validní JSON.
+- Po deployi: otestovat v [Rich Results Test](https://search.google.com/test/rich-results) na URL `/blog/<slug>`, `/akce/<slug>`, `/servis`.
+
+---
+
 ## Celkové hodnocení
 
 | Oblast | Skóre | Shrnutí |

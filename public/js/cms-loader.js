@@ -858,19 +858,52 @@ async function loadAkceDetail(slug) {
       pageHeading.classList.remove('w-dyn-bind-empty');
     }
 
-    setPageMeta(`${data.nazev} | BikeSkills`, data.popis, data.imageUrl, 'website');
-    injectJsonLd({
+    setPageMeta(`${data.nazev} | BikeSkills`, data.popis, data.imageUrl, 'event');
+    // Datum na ISO 8601 (YYYY-MM-DD) pro schema.org
+    const akceISOStart = data.datum
+      ? new Date(data.datum.seconds ? data.datum.seconds * 1000 : data.datum).toISOString().split('T')[0]
+      : null;
+    const akceImage = (data.imageUrl ? resolveUrl(data.imageUrl) : 'https://bikeskills.cz/images/og-image.jpg');
+    const eventSchema = {
       '@context': 'https://schema.org',
       '@type': 'Event',
       'name': data.nazev || '',
-      'description': (data.popis || '').replace(/<[^>]*>/g, '').trim().substring(0, 200),
-      'image': data.imageUrl ? resolveUrl(data.imageUrl) : 'https://bikeskills.cz/images/webclip.png',
+      'description': (data.popis || '').replace(/<[^>]*>/g, '').trim().substring(0, 300),
+      'image': akceImage,
       'url': window.location.href,
-      'organizer': { '@type': 'Organization', 'name': 'BikeSkills', 'url': 'https://bikeskills.cz' }
-    });
+      'eventStatus': 'https://schema.org/EventScheduled',
+      'eventAttendanceMode': 'https://schema.org/OfflineEventAttendanceMode',
+      'location': {
+        '@type': 'Place',
+        'name': 'BikeSkills — Tehov / Říčany u Prahy',
+        'address': {
+          '@type': 'PostalAddress',
+          'streetAddress': 'Na Vyhlídce 285',
+          'addressLocality': 'Tehov',
+          'postalCode': '25101',
+          'addressCountry': 'CZ'
+        }
+      },
+      'organizer': {
+        '@type': 'Organization',
+        'name': 'BikeSkills',
+        'url': 'https://bikeskills.cz'
+      }
+    };
+    if (akceISOStart) eventSchema.startDate = akceISOStart;
+    if (data.cena) {
+      eventSchema.offers = {
+        '@type': 'Offer',
+        'price': String(data.cena),
+        'priceCurrency': 'CZK',
+        'url': window.location.href,
+        'availability': 'https://schema.org/InStock'
+      };
+    }
+    injectJsonLd(eventSchema);
     injectBreadcrumb([
       { name: 'Domů', item: 'https://bikeskills.cz/' },
-      { name: 'Akce', item: 'https://bikeskills.cz/akce-archive.html' },
+      { name: 'Akce', item: 'https://bikeskills.cz/akce-archive' },
       { name: data.nazev || 'Akce', item: window.location.href }
     ]);
 
@@ -1135,20 +1168,38 @@ async function loadClanekDetail(slug) {
       : [data.galerie1, data.galerie2, data.galerie3, data.galerie4].filter(Boolean);
 
     setPageMeta(`${data.titulek} | BikeSkills`, data.popis || data.perex, galerie[0] || data.imageUrl, 'article');
-    injectJsonLd({
+    // ISO 8601 datumy pro Article schema
+    const postPublishedISO = data.datum
+      ? new Date(data.datum.seconds ? data.datum.seconds * 1000 : data.datum).toISOString()
+      : null;
+    const postModifiedISO = data.datumZmeny
+      ? new Date(data.datumZmeny.seconds ? data.datumZmeny.seconds * 1000 : data.datumZmeny).toISOString()
+      : postPublishedISO;
+    const postImage = (galerie[0] || data.imageUrl)
+      ? resolveUrl(galerie[0] || data.imageUrl)
+      : 'https://bikeskills.cz/images/og-image.jpg';
+    const articleSchema = {
       '@context': 'https://schema.org',
       '@type': 'Article',
-      'headline': data.titulek || '',
-      'description': (data.popis || data.perex || '').replace(/<[^>]*>/g, '').trim().substring(0, 200),
-      'image': (galerie[0] || data.imageUrl) ? resolveUrl(galerie[0] || data.imageUrl) : 'https://bikeskills.cz/images/webclip.png',
-      'datePublished': datum,
+      'headline': (data.titulek || '').substring(0, 110),
+      'description': (data.popis || data.perex || '').replace(/<[^>]*>/g, '').trim().substring(0, 300),
+      'image': postImage,
       'author': { '@type': 'Person', 'name': data.autor || 'BikeSkills' },
-      'publisher': { '@type': 'Organization', 'name': 'BikeSkills', 'url': 'https://bikeskills.cz', 'logo': { '@type': 'ImageObject', 'url': 'https://bikeskills.cz/images/webclip.png' } },
-      'url': window.location.href
-    });
+      'publisher': {
+        '@type': 'Organization',
+        'name': 'BikeSkills',
+        'url': 'https://bikeskills.cz',
+        'logo': { '@type': 'ImageObject', 'url': 'https://bikeskills.cz/images/webclip.png', 'width': 256, 'height': 256 }
+      },
+      'url': window.location.href,
+      'mainEntityOfPage': { '@type': 'WebPage', '@id': window.location.href }
+    };
+    if (postPublishedISO) articleSchema.datePublished = postPublishedISO;
+    if (postModifiedISO) articleSchema.dateModified = postModifiedISO;
+    injectJsonLd(articleSchema);
     injectBreadcrumb([
       { name: 'Domů', item: 'https://bikeskills.cz/' },
-      { name: 'Blog', item: 'https://bikeskills.cz/blog.html' },
+      { name: 'Blog', item: 'https://bikeskills.cz/blog' },
       { name: data.titulek || 'Článek', item: window.location.href }
     ]);
 
@@ -1349,7 +1400,7 @@ async function loadTeamDetail(slug) {
     });
     injectBreadcrumb([
       { name: 'Domů', item: 'https://bikeskills.cz/' },
-      { name: 'Tým', item: 'https://bikeskills.cz/team.html' },
+      { name: 'Tým', item: 'https://bikeskills.cz/team' },
       { name: data.jmeno || 'Člen týmu', item: window.location.href }
     ]);
     const h1El = container.querySelector('h1.page-heading');
