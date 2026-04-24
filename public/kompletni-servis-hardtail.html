@@ -585,6 +585,30 @@ button:hover {
     flex-direction: column !important;
   }
 }
+/* Custom dropdown — volby přímo pod triggerem */
+.servis-select-wrapper { position: relative; }
+.servis-select-trigger {
+  display: flex; justify-content: space-between; align-items: center;
+  background-color: var(--modra); color: var(--white);
+  padding: 8px 12px; cursor: pointer; width: 100%;
+  font-family: proxima-nova, sans-serif; font-size: 15px; font-weight: 500;
+  border-radius: .25rem; user-select: none;
+}
+.servis-select-trigger::after { content: "▾"; font-size: 1.1em; margin-left: 8px; }
+.servis-select-options {
+  position: absolute; top: 100%; left: 0; right: 0; z-index: 999;
+  background-color: var(--modra); list-style: none;
+  margin: 2px 0 0; padding: 0; border-radius: 0 0 .25rem .25rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,.25); display: none;
+}
+.servis-select-options.open { display: block; }
+.servis-select-options li {
+  padding: 10px 12px; cursor: pointer; color: var(--white);
+  font-family: proxima-nova, sans-serif; font-size: 15px;
+  border-top: 1px solid rgba(255,255,255,.15);
+}
+.servis-select-options li:hover { background: rgba(255,255,255,.15); }
+.servis-select-options li.selected { font-weight: 700; }
 </style>
   <link rel="canonical" href="https://bikeskills.cz/kompletni-servis-hardtail.html">
 </head>
