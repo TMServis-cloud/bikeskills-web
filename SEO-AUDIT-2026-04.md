@@ -51,6 +51,31 @@ Sitemap: https://bikeskills.cz/sitemap.xml
 
 ---
 
+## Aktualizace 24. 4. 2026 — OG image
+
+Vytvořen nový Open Graph obrázek `public/images/og-image.jpg` (1200×630 px, 61,7 KB) nahrazující původní `webclip.png` (256×256 px).
+
+**Design:**
+- Brand badge logo (webclip.png) vlevo
+- Titulek *"BikeSkills"* v Lobster fontu (stejný jako na webu)
+- Subtitle *"MTB & E-MTB kurzy · Servis · Půjčovna"* v Montserrat (vizuální proxy za Proxima Nova — ta je Adobe Typekit licenční)
+- URL *"bikeskills.cz"* v žluté akcentové barvě loga
+- Pozadí: tmavě modrý gradient se siluetou hor a žlutým sluncem (v duchu loga)
+
+**Nasazeno na 22 HTML stránkách:**
+- 9 stránek mělo původní `og:image` → URL nahrazena, doplněno `og:image:width`, `og:image:height`, `og:image:alt`
+- 13 stránek `og:image` nemělo → přidán kompletní blok (og:image, og:image:width, og:image:height, og:image:alt, twitter:image)
+- `twitter:card` bylo již dříve nastaveno na `summary_large_image` — správně pro velké náhledy
+- Alt text: *"BikeSkills – MTB & E-MTB kurzy, servis a půjčovna kol"*
+
+**Po deployi:**
+1. **Facebook Sharing Debugger** — vložit URL `https://bikeskills.cz/`, kliknout *Scrape Again* pro obnovení cache. Totéž pro pár dalších klíčových stránek (blog, kontakt, servis).
+2. **LinkedIn Post Inspector** — `https://www.linkedin.com/post-inspector/` pro vynucení refresh.
+3. **Twitter Card Validator** — `https://cards-dev.twitter.com/validator` (pokud stále funguje; X/Twitter validátor byl deprecated).
+
+
+---
+
 ## Celkové hodnocení
 
 | Oblast | Skóre | Shrnutí |
