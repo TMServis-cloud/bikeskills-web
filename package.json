@@ -12,10 +12,11 @@
     "sitemap": "node scripts/generate-sitemap.js"
   },
   "dependencies": {
-    "xml2js": "^0.6.2",
-    "firebase-admin": "^12.0.0"
+    "firebase-admin": "^12.0.0",
+    "xml2js": "^0.6.2"
   },
   "devDependencies": {
+    "clean-css": "^5.3.3",
     "firebase-tools": "^13.0.0"
   }
 }

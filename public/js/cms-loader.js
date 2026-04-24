@@ -675,12 +675,20 @@ function toThumbUrl(resolvedUrl, size = '800x600') {
   return m[1] + encoded + m[3];
 }
 
-/** Nastaví img src na thumbnail; při chybě se přepne na originál a pak na placeholder. */
+/**
+ * Nastaví img src + srcset na thumbnaily; při chybě přepne na originál.
+ * srcset: 400x300 pro mobil (< 767px), 800x600 pro desktop.
+ * Lightbox čte data-full-url = originál v plné kvalitě.
+ */
 function setImgWithThumb(imgEl, origUrl) {
-  const thumbUrl = toThumbUrl(origUrl);
-  imgEl.src = thumbUrl;
+  const thumb800 = toThumbUrl(origUrl, '800x600');
+  const thumb400 = toThumbUrl(origUrl, '400x300');
+  imgEl.src = thumb800;
+  imgEl.srcset = `${thumb400} 400w, ${thumb800} 800w`;
+  imgEl.sizes = '(max-width: 767px) 33vw, 25vw';
   imgEl.setAttribute('data-full-url', origUrl);
   imgEl.onerror = function() {
+    this.srcset = '';
     if (this.src !== origUrl) { this.src = origUrl; this.onerror = makeImgErrorHandler(); }
     else showImgPlaceholder(this);
   };
