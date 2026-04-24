@@ -497,3 +497,64 @@ Kandidáti na smazání (celkem 114 souborů / 4,59 MB):
 
 - `public/index.html` — inline `<style>` override na konci stávajícího bloku (řádky 627–651)
 - `public/akce-archive.html` — stejný override před `</style>` (řádek 548)
+
+
+---
+
+## Aktualizace 24. 4. 2026 — PageSpeed Insights baseline
+
+**Metodika:** Měření přes [pagespeed.web.dev](https://pagespeed.web.dev) (Lighthouse 13.0.1, jedno načtení stránky, prostředí HeadlessChromium 146). Mobilní emulace: Moto G Power, pomalé 4G. Desktop: emulovaná plocha, vlastní omezení sítě. Měřeno z produkční domény `bikeskills.cz`, snapshot z 24. 4. 2026 ~23:40–23:45 SELČ. Hodnoty Lighthouse jsou odhady a kolísají ±5–10 bodů mezi běhy — baseline slouží jako orientační startovní bod, ne absolutní hodnota.
+
+Zkratky: **P** = Výkon (Performance), **A** = Přístupnost (Accessibility), **BP** = Doporučené postupy (Best Practices), **SEO** = SEO skóre.
+
+### Skóre přehled (Lighthouse 0–100)
+
+| Stránka | Zařízení | P | A | BP | SEO |
+|---|---|---:|---:|---:|---:|
+| `/` (HP) | Mobil | 45 | 87 | 96 | 100 |
+| `/` (HP) | Desktop | 66 | 87 | 92 | 100 |
+| `/individualni-kurzy` | Mobil | 55 | 90 | 100 | 100 |
+| `/individualni-kurzy` | Desktop | 84 | 90 | 96 | 100 |
+| `/campy` | Mobil | 48 | 86 | 100 | 100 |
+| `/campy` | Desktop | 87 | 86 | 96 | 100 |
+| `/servis` | Mobil | 48 | 87 | 100 | 100 |
+| `/servis` | Desktop | 69 | 83 | 96 | 100 |
+| `/akce-archive` | Mobil | 50 | 81 | 92 | 100 |
+| `/akce-archive` | Desktop | **29** | 81 | 92 | 100 |
+| `/blog` | Mobil | 52 | 86 | 92 | 100 |
+| `/blog` | Desktop | 53 | 86 | 92 | 100 |
+
+### Core Web Vitals — detailní metriky (vybrané stránky)
+
+| Stránka | Zařízení | FCP | LCP | TBT | CLS | SI |
+|---|---|---:|---:|---:|---:|---:|
+| `/akce-archive` | Mobil | 8,3 s | 18,0 s | 290 ms | 0,07 | 8,5 s |
+| `/akce-archive` | Desktop | 0,7 s | 4,0 s | 620 ms | **0,713** | 1,7 s |
+| `/blog` | Mobil | 2,6 s | **22,6 s** | 420 ms | 0,002 | 9,6 s |
+| `/blog` | Desktop | 0,7 s | 3,8 s | 410 ms | 0,003 | 3,3 s |
+
+Prahy Core Web Vitals (2026): **LCP** ≤ 2,5 s good / ≤ 4 s needs improvement. **TBT** ≤ 200 ms / ≤ 600 ms. **CLS** ≤ 0,1 / ≤ 0,25. **FCP** ≤ 1,8 s / ≤ 3 s.
+
+### Klíčová zjištění
+
+- **SEO a Přístupnost jsou OK** — všechny stránky 100 SEO, A mezi 81–90. Focus je na P a BP.
+- **Mobilní výkon je všude slabý** (45–55) — primárně kvůli LCP (největší obrázek nebo text render se načítá příliš pomalu) a Total Blocking Time (jQuery + Webflow JS balíky blokují hlavní vlákno).
+- **Desktop se kroutí** mezi 53 (blog) a 87 (campy). Variabilita ukazuje, že problém je závislý na obsahu konkrétní stránky, ne systémový.
+- **`/akce-archive` desktop — CLS 0,713 je kritické** (~7× nad good threshold). Stránka během renderu výrazně poskakuje. Pravděpodobná příčina: CMS loader (`cms-loader.js`) vkládá obrázky s `width`/`height` atributy, ale **kontejner `.akce-image-blok` má nově fixní výšku a `image-55` absolute pozici** — to by mělo pomoct. Vysoké CLS může být z jiné sekce (např. `.kurzy-campy` wrapper, který na archivu hostí všechny akce, nebo cookies banner). **Stojí za další prozkoumání** až bude nasazeno.
+- **`/akce-archive` desktop TBT 620 ms** — hraničně "poor". JS pro CMS filtrování akcí běží nepotrebně dlouho.
+- **`/blog` mobil LCP 22,6 s** — extrémně pomalý first paint. Stránka načítá úvodní banner z `/wp-content/uploads/` (nekomprimovaný/velký původní obrázek). Náprava: WebP + `fetchpriority="high"` + preload.
+
+### Kontext pro interpretaci
+
+Snapshot byl pořízen **před** nasazením opravy zoomu náhledů Akce (sekce výše). Opětovné změření po deploy ukáže, jestli:
+
+1. fix `.akce-image-blok { height: 240px }` pomohl s CLS na `/akce-archive` (očekávané zlepšení — kontejner nyní alokuje prostor předem)
+2. nebo jestli CLS byl způsoben jinou sekcí (cookies banner, Webflow interactions)
+
+### Priority pro optimalizaci (návrh podle baseline)
+
+1. **P1 — `/akce-archive` desktop CLS 0,713** — nejdřív ověřit dopad fixu Akce, pak diagnostikovat zbytek (cookies banner, Webflow IX2, lazy-loadované obrázky bez rozměrů). Layout shift je z UX i SEO hlediska nejhorší problém celého webu.
+2. **P1 — `/blog` mobil LCP 22,6 s** — konverze obrázku banneru článku na WebP (zachování kvality, ~30–50 % úspora), `<link rel="preload">` pro hero image, kontrola `loading="lazy"` u first-above-the-fold.
+3. **P2 — TBT napříč stránkami (290–620 ms)** — defer/async skriptů, odstranění nepoužívaných Webflow JS modulů (`webflow.js` je monolit ~120 KB). Sledovat `scripts` tag a zavést `defer` tam, kde ještě není.
+4. **P2 — Accessibility 81–90** — většinou drobné (contrast ratio, chybějící aria-label). Doplnit při příštím iteračním kole.
+5. **P3 — BP 92 vs 100** — rozdíl je obvykle v `no-unload-listeners` nebo `third-party-cookies`. Nízká priorita, některé nálezy plynou z GTM/GA, na které má smysl nezasahovat.
