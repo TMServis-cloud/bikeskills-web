@@ -545,6 +545,31 @@ button:hover {
     color: #fff200;
     transition: all .3s ease-out;
 	}
+/* Archiv akcí — oprava zoomu/ořezu náhledů (stejný problém jako na HP).
+   .akce-image-blok měl height:130px + overflow:hidden, .image-55 position:absolute bez rozměrů
+   → zobrazoval se jen horní výřez obrázku. Fix: img vyplní celý blok přes object-fit:cover. */
+.section-wrapper.kurzy-campy .akce-image-blok {
+    height: 240px;
+}
+.section-wrapper.kurzy-campy .image-55 {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    object-fit: cover;
+    object-position: center center;
+}
+@media (max-width: 991px) {
+    .section-wrapper.kurzy-campy .akce-image-blok { height: 220px; }
+}
+@media (max-width: 767px) {
+    .section-wrapper.kurzy-campy .akce-image-blok { height: 210px; }
+}
+@media (max-width: 479px) {
+    .section-wrapper.kurzy-campy .akce-image-blok { height: 260px; }
+}
 </style>
   <link rel="canonical" href="https://bikeskills.cz/akce-archive">
 </head>

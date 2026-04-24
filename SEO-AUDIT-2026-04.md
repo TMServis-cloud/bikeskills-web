@@ -490,5 +490,10 @@ Kandidáti na smazání (celkem 114 souborů / 4,59 MB):
 - Obrázek nyní vyplňuje celý blok přes `object-fit: cover` a zobrazuje střed motivu.
 - Výška bloku zvětšena ze 130 px na 240 px (desktop) / 260 px (mobil ≤479 px, kde je grid 1 sloupec).
 - Rozsah úpravy: **pouze homepage** (scoping přes `.kurzy-campy-akce-section`, která se jinde nevyskytuje).
-- Archiv akcí (`akce-archive.html`) používá stejné třídy bez tohoto wrapperu → nebyl zasažen. V případě potřeby lze úpravu rozšířit i tam.
+- Archiv akcí (`akce-archive.html`) má stejný problém — doplněna identická úprava scoped přes `.section-wrapper.kurzy-campy` (wrapper existuje na HP i v archivu).
 - HTML atributy `width="800" height="600"` z `cms-loader.js` (doplněné kvůli CLS) zůstávají — CLS se neřeší přes ně, protože kontejner má teď fixní výšku.
+
+**Dotčené soubory:**
+
+- `public/index.html` — inline `<style>` override na konci stávajícího bloku (řádky 627–651)
+- `public/akce-archive.html` — stejný override před `</style>` (řádek 548)
