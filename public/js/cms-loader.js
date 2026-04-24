@@ -682,13 +682,9 @@ function toThumbUrl(resolvedUrl, size = '800x600') {
  */
 function setImgWithThumb(imgEl, origUrl) {
   const thumb800 = toThumbUrl(origUrl, '800x600');
-  const thumb400 = toThumbUrl(origUrl, '400x300');
   imgEl.src = thumb800;
-  imgEl.srcset = `${thumb400} 400w, ${thumb800} 800w`;
-  imgEl.sizes = '(max-width: 767px) 33vw, 25vw';
   imgEl.setAttribute('data-full-url', origUrl);
   imgEl.onerror = function() {
-    this.srcset = '';
     if (this.src !== origUrl) { this.src = origUrl; this.onerror = makeImgErrorHandler(); }
     else showImgPlaceholder(this);
   };
