@@ -23,6 +23,23 @@ if (!firebase.apps.length) {
 const db = firebase.firestore();
 
 // ============================================================
+// PROGRESSIVE ENHANCEMENT — pre-rendered (SSG) detection
+// Build-time skript scripts/prerender.js značí pre-renderovaný DOM:
+//   - Listings: <div class="...w-dyn-items..." data-prerendered="true"> kolem karet
+//   - Detail:   <html data-prerendered="true">
+// Když je obsah pre-renderovaný, JS přeskakuje DOM mutace a jen
+// dotahuje data potřebná pro filtry/paginaci/galerii/lightbox.
+// ============================================================
+const PAGE_PRERENDERED = (function() {
+  try { return document.documentElement.getAttribute('data-prerendered') === 'true'; }
+  catch (e) { return false; }
+})();
+function isPrerenderedList(el) {
+  if (!el) return false;
+  return el.getAttribute && el.getAttribute('data-prerendered') === 'true';
+}
+
+// ============================================================
 // SKELETON LOADER
 // ============================================================
 (function injectSkeletonCSS() {
@@ -803,7 +820,9 @@ async function loadAkceList() {
     renderAkceListPage
   );
 
-  showSkeleton(itemsList, 8);
+  const prerenderedList = isPrerenderedList(itemsList);
+  if (!prerenderedList) showSkeleton(itemsList, 8);
+
   try {
     // Bez orderBy — Firestore vylučuje dokumenty bez indexovaného pole
     const snapshot = await db.collection('akce').get();
@@ -822,7 +841,14 @@ async function loadAkceList() {
     _akceYears = Array.from(yearSet).sort((a, b) => b - a);
     _akceTypy = Array.from(typSet).sort();
 
-    renderAkceListPage();
+    if (prerenderedList && currentAkcePage === 1 &&
+        akceYearFilter === 'all' && akceZamereniFilter === 'all' && akceCenaFilter === 'all') {
+      // Pre-rendered DOM už zobrazuje prvních 12 — jen napojit filtry/paginaci
+      buildAkceFilterBar(_akceFilterBar, _akceYears, _akceTypy);
+      updatePaginationState(_akcePrevBtn, _akceNextBtn, currentAkcePage, getFilteredAkce().length);
+    } else {
+      renderAkceListPage();
+    }
   } catch (err) {
     console.error('Chyba načítání akce list:', err);
   }
@@ -846,12 +872,81 @@ async function loadAkceDetail(slug) {
       ? data.galerie.filter(Boolean)
       : [data.galerie1, data.galerie2, data.galerie3, data.galerie4].filter(Boolean);
 
-    // Nastav název akce do rezervačního modalu
+    // Nastav název akce do rezervačního modalu (i v pre-renderovaném režimu)
     const rezCamp = document.getElementById('rez-modal-camp');
     if (rezCamp) rezCamp.textContent = data.nazev || '';
     const rezMailLink = document.getElementById('rez-mail-link');
     if (rezMailLink) rezMailLink.href = `mailto:cihi@bikeskills.cz?subject=${encodeURIComponent('Registrace: ' + (data.nazev || 'akce'))}`;
     window._akceNazev = data.nazev || '';
+
+    // Pre-rendered režim: pouze doplnit interaktivitu nad existujícím DOMem
+    if (PAGE_PRERENDERED) {
+      const itemPre = document.querySelector('.collection-list-wrapper-5 .w-dyn-item');
+      if (!itemPre) return;
+      const imgPre = itemPre.querySelector('img[item="featured-image"]');
+      if (imgPre && imgPre.src) imgPre.onerror = makeImgErrorHandler();
+
+      // Video (není pre-renderované)
+      const videoEl = itemPre.querySelector('.video-4');
+      if (videoEl) {
+        const embedUrl = youtubeEmbedUrl(data.videoUrl);
+        if (embedUrl) {
+          videoEl.style.cssText = 'position:relative;padding-bottom:56.25%;height:0;overflow:hidden;';
+          videoEl.innerHTML = `<iframe src="${embedUrl}" frameborder="0" allowfullscreen loading="lazy" style="position:absolute;top:0;left:0;width:100%;height:100%;"></iframe>`;
+          videoEl.classList.remove('w-dyn-bind-empty');
+        } else {
+          videoEl.style.display = 'none';
+        }
+      }
+
+      // Gallery (není pre-renderovaná — vyžaduje runtime + lightbox)
+      const galleryBlock = itemPre.querySelector('.div-block-340');
+      if (galleryBlock) {
+        if (galerie.length) {
+          const galItems = galleryBlock.querySelector('.collection-list-15');
+          const galTemplate = galleryBlock.querySelector('.collection-item-8.w-dyn-item');
+          if (galItems && galTemplate) {
+            galItems.innerHTML = '';
+            galItems.classList.remove('akce-gal-1', 'akce-gal-2', 'akce-gal-3');
+            if (galerie.length <= 3) galItems.classList.add(`akce-gal-${galerie.length}`);
+            galerie.forEach(url => {
+              const gi = galTemplate.cloneNode(true);
+              const gImg = gi.querySelector('img');
+              if (gImg) {
+                gImg.alt = data.nazev || '';
+                gImg.loading = 'lazy';
+                setImgWithThumb(gImg, resolveUrl(url));
+              }
+              galItems.appendChild(gi);
+            });
+          }
+        } else {
+          galleryBlock.style.display = 'none';
+        }
+      }
+
+      if (data.instagramUrl) {
+        const igDiv = document.createElement('div');
+        igDiv.style.cssText = 'margin:1.5rem 0;';
+        igDiv.innerHTML = `<blockquote class="instagram-media" data-instgrm-captioned data-instgrm-permalink="${escapeHtml(data.instagramUrl)}" style="max-width:540px;margin:0 auto;"></blockquote>`;
+        const akceDiv = itemPre.querySelector('.akce');
+        if (akceDiv) akceDiv.appendChild(igDiv);
+        else itemPre.appendChild(igDiv);
+        if (!document.getElementById('ig-embed-script')) {
+          const s = document.createElement('script');
+          s.id = 'ig-embed-script'; s.src = 'https://www.instagram.com/embed.js'; s.async = true;
+          document.body.appendChild(s);
+        }
+      }
+
+      attachLightbox(galleryBlock);
+      const contentPre = itemPre.querySelector('[item="content"]');
+      if (contentPre) {
+        attachLightbox(contentPre);
+        externalLinksNewTab(contentPre);
+      }
+      return; // hotovo, pre-rendered režim
+    }
 
     const pageHeading = document.querySelector('.page-heading[acf\\:text="typ-akce"]');
     if (pageHeading) {
@@ -1138,7 +1233,9 @@ async function loadClankyList() {
     renderClankyListPage
   );
 
-  showSkeleton(itemsList, 8);
+  const prerenderedList = isPrerenderedList(itemsList);
+  if (!prerenderedList) showSkeleton(itemsList, 8);
+
   try {
     const snapshot = await db.collection('clanky').orderBy('datum', 'desc').get();
     allClankyData = snapshot.docs.map(d => d.data()).filter(d => d.publikovano !== false);
@@ -1150,7 +1247,13 @@ async function loadClankyList() {
     });
     _clankyYears = Array.from(yearSet).sort((a, b) => b - a);
 
-    renderClankyListPage();
+    if (prerenderedList && currentClankyPage === 1 && clankyYearFilter === 'all') {
+      // Pre-rendered DOM už zobrazuje prvních 12 — jen napojit filtry/paginaci
+      buildClankyFilterBar(_clankyFilterBar, _clankyYears);
+      updatePaginationState(_clankyPrevBtn, _clankyNextBtn, currentClankyPage, getFilteredClanky().length);
+    } else {
+      renderClankyListPage();
+    }
   } catch (err) {
     console.error('Chyba načítání clanky list:', err);
   }
@@ -1169,76 +1272,79 @@ async function loadClanekDetail(slug) {
       ? data.galerie.filter(Boolean)
       : [data.galerie1, data.galerie2, data.galerie3, data.galerie4].filter(Boolean);
 
-    setPageMeta(`${data.titulek} | BikeSkills`, data.popis || data.perex, galerie[0] || data.imageUrl, 'article');
-    // ISO 8601 datumy pro Article schema
-    const postPublishedISO = data.datum
-      ? new Date(data.datum.seconds ? data.datum.seconds * 1000 : data.datum).toISOString()
-      : null;
-    const postModifiedISO = data.datumZmeny
-      ? new Date(data.datumZmeny.seconds ? data.datumZmeny.seconds * 1000 : data.datumZmeny).toISOString()
-      : postPublishedISO;
-    const postImage = (galerie[0] || data.imageUrl)
-      ? resolveUrl(galerie[0] || data.imageUrl)
-      : 'https://bikeskills.cz/images/og-image.jpg';
-    const articleSchema = {
-      '@context': 'https://schema.org',
-      '@type': 'Article',
-      'headline': (data.titulek || '').substring(0, 110),
-      'description': (data.popis || data.perex || '').replace(/<[^>]*>/g, '').trim().substring(0, 300),
-      'image': postImage,
-      'author': { '@type': 'Person', 'name': data.autor || 'BikeSkills' },
-      'publisher': {
-        '@type': 'Organization',
-        'name': 'BikeSkills',
-        'url': 'https://bikeskills.cz',
-        'logo': { '@type': 'ImageObject', 'url': 'https://bikeskills.cz/images/webclip.png', 'width': 256, 'height': 256 }
-      },
-      'url': window.location.href,
-      'mainEntityOfPage': { '@type': 'WebPage', '@id': window.location.href }
-    };
-    if (postPublishedISO) articleSchema.datePublished = postPublishedISO;
-    if (postModifiedISO) articleSchema.dateModified = postModifiedISO;
-    injectJsonLd(articleSchema);
-    injectBreadcrumb([
-      { name: 'Domů', item: 'https://bikeskills.cz/' },
-      { name: 'Blog', item: 'https://bikeskills.cz/blog' },
-      { name: data.titulek || 'Článek', item: window.location.href }
-    ]);
+    if (!PAGE_PRERENDERED) {
+      // Pre-rendered HTML již obsahuje meta + JSON-LD + title/date/author/content/img.
+      // Při SSG režimu přeskočíme DOM mutaci hlavičky a hlavního obsahu — jen
+      // dotahujeme galerii, video, related-posts (ty pre-renderované nejsou).
+      setPageMeta(`${data.titulek} | BikeSkills`, data.popis || data.perex, galerie[0] || data.imageUrl, 'article');
+      const postPublishedISO = data.datum
+        ? new Date(data.datum.seconds ? data.datum.seconds * 1000 : data.datum).toISOString()
+        : null;
+      const postModifiedISO = data.datumZmeny
+        ? new Date(data.datumZmeny.seconds ? data.datumZmeny.seconds * 1000 : data.datumZmeny).toISOString()
+        : postPublishedISO;
+      const postImage = (galerie[0] || data.imageUrl)
+        ? resolveUrl(galerie[0] || data.imageUrl)
+        : 'https://bikeskills.cz/images/og-image.jpg';
+      const articleSchema = {
+        '@context': 'https://schema.org',
+        '@type': 'Article',
+        'headline': (data.titulek || '').substring(0, 110),
+        'description': (data.popis || data.perex || '').replace(/<[^>]*>/g, '').trim().substring(0, 300),
+        'image': postImage,
+        'author': { '@type': 'Person', 'name': data.autor || 'BikeSkills' },
+        'publisher': {
+          '@type': 'Organization',
+          'name': 'BikeSkills',
+          'url': 'https://bikeskills.cz',
+          'logo': { '@type': 'ImageObject', 'url': 'https://bikeskills.cz/images/webclip.png', 'width': 256, 'height': 256 }
+        },
+        'url': window.location.href,
+        'mainEntityOfPage': { '@type': 'WebPage', '@id': window.location.href }
+      };
+      if (postPublishedISO) articleSchema.datePublished = postPublishedISO;
+      if (postModifiedISO) articleSchema.dateModified = postModifiedISO;
+      injectJsonLd(articleSchema);
+      injectBreadcrumb([
+        { name: 'Domů', item: 'https://bikeskills.cz/' },
+        { name: 'Blog', item: 'https://bikeskills.cz/blog' },
+        { name: data.titulek || 'Článek', item: window.location.href }
+      ]);
 
-    // Nadpis
-    const titleEl = document.querySelector('[item="title"].heading-83, .div-block-325 [item="title"]');
-    if (titleEl) { titleEl.textContent = data.titulek || ''; titleEl.classList.remove('w-dyn-bind-empty'); }
+      const titleEl = document.querySelector('[item="title"].heading-83, .div-block-325 [item="title"]');
+      if (titleEl) { titleEl.textContent = data.titulek || ''; titleEl.classList.remove('w-dyn-bind-empty'); }
 
-    // Datum
-    const dateEl = document.querySelector('[item="date"].blog-date-author, .div-block-326 [item="date"]');
-    if (dateEl) { dateEl.textContent = datum; dateEl.classList.remove('w-dyn-bind-empty'); }
+      const dateEl = document.querySelector('[item="date"].blog-date-author, .div-block-326 [item="date"]');
+      if (dateEl) { dateEl.textContent = datum; dateEl.classList.remove('w-dyn-bind-empty'); }
 
-    // Autor
-    const authorEl = document.querySelector('[item="author-display-name"].blog-date-author, .div-block-326 [item="author-display-name"]');
-    if (authorEl) { authorEl.textContent = data.autor || ''; authorEl.classList.remove('w-dyn-bind-empty'); }
+      const authorEl = document.querySelector('[item="author-display-name"].blog-date-author, .div-block-326 [item="author-display-name"]');
+      if (authorEl) { authorEl.textContent = data.autor || ''; authorEl.classList.remove('w-dyn-bind-empty'); }
 
-    // Obsah
-    const contentEl = document.querySelector('[item="content"].rich-text-block-3, .div-block-325 [item="content"]');
-    if (contentEl) {
-      contentEl.innerHTML = resolveContentUrls(ensureHtml(processWpContent(data.obsah)));
-      contentEl.classList.remove('w-dyn-bind-empty');
-      contentEl.querySelectorAll('img').forEach(img => { img.onerror = function() { this.style.display = 'none'; }; });
-    }
-
-    // Hlavní fotka
-    const imgEl = document.querySelector('.div-block-324 img[item="featured-image"], img[item="featured-image"].image-53');
-    if (imgEl) {
-      if (data.imageUrl) {
-        imgEl.src = resolveUrl(data.imageUrl); imgEl.alt = data.titulek || '';
-        imgEl.width = 1280; imgEl.height = 720;
-        imgEl.onerror = makeImgErrorHandler();
-        imgEl.classList.remove('w-dyn-bind-empty');
-        const wrap = imgEl.parentElement;
-        if (wrap) wrap.style.display = '';
-      } else {
-        const wrap = imgEl.parentElement;
-        if (wrap) wrap.style.display = 'none';
+      const contentEl = document.querySelector('[item="content"].rich-text-block-3, .div-block-325 [item="content"]');
+      if (contentEl) {
+        contentEl.innerHTML = resolveContentUrls(ensureHtml(processWpContent(data.obsah)));
+        contentEl.classList.remove('w-dyn-bind-empty');
+        contentEl.querySelectorAll('img').forEach(img => { img.onerror = function() { this.style.display = 'none'; }; });
       }
+
+      const imgEl = document.querySelector('.div-block-324 img[item="featured-image"], img[item="featured-image"].image-53');
+      if (imgEl) {
+        if (data.imageUrl) {
+          imgEl.src = resolveUrl(data.imageUrl); imgEl.alt = data.titulek || '';
+          imgEl.width = 1280; imgEl.height = 720;
+          imgEl.onerror = makeImgErrorHandler();
+          imgEl.classList.remove('w-dyn-bind-empty');
+          const wrap = imgEl.parentElement;
+          if (wrap) wrap.style.display = '';
+        } else {
+          const wrap = imgEl.parentElement;
+          if (wrap) wrap.style.display = 'none';
+        }
+      }
+    } else {
+      // V pre-rendered režimu navíc napojit onerror handler na hlavní fotku
+      const imgEl = document.querySelector('.div-block-324 img[item="featured-image"], img[item="featured-image"].image-53');
+      if (imgEl && imgEl.src) imgEl.onerror = makeImgErrorHandler();
     }
 
     // YouTube video — vložíme pod obsah jako plná šířka

@@ -558,3 +558,104 @@ Snapshot byl pořízen **před** nasazením opravy zoomu náhledů Akce (sekce v
 3. **P2 — TBT napříč stránkami (290–620 ms)** — defer/async skriptů, odstranění nepoužívaných Webflow JS modulů (`webflow.js` je monolit ~120 KB). Sledovat `scripts` tag a zavést `defer` tam, kde ještě není.
 4. **P2 — Accessibility 81–90** — většinou drobné (contrast ratio, chybějící aria-label). Doplnit při příštím iteračním kole.
 5. **P3 — BP 92 vs 100** — rozdíl je obvykle v `no-unload-listeners` nebo `third-party-cookies`. Nízká priorita, některé nálezy plynou z GTM/GA, na které má smysl nezasahovat.
+
+
+---
+
+## Aktualizace 25. 4. 2026 — Architekturní analýza LCP na CMS stránkách
+
+**Návaznost:** baseline z 24. 4. 2026 ukázal `/blog` mobil LCP **22,6 s**. Tento oddíl rozebírá, **proč** je to tak špatné, a navrhuje 4 cesty řešení.
+
+**Poznámka k metodice:** Chrome MCP extension nebyla v této session dostupná, nemohl jsem zachytit živý waterfall. Analýza vychází z lokálního čtení kódu (`public/js/cms-loader.js` 1612 řádků, `public/blog.html`, `firebase.json`, `functions/index.js`) a z baseline PSI. Doporučuji ručně potvrdit waterfall v DevTools před implementací.
+
+### Problém technicky
+
+LCP element na `/blog` je první náhledový obrázek karty článku (`[item="featured-image"]` v `.collection-blog-item`). V publikovaném HTML má `<img>` **prázdný `src=""`** — URL se nastaví až runtime z Firestore. Tím LCP čeká na celý řetězec závislostí:
+
+1. **HTML download** (TTFB ~200–500 ms na Firebase Hosting CDN)
+2. **HTML parse + script discovery** — všechny skripty mají `defer`: jQuery (86 KB), `webflow.js`, `firebase-app-compat.js`, **`firebase-firestore-compat.js` (~280 KB)**, `cms-loader.js` (~50 KB)
+3. **Skripty se stáhnou + parsuje + spustí** — na pomalé 4G to je 1,5–2,5 s pro Firestore SDK samotné
+4. **`DOMContentLoaded` fire** → `cms-loader.js` zavolá `loadClankyList()`
+5. **TLS handshake na `firestore.googleapis.com`** (cold connect ~300–600 ms — žádný preconnect v `<head>`)
+6. **Firestore query `db.collection('clanky').orderBy('datum','desc').get()`** — **bez `.limit()`**, stáhne všech **138 článků** najednou (každý dokument obsahuje `popis`, `obsah` HTML, atd. — odhad 1–3 MB komprimované response)
+7. **Render** — `imgEl.src = resolveUrl(data.imageUrl)` na první kartě — **teď teprve** browser začne stahovat hero obrázek
+8. **TLS handshake na `firebasestorage.googleapis.com`** (cold connect — opět žádný preconnect)
+9. **Image download** (i pro WebP 200 KB to je 0,5–2 s na pomalé 4G)
+10. **LCP fires**
+
+Na desktop tento řetězec stihne ~3,8 s, na mobilu Lighthouse pomalá 4G dosáhne 22,6 s. Konverze JPG → WebP samotná zachrání jen krok 9 (~500–1 000 ms) — **to je zhruba 5 % problému**, ne hlavní páka.
+
+### Analýza CMS architektury (z kódu)
+
+**Stránky a fetch pattern:**
+
+- `/blog` → `loadClankyList()` → `db.collection('clanky').orderBy('datum','desc').get()` — **138 článků naráz**, klient-side paginace na 12 / stránku
+- `/akce-archive` → `loadAkceList()` → `db.collection('akce').get()` — **60 akcí naráz**
+- `/blog/<slug>` → `loadClanekDetail(slug)` → `where('slug','==',slug).limit(1).get()` + následně `orderBy('datum','desc').limit(5).get()` pro related posts (2 paralelní queries)
+- `/akce/<slug>` → `loadAkceDetail(slug)` → `where('slug','==',slug).limit(1).get()` + galerie/lightbox
+- Navíc každá stránka volá `applySeoFromSettings(path)` → `db.collection('settings').doc('seo').get()` (3. paralelní query)
+
+**Build-time generování:** `scripts/generate-sitemap.js` už používá `firebase-admin` se `serviceAccountKey.json` — infrastruktura pro pre-render je tedy připravená, jen není využitá pro HTML.
+
+**Firebase Functions:** `functions/index.js` má `sitemap`, `sendReservation`, `sendServisForm` — žádné SSR, ale infrastruktura existuje (region `europe-west1`).
+
+**Hosting rewrites (`firebase.json`):** všechny detail URL (`/blog/**`, `/akce/**`, `/team/**`) jsou rewritované na statický `detail_post.html` / `detail_akce.html` / `detail_archive-team.html`. Tj. SEO crawler dostane prázdnou kostru a musí počkat na JS — neskvělé pro indexaci, ale Google to dnes řeší.
+
+### Rozsah dat
+
+| Kolekce | Počet dokumentů | Reálná potřeba pro LCP |
+|---|---:|---|
+| `clanky` | ~138 | 12 (první stránka) |
+| `akce` | ~60 | 12 (první stránka) |
+| Detail stránek | 138 + 60 = 198 | 1 (konkrétní slug) |
+
+Over-fetch faktor 11× na `/blog` a 5× na `/akce-archive`.
+
+### Možnosti řešení
+
+| | Varianta A — Pre-render (SSG) | Varianta B — Functions SSR | Varianta C — Resource hints + limit | Varianta D — Status quo |
+|---|---|---|---|---|
+| **Princip** | Build-time skript stáhne data z Firestore a injectuje statický HTML do `blog.html`, `akce-archive.html` a generuje detail soubory `public/blog/<slug>/index.html` | Cloud Function renderuje HTML on-demand, cached na CDN přes `Cache-Control` header, rewrite v `firebase.json` | `<link rel="preconnect">` na `firestore.googleapis.com` + `firebasestorage.googleapis.com`, Firestore query s `.limit(12)` | Akceptovat pomalé CMS, optimalizovat statické stránky |
+| **Dopad na LCP** | **22 s → ~3–5 s** (eliminuje firebase SDK + Firestore query z kritické cesty, browser preload scanner najde `src` v HTML hned) | **22 s → ~3–5 s** po cache hit; cold start funkce přidá 1–3 s | **22 s → ~17–19 s** (ušetří TLS handshakes a stahování dat, ale Firestore SDK 280 KB zůstává) | žádná změna |
+| **Úsilí** | 1,5–2 dny (3 skripty, drobné úpravy `cms-loader.js` na progressive enhancement) | 2–4 dny (SSR template, error handling, cache logika, `minInstances: 1` pro cold start) | 0,5–1 den | 0 hodin |
+| **Údržba** | Nízká — script běží automaticky před `firebase deploy`. CMS update = `npm run deploy:hosting` (volitelně automatizovat přes Firebase trigger + GitHub Action) | Střední — Function code je další vrstva, kterou je třeba testovat a deployovat. Cache invalidation logika nutná | Nízká | Nulová |
+| **Náklady** | $0 — žádný runtime overhead | ~$0–5/měs (free tier 2M invokes; `minInstances:1` přidá ~$3) | $0 | $0 |
+| **Rizika** | CMS změny nejsou real-time (ale reporty z akcí přidáváš nárazově, ne kontinuálně). Detail stránky se generují staticky → nutno re-deploy při změně textu článku | Cold start, vendor lock-in na Functions, deploy komplexnější. Pokud Functions selžou, celý blog nefunguje | LCP zůstane v "poor" pásmu (>4 s). Google CWV penalizace nezmizí | Postupné zhoršení Search rankingu jak Google víc bere CWV v úvahu |
+| **Vhodnost** | ✅ Nejlepší pro malý web s relativně statickým obsahem | Použitelné, ale overkill pro 138 článků | Užitečné jako doplněk k A nebo B | Nedoporučeno — CWV mají rostoucí váhu v rankingu |
+
+### Doporučení
+
+**Doporučuji Variantu A (SSG/pre-render) doplněnou o resource hints z Varianty C.**
+
+Důvody:
+
+1. **One-person team** — A nepřidává runtime infrastrukturu k údržbě. SSR (B) přidá další kódovou bázi a cache logiku, kterou musíš sám provozovat.
+2. **Bikeskills má relativně statický CMS** — reporty z akcí přibývají v řádu jednotek měsíčně, akce/kurzy se plánují s předstihem. Real-time nemá hodnotu, latence "deploy ~5 min po publish" je akceptovatelná.
+3. **Reuse infrastruktury** — `firebase-admin` se service accountem už používáš v `scripts/generate-sitemap.js`. Stejný kód, stejné credentials.
+4. **Bez vendor lock** — pre-rendered HTML je čistý statický soubor. Pokud někdy migruješ z Firebase Hosting jinam, `public/` jde převést 1:1.
+5. **Nulové runtime náklady** — žádný cold start, žádný compute, jen Firebase Hosting CDN (kde už platíš).
+6. **LCP redukce největší** — A i B dosahují srovnatelně cca 3–5 s, ale A je výrazně levnější na implementaci.
+7. **Možnost progressive enhancement** — `cms-loader.js` může zůstat pro filtry/paginaci/related posts; jen ho upravíš tak, aby nepřepisoval pre-rendered DOM, pokud existuje.
+
+**Konkrétní krok-za-krokem (odhad celkem 1,5–2 dny):**
+
+- *Krok 1 (3–4 h):* `scripts/prerender-listings.js` — načte 12 nejnovějších článků a 12 nejbližších akcí, vyrenderuje HTML markup karet a injectuje do `public/blog.html` + `public/akce-archive.html` na místo prázdného template.
+- *Krok 2 (4–6 h):* `scripts/prerender-detail-pages.js` — pro každý slug vygeneruje `public/blog/<slug>/index.html` jako kopii `detail_post.html` s nahrazeným `<title>`, `<meta>`, `<img src>`, `[item="content"]` HTML, JSON-LD Article schema. Stejně pro `akce/<slug>/index.html`. Pak smazat rewrites z `firebase.json`.
+- *Krok 3 (1–2 h):* upravit `cms-loader.js` — pokud detekuje, že `[item="featured-image"]` už má neprázdný `src`, neresetuje DOM, jen napojí filtry/paginaci/related posts.
+- *Krok 4 (1 h):* `package.json` — `"prerender": "node scripts/prerender-listings.js && node scripts/prerender-detail-pages.js"`, deploy hook `npm run deploy:hosting`.
+- *Krok 5 (15 min):* přidat preconnect hints do `<head>` všech HTML (i statických — pomůže `cms-loader.js` doplňování pro filtry/related/paginace).
+
+**Sekundární optimalizace (i pokud zvolíš jinou variantu):**
+
+- Refaktor `loadClankyList()` a `loadAkceList()` na `.limit(12).get()` + Firestore cursor pro stránkování — over-fetch 11× je velmi špatný i kdyby LCP byl OK.
+- Odstranit `applySeoFromSettings()` query pro CMS stránky — meta tagy už jsou v HTML staticky napsané, dynamický override z Firestore přidává jen latenci a nepřidává hodnotu.
+
+### Návazné kroky
+
+Před implementací doporučuji:
+
+1. **Spustit DevTools waterfall** na `/blog` (Chrome DevTools → Network → Disable cache → Slow 4G throttling → reload). Potvrdit, že LCP element je opravdu featured-image první karty a ne např. hero text. Pokud bys nedostál připojit Chrome MCP příště, můžeš mi sdílet HAR export.
+2. **Zkontrolovat Search Console**, kolik traffic má `/blog` a `/akce-archive` a jednotlivé detail URL — pokud detail stránky generují většinu kliků, je to silný argument pro variantu A (kde detail dostane největší benefit).
+3. **Rozhodnout se pro variantu** (A / B / C / D). Po potvrzení připravím implementační plán a skripty.
+
+**Status:** analýza, neimplementováno. Čeká na rozhodnutí.

@@ -1,0 +1,147 @@
+/* ============================================================
+ * BIKESKILLS overrides
+ * Custom CSS overrides aplikované za Webflow CSS.
+ * Účel:
+ *  - Partner-logo marquee: konzistentní animace na všech breakpointech
+ *  - Opravit deformaci log (hardcoded width="300" height="200" v HTML)
+ *  - Single-row layout (původní grid se na mobilu lámal do více řádků)
+ * ============================================================ */
+
+/* ============================================================
+ * Partner logo marquee — vlastní CSS animace
+ *
+ * Pozadí:
+ *  - Original Webflow řešení používá IX2 interaction (data-w-id na
+ *    .partner-logo-section) která posouvá .partner-container přes JS.
+ *    Webflow IX2 typicky disabuje animace na mobile breakpointech →
+ *    pod 991px stál strip nehybný, viditelná byla jen prvních ~360px
+ *    z 3000px stripu.
+ *  - .partner-logo-container byl CSS Grid s 9 sloupci → na úzkém viewportu
+ *    grid forcoval velmi malé sloty a obrázky s hardcoded width/height
+ *    se vertikálně natahovaly.
+ *
+ * Naše řešení:
+ *  - Override IX2: `transform:none` + vlastní `animation` s `!important`
+ *    (animation transform má při běhu vyšší prioritu než inline transform)
+ *  - .partner-logo-container změněn z Grid na Flex (nowrap) → single row
+ *  - Loga: fixed slot (width × height) + object-fit:contain → bez deformace
+ *  - Animace -50% pole znamená, že sjedou všechna logy z jedné kopie
+ *    (druhý duplicitní container drží navazující sekvenci pro seamless loop)
+ * ============================================================ */
+
+/* Wrapper — overflow hidden, plná šíře */
+.partner-overflow-wrapper {
+  width: 100% !important;
+  overflow: hidden !important;
+}
+
+/* Strip — flex row, vlastní animace, override Webflow IX2 inline transform */
+.partner-container {
+  width: max-content !important;
+  display: flex !important;
+  overflow: visible !important;
+  transform: none;
+  animation: bs-partner-marquee 40s linear infinite !important;
+  will-change: transform;
+}
+
+/* Logo container — flex row místo grid */
+.partner-container > .partner-logo-container {
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  align-items: center;
+  gap: 32px;
+  padding: 15px 24px;
+  width: auto !important;
+  grid-template-columns: none !important;
+  grid-template-rows: none !important;
+}
+
+/* Logo slot — fixed dimenze, image contain (žádná deformace) */
+.partner-logo-container .partner-logo-link {
+  flex: 0 0 auto;
+  width: 140px;
+  height: 80px;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  max-width: none;
+}
+
+.partner-logo-container .partner-logo-link img {
+  max-width: 100% !important;
+  max-height: 100% !important;
+  width: auto !important;
+  height: auto !important;
+  object-fit: contain;
+  display: block;
+}
+
+/* Marquee keyframes — translate -50% (přejde celá kopie 1, druhá kopie navazuje) */
+@keyframes bs-partner-marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+/* Hover pause — uživatel si může logo prohlédnout */
+.partner-overflow-wrapper:hover .partner-container {
+  animation-play-state: paused !important;
+}
+
+/* Respect prefers-reduced-motion (uživatelé s vestibulárními poruchami) */
+@media (prefers-reduced-motion: reduce) {
+  .partner-container {
+    animation: none !important;
+    transform: translateX(0) !important;
+  }
+}
+
+/* ============================================================
+ * Responsive breakpointy — postupné zmenšení slotu + zrychlení animace
+ * (kratší strip → kratší doba pro stejnou rychlost čtení)
+ * ============================================================ */
+
+/* Tablet (≤991px) */
+@media (max-width: 991px) {
+  .partner-logo-container .partner-logo-link {
+    width: 110px;
+    height: 65px;
+  }
+  .partner-container > .partner-logo-container {
+    gap: 24px;
+    padding: 12px 16px;
+  }
+  .partner-container {
+    animation-duration: 35s !important;
+  }
+}
+
+/* Telefon (≤767px) */
+@media (max-width: 767px) {
+  .partner-logo-container .partner-logo-link {
+    width: 95px;
+    height: 56px;
+  }
+  .partner-container > .partner-logo-container {
+    gap: 20px;
+    padding: 10px 12px;
+  }
+  .partner-container {
+    animation-duration: 30s !important;
+  }
+}
+
+/* Malý telefon (≤479px) */
+@media (max-width: 479px) {
+  .partner-logo-container .partner-logo-link {
+    width: 80px;
+    height: 50px;
+  }
+  .partner-container > .partner-logo-container {
+    gap: 16px;
+    padding: 10px;
+  }
+  .partner-container {
+    animation-duration: 25s !important;
+  }
+}
