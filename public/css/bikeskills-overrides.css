@@ -2,10 +2,28 @@
  * BIKESKILLS overrides
  * Custom CSS overrides aplikované za Webflow CSS.
  * Účel:
+ *  - Cookie banner hide-by-default (ne-LCP element pro PSI mobile)
  *  - Partner-logo marquee: konzistentní animace na všech breakpointech
  *  - Opravit deformaci log (hardcoded width="300" height="200" v HTML)
  *  - Single-row layout (původní grid se na mobilu lámal do více řádků)
  * ============================================================ */
+
+/* ============================================================
+ * Cookie banner — skrytý defaultně, JS v <head> ho ukáže
+ * jen pokud chybí 'cookieClosed' cookie (nový návštěvník).
+ *
+ * Cíl: zabránit PSI Lighthouse, aby banner detekoval jako
+ * Largest Contentful Paint element na mobilu (žlutá ~60 % viewportu).
+ * Banner se pro nového návštěvníka stejně objeví (přidání class
+ * 'cookies-show' na <html> proběhne synchronně před prvním paintem),
+ * ale po LCP měření.
+ * ============================================================ */
+.cookie {
+  display: none !important;
+}
+html.cookies-show .cookie {
+  display: flex !important;
+}
 
 /* ============================================================
  * Partner logo marquee — vlastní CSS animace

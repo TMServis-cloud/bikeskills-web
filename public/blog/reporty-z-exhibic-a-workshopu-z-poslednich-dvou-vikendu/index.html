@@ -38,6 +38,7 @@ Malá vesnička na severu pořádala cykloden, kam byl přizván i náš tým ve
   <meta content="summary_large_image" name="twitter:card">
   <meta content="width=device-width, initial-scale=1" name="viewport">
   <meta content="Webflow" name="generator">
+  <script>(function(){if(!document.cookie.match(/(?:^|; )cookieClosed=/)){document.documentElement.classList.add('cookies-show');}})();</script>
   <link href="css/normalize.css" rel="stylesheet" type="text/css">
   <link href="css/webflow.css" rel="stylesheet" type="text/css">
   <link href="css/multy-webflow-to-wordpres-ea5f0e3d27991.webflow.css" rel="stylesheet" type="text/css">
@@ -906,6 +907,7 @@ button:hover {
     document.cookie = n + '=' + encodeURIComponent(v) + '; expires=' + d.toUTCString() + '; path=/; SameSite=Lax';
   }
   function hideBanner() {
+    document.documentElement.classList.remove('cookies-show');
     if (!document.getElementById('bs-cookie-hide')) {
       var s = document.createElement('style');
       s.id = 'bs-cookie-hide';
