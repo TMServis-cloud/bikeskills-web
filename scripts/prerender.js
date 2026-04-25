@@ -222,10 +222,14 @@ function buildAkceCard(d, i) {
 // ============================================================
 function injectPreloadHero(html, heroSrc) {
   if (!heroSrc) return html;
+  // Idempotence: nejprve odstraň VŠECHNY existující preload-image tagy z <head>
+  // (staré běhy prerenderu nechávaly preloady akumulovat se před prvním <link>)
+  const cleaned = html.replace(
+    /\n?\s*<link\s+rel="preload"\s+as="image"\s+href="[^"]*"\s+fetchpriority="[^"]*">\s*/gi,
+    ''
+  );
   const link = `<link rel="preload" as="image" href="${escapeAttr(heroSrc)}" fetchpriority="high">`;
-  // Před prvním <link> v <head>
-  return html.replace(/<head>([\s\S]*?)<link/, (m, headInner) => {
-    if (headInner.includes(link)) return m;
+  return cleaned.replace(/<head>([\s\S]*?)<link/, (m, headInner) => {
     return `<head>${headInner}${link}\n  <link`;
   });
 }

@@ -1104,42 +1104,53 @@
     type="text/javascript" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"
     defer></script>
   <script src="js/webflow.js" type="text/javascript" defer></script>
-  <script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
   <script>
-    var cookieName = 'cookieClosed';
-    (function () {
-      var WFID = 'dc855bcd-7523-d583-8df1-cb2e9f6c7f30';
-      var banner = document.querySelector('.cookie');
-      if (!banner) return;
-
-      function hideBanner() {
-        // Inject !important CSS so Webflow inline style can't override
-        if (!document.getElementById('bs-cookie-hide')) {
-          var s = document.createElement('style');
-          s.id = 'bs-cookie-hide';
-          s.textContent = '[data-w-id="' + WFID + '"]{display:none!important}';
-          document.head.appendChild(s);
-        }
-        if (banner && banner.parentNode) { banner.parentNode.removeChild(banner); banner = null; }
-      }
-
-      if (typeof Cookies.get(cookieName) !== 'undefined') {
+// Cookie banner — native, defer-friendly
+(function() {
+  var WFID = 'dc855bcd-7523-d583-8df1-cb2e9f6c7f30';
+  var COOKIE = 'cookieClosed';
+  function getCookie(n) {
+    var m = document.cookie.match(new RegExp('(?:^|; )' + n.replace(/[.$?*|{}()[\]\\/+^]/g, '\$&') + '=([^;]*)'));
+    return m ? decodeURIComponent(m[1]) : null;
+  }
+  function setCookie(n, v, days) {
+    var d = new Date(); d.setTime(d.getTime() + days*86400000);
+    document.cookie = n + '=' + encodeURIComponent(v) + '; expires=' + d.toUTCString() + '; path=/; SameSite=Lax';
+  }
+  function hideBanner() {
+    if (!document.getElementById('bs-cookie-hide')) {
+      var s = document.createElement('style');
+      s.id = 'bs-cookie-hide';
+      s.textContent = '[data-w-id="' + WFID + '"]{display:none!important}';
+      document.head.appendChild(s);
+    }
+    var b = document.querySelector('.cookie');
+    if (b && b.parentNode) b.parentNode.removeChild(b);
+  }
+  function init() {
+    var banner = document.querySelector('.cookie');
+    if (!banner) return;
+    if (getCookie(COOKIE)) {
+      hideBanner();
+      window.addEventListener('load', hideBanner, { once: true });
+      return;
+    }
+    ['.close-btn', '.banner-close-card'].forEach(function(sel) {
+      var btn = banner.querySelector(sel);
+      if (btn) btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        setCookie(COOKIE, 'ok', 31);
         hideBanner();
-        // Re-hide after Webflow PAGE_FINISH (window.load); our listener registered first → fires first
-        window.addEventListener('load', hideBanner, { once: true });
-        return;
-      }
-
-      ['.close-btn', '.banner-close-card'].forEach(function (sel) {
-        var btn = banner.querySelector(sel);
-        if (btn) btn.addEventListener('click', function (e) {
-          e.preventDefault();
-          Cookies.set(cookieName, 'ok', { expires: 31 });
-          hideBanner();
-        });
       });
-    })();
-  </script>
+    });
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
 
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js" defer></script>
