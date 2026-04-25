@@ -40,12 +40,19 @@
  * Banner se pro nového návštěvníka stejně objeví (přidání class
  * 'cookies-show' na <html> proběhne synchronně před prvním paintem),
  * ale po LCP měření.
+ *
+ * CLS fix (PSI mobile 2026-04-25):
+ *  - Multy-webflow CSS má `.cookie{position:sticky; bottom:0; height:100vh}`.
+ *    Sticky je v normal flow → display:none→flex přidá 100vh k page height,
+ *    což může u Lighthouse způsobit indirect layout shift hero-home-v2.
+ *  - Override na `position:fixed` ho dostane mimo flow → 0 layout impact.
  * ============================================================ */
 .cookie {
   display: none !important;
 }
 html.cookies-show .cookie {
   display: flex !important;
+  position: fixed !important;
 }
 
 /* ============================================================
@@ -222,7 +229,7 @@ html.cookies-show .cookie {
   font-family: 'Lobster';
   font-style: normal;
   font-weight: 400;
-  font-display: swap;
+  font-display: optional;
   src: url('../fonts/lobster-latin-ext.woff2') format('woff2');
   unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
 }
@@ -230,7 +237,7 @@ html.cookies-show .cookie {
   font-family: 'Lobster';
   font-style: normal;
   font-weight: 400;
-  font-display: swap;
+  font-display: optional;
   src: url('../fonts/lobster-latin.woff2') format('woff2');
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
