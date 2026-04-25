@@ -186,3 +186,20 @@ html.cookies-show .cookie {
     animation-duration: 25s !important;
   }
 }
+
+/* ============================================================
+ * Hero-home-v2 — responzivní background-image (LCP optimalizace)
+ *
+ * Pozadí:
+ *  - .hero-home-v2 má v multy-webflow CSS background-image: banner2021.jpg (234 KiB, 1250x937).
+ *  - Na mobile je element zobrazen na ~686x515 — fullsize obrázek je 2× větší než potřeba.
+ *  - PSI měření: LCP element je tento <div>, jeho background blokuje LCP.
+ *
+ * Fix: na mobile podsouváme menší variantu banner2021-mobile.jpg (177 KiB).
+ *      Doplněno preload tagem v <head> index.html s fetchpriority=high.
+ * ============================================================ */
+@media (max-width: 991px) {
+  .hero-home-v2 {
+    background-image: url('../images/banner2021-mobile.jpg') !important;
+  }
+}
