@@ -130,62 +130,66 @@ html.cookies-show .cookie .banner-icon {
  *      menší bell, menší padding. Cíl: ~120-140 px výška.
  * ============================================================ */
 @media (max-width: 767px) {
-  /* product-wrap: row+wrap, side padding 10px */
+  /* CSS Grid layout — 3 řádky, explicitní template-areas:
+     ┌─────────────────────────────────┐
+     │ .  .  .  close │  Row 1: × vpravo
+     │ rej acc .  .   │  Row 2: ODMÍTNOUT + PŘIJÍMÁM vlevo
+     │ bell text text │  Row 3: bell + cookies text
+     └─────────────────────────────────┘ */
   html.cookies-show .cookie .product-wrap {
-    flex-direction: row !important;
-    flex-wrap: wrap !important;
+    display: grid !important;
+    grid-template-columns: auto auto 1fr auto !important;
+    grid-template-areas:
+      ".      .      .    close"
+      "reject accept .    .    "
+      "bell   text   text text " !important;
+    column-gap: 10px !important;
+    row-gap: 6px !important;
     align-items: center !important;
-    justify-content: flex-start !important;
-    padding: 10px !important;
+    padding: 8px 10px !important;
     min-height: 0 !important;
   }
-  /* left-wrap rozbalit (display:contents) → bell + title-wrap se chovají
-     jako přímé děti product-wrap, můžu je individuálně reorderovat */
+  /* left-wrap rozbalit → bell + title-wrap jsou přímé grid items */
   html.cookies-show .cookie .left-wrap {
     display: contents !important;
   }
-  /* ORDER (mobile only):
-     1) bell  2) ODMÍTNOUT (push pravo přes margin-left:auto)
-     3) PŘIJÍMÁM  4) × close   5) TEXT (full width, pod close buttonem)  */
-  html.cookies-show .cookie .con-wrap-2 {
-    order: 1 !important;
-    flex: 0 0 auto !important;
+  /* Grid placement */
+  html.cookies-show .cookie .banner-close-card {
+    grid-area: close !important;
+    width: 24px !important;
+    height: 24px !important;
+    margin: 0 !important;
   }
   html.cookies-show .cookie .bs-reject-btn {
-    order: 2 !important;
+    grid-area: reject !important;
     font-size: 11px !important;
-    margin-left: auto !important;
-    margin-right: 10px !important;
-    margin-top: 0 !important;
+    margin: 0 !important;
     text-underline-offset: 2px;
+    justify-self: start !important;
   }
   html.cookies-show .cookie .close-btn:not(.bs-reject-btn) {
-    order: 3 !important;
+    grid-area: accept !important;
     display: inline-block !important;
-    padding: 7px 14px !important;
+    padding: 6px 12px !important;
     font-size: 11px !important;
     margin: 0 !important;
     line-height: 1.4 !important;
+    justify-self: start !important;
   }
-  html.cookies-show .cookie .banner-close-card {
-    order: 4 !important;
-    width: 28px !important;
-    height: 28px !important;
-    margin-left: 8px !important;
+  html.cookies-show .cookie .con-wrap-2 {
+    grid-area: bell !important;
+    margin: 0 !important;
   }
-  /* Text → vlastní řádek pod close buttonem, 10px mezera od tlačítek */
   html.cookies-show .cookie .banner-title-wrap {
-    order: 5 !important;
-    flex: 1 1 100% !important;
-    width: 100% !important;
-    margin-top: 10px !important;
+    grid-area: text !important;
+    margin: 0 !important;
   }
   /* Bell ikona menší */
   html.cookies-show .cookie .banner-icon {
-    width: 24px !important;
-    height: 28px !important;
-    max-width: 24px !important;
-    max-height: 28px !important;
+    width: 22px !important;
+    height: 26px !important;
+    max-width: 22px !important;
+    max-height: 26px !important;
   }
   /* Texty menší */
   html.cookies-show .cookie .banner-author,
@@ -193,7 +197,7 @@ html.cookies-show .cookie .banner-icon {
   html.cookies-show .cookie .banner-title-wrap,
   html.cookies-show .cookie .banner-author-wrap {
     font-size: 11px !important;
-    line-height: 1.35 !important;
+    line-height: 1.3 !important;
   }
 }
 
