@@ -154,10 +154,15 @@ html.cookies-show .cookie .banner-icon {
   html.cookies-show .cookie .left-wrap {
     display: contents !important;
   }
-  /* × close — Row 1 vpravo, ORIGINÁLNÍ velikost (žádný width/height override) */
+  /* × close — Row 1 vpravo, ORIGINÁLNÍ velikost
+     KRITICKÉ: Webflow má `.banner-close-card{position:absolute; inset:0 0 0 auto}`
+     → musí být `position:static`, jinak vypadne z grid flow a překryje
+     tlačítka u pravého okraje. */
   html.cookies-show .cookie .banner-close-card {
     grid-area: close !important;
     justify-self: end !important;
+    position: static !important;
+    inset: auto !important;
     margin: 0 !important;
   }
   /* ODMÍTNOUT + PŘIJÍMÁM — Row 2 vlevo */
