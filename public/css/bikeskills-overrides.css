@@ -80,19 +80,41 @@ html.cookies-show .cookie a {
   pointer-events: auto !important;  /* uvnitř lišty klik funguje normálně */
 }
 
-/* ODMÍTNOUT button — outline secondary, vedle PŘIJÍMÁM.
- * GDPR/ÚOOÚ: reject musí být stejně viditelný a snadno klikatelný
- * jako accept. Stejný shape, stejné padding, jen invertované barvy
- * (transparent bg + black border vs. black bg + light border u accept). */
+/* ODMÍTNOUT — vizuálně jako text link s podtržením (jako 'NAŠE AKCE A CAMPY'
+ * v hero sekci). GDPR-compliant je důležité, aby reject byl viditelný a snadno
+ * klikatelný — text link s podtržením to splňuje (stejně viditelný jako accept,
+ * ale vizuálně méně agresivní než button → lepší vyvážení nátlaku k souhlasu). */
 html.cookies-show .cookie .bs-reject-btn {
-  background-color: transparent !important;
+  display: inline-block;
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  margin-right: 24px !important;
   color: var(--black, #1a1a1a) !important;
-  border: 2px solid var(--black, #1a1a1a) !important;
-  margin-right: 12px !important;  /* menší mezera mezi ODMÍTNOUT a PŘIJÍMÁM */
+  font-family: proxima-nova, sans-serif !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  letter-spacing: .025rem;
+  text-transform: uppercase;
+  text-decoration: underline !important;
+  text-underline-offset: 3px;
+  cursor: pointer;
+  transition: opacity .2s;
 }
 html.cookies-show .cookie .bs-reject-btn:hover {
-  background-color: var(--black, #1a1a1a) !important;
-  color: var(--bílo-seda, #f5f5f5) !important;
+  opacity: .65 !important;
+}
+
+/* Bell ikona — original HTML má width=70 height=84 + duplicitní width=30
+ * (špatný markup), což CSS deformuje na výšku. Lock na fixed dimensions
+ * s object-fit:contain (zachová poměr i kdyby zdroj měl jiný). */
+html.cookies-show .cookie .banner-icon {
+  width: 40px !important;
+  height: 48px !important;
+  max-width: 40px !important;
+  max-height: 48px !important;
+  object-fit: contain !important;
+  flex-shrink: 0 !important;
 }
 
 /* ============================================================

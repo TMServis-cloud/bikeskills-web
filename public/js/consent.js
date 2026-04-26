@@ -73,7 +73,7 @@
     if (!acceptBtn || !acceptBtn.parentNode) return;
     var rejectBtn = document.createElement('a');
     rejectBtn.href = '#';
-    rejectBtn.className = 'close-btn bs-reject-btn w-button';
+    rejectBtn.className = 'bs-reject-btn';
     rejectBtn.textContent = 'ODMÍTNOUT';
     rejectBtn.setAttribute('role', 'button');
     rejectBtn.setAttribute('aria-label', 'Odmítnout cookies');
