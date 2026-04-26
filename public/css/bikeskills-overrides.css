@@ -393,3 +393,31 @@ html.cookies-show .cookie .banner-icon {
   src: url('../fonts/lobster-latin.woff2') format('woff2');
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
+
+/* ============================================================
+ * .image-53 (CMS hero / featured image) — fix CLS 0.137 on mobile
+ *
+ * Pozadí (PSI mobile blog detail 2026-04-26):
+ *  - HTML attrs: width="1280" height="720" (16:9) — browser z nich
+ *    odvodí aspect-ratio a před načtením rezervuje 100vw × 9/16.
+ *  - Inline <style> v detail_post.html: { width:100%; max-height:480px;
+ *    object-fit:cover; object-position:center top }.
+ *  - Reálné CMS hero obrázky jsou často portrait (např. 1200×1800).
+ *    Po načtení browser přepočítá výšku z reálného aspect-ratio (1.5×
+ *    šířky), narazí na max-height:480px → výsledná výška ~480px.
+ *  - Mobile 360px viewport: rezervace 360 × 9/16 = 202 px → po loadu 480 px.
+ *    Shift +278 px = CLS 0.137 (PSI mobile only — na desktopu side-by-side
+ *    grid izoluje shift do pravé kolonky → CLS 0).
+ *
+ * Fix: vynutit aspect-ratio 16:9 + zrušit max-height cap, takže rezervovaná
+ *  i renderovaná výška je vždy stejná (cover crop u portrait obrázků
+ *  zachová horní část díky object-position:center top, který už je tam).
+ * ============================================================ */
+.image-53 {
+  aspect-ratio: 16 / 9 !important;
+  height: auto !important;
+  max-height: none !important;
+  width: 100% !important;
+  object-fit: cover !important;
+  object-position: center top !important;
+}
