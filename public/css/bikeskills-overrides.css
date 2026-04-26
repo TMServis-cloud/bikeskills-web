@@ -118,6 +118,74 @@ html.cookies-show .cookie .banner-icon {
 }
 
 /* ============================================================
+ * Cookie banner — mobil (≤767px) kompaktní layout
+ *
+ * Pozadí:
+ *  - Webflow Mobile L breakpoint dává `.product-wrap{flex-direction:column;
+ *    padding:20px 20px 75px}` + `.close-btn{display:block; margin-top:19px}`.
+ *  - Výsledek: bell, text, ODMÍTNOUT, PŘIJÍMÁM jsou pod sebou → ~290 px
+ *    výška na 360px viewportu (Samsung Galaxy S8+).
+ *
+ * Fix: vrátit row layout, tlačítka inline-block side-by-side, menší font,
+ *      menší bell, menší padding. Cíl: ~120-140 px výška.
+ * ============================================================ */
+@media (max-width: 767px) {
+  /* product-wrap: row+wrap, kompaktní padding */
+  html.cookies-show .cookie .product-wrap {
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    padding: 10px 12px !important;
+    min-height: 0 !important;
+  }
+  /* left-wrap (bell + text): plná šíře, řádek nad tlačítky */
+  html.cookies-show .cookie .left-wrap {
+    flex: 1 1 100% !important;
+    width: 100% !important;
+    padding-bottom: 8px !important;
+    align-items: center !important;
+  }
+  /* Bell menší */
+  html.cookies-show .cookie .banner-icon {
+    width: 24px !important;
+    height: 28px !important;
+    max-width: 24px !important;
+    max-height: 28px !important;
+  }
+  /* Texty menší */
+  html.cookies-show .cookie .banner-author,
+  html.cookies-show .cookie .banner-author.link,
+  html.cookies-show .cookie .banner-title-wrap,
+  html.cookies-show .cookie .banner-author-wrap {
+    font-size: 11px !important;
+    line-height: 1.35 !important;
+  }
+  /* ODMÍTNOUT: menší font, push doleva v řádku tlačítek */
+  html.cookies-show .cookie .bs-reject-btn {
+    font-size: 11px !important;
+    margin-right: 14px !important;
+    margin-left: 0 !important;
+    margin-top: 0 !important;
+    text-underline-offset: 2px;
+  }
+  /* PŘIJÍMÁM: zachovat button styl ale kompaktní + INLINE (ne block!) */
+  html.cookies-show .cookie .close-btn:not(.bs-reject-btn) {
+    display: inline-block !important;
+    padding: 7px 14px !important;
+    font-size: 11px !important;
+    margin: 0 !important;
+    line-height: 1.4 !important;
+  }
+  /* × close icon — menší a v rohu */
+  html.cookies-show .cookie .banner-close-card {
+    width: 28px !important;
+    height: 28px !important;
+  }
+}
+
+
+/* ============================================================
  * Partner logo marquee — vlastní CSS animace
  *
  * Pozadí:

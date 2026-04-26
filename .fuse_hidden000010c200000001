@@ -1,0 +1,23 @@
+[debug] [2026-04-26T07:32:40.646Z] ----------------------------------------------------------------------
+[debug] [2026-04-26T07:32:40.647Z] Command:       /usr/bin/node /sessions/relaxed-hopeful-gauss/mnt/bikeskills-web/node_modules/.bin/firebase deploy --only hosting
+[debug] [2026-04-26T07:32:40.647Z] CLI Version:   13.35.1
+[debug] [2026-04-26T07:32:40.647Z] Platform:      linux
+[debug] [2026-04-26T07:32:40.647Z] Node Version:  v22.22.0
+[debug] [2026-04-26T07:32:40.648Z] Time:          Sun Apr 26 2026 07:32:40 GMT+0000 (Coordinated Universal Time)
+[debug] [2026-04-26T07:32:40.648Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2026-04-26T07:32:40.650Z] >>> [apiv2][query] GET https://firebase-public.firebaseio.com/cli.json [none]
+[debug] [2026-04-26T07:32:40.769Z] Object "/extensions" in "firebase.json" has unknown property: {"additionalProperty":"storage-resize-images"}
+[debug] [2026-04-26T07:32:40.773Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2026-04-26T07:32:40.780Z] Error: Could not load the default credentials. Browse to https://cloud.google.com/docs/authentication/getting-started for more information.
+    at GoogleAuth.getApplicationDefaultAsync (/sessions/relaxed-hopeful-gauss/mnt/bikeskills-web/node_modules/google-auth-library/build/src/auth/googleauth.js:287:15)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async GoogleAuth._GoogleAuth_determineClient (/sessions/relaxed-hopeful-gauss/mnt/bikeskills-web/node_modules/google-auth-library/build/src/auth/googleauth.js:834:32)
+    at async GoogleAuth.getClient (/sessions/relaxed-hopeful-gauss/mnt/bikeskills-web/node_modules/google-auth-library/build/src/auth/googleauth.js:698:20)
+    at async GoogleAuth.getAccessToken (/sessions/relaxed-hopeful-gauss/mnt/bikeskills-web/node_modules/google-auth-library/build/src/auth/googleauth.js:722:24)
+    at async autoAuth (/sessions/relaxed-hopeful-gauss/mnt/bikeskills-web/node_modules/firebase-tools/lib/requireAuth.js:26:19)
+    at async requireAuth (/sessions/relaxed-hopeful-gauss/mnt/bikeskills-web/node_modules/firebase-tools/lib/requireAuth.js:81:20)
+    at async requirePermissions (/sessions/relaxed-hopeful-gauss/mnt/bikeskills-web/node_modules/firebase-tools/lib/requirePermissions.js:17:5)
+    at async /sessions/relaxed-hopeful-gauss/mnt/bikeskills-web/node_modules/firebase-tools/lib/command.js:241:17
+[error] 
+[error] Error: Failed to authenticate, have you run firebase login?
