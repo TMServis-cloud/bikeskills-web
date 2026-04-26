@@ -170,17 +170,20 @@ function replaceListContainer(html, listClassMarker, newInnerHtml, extraAttr) {
 function buildClanekCard(d, i) {
   const href = `/blog/${d.slug}/`;
   const resolved = d.imageUrl ? resolveUrl(d.imageUrl) : null;
-  const src = resolved ? toThumbUrl(resolved, '800x800') : PLACEHOLDER_URL;
+  // src = originál (vždy 200) — fallback pokud variant ze srcset 404
+  const src = resolved || PLACEHOLDER_URL;
   const srcset = resolved ? thumbSrcset(resolved) : '';
   const sizes = '(max-width: 767px) 100vw, (max-width: 991px) 50vw, 50vw';
   const ssAttr = srcset ? ` srcset="${escapeAttr(srcset)}" sizes="${escapeAttr(sizes)}"` : '';
+  // onerror: pokud variant 404, odstraň srcset → browser fallne na src=originál
+  const onErr = srcset ? ` onerror="this.onerror=null;this.removeAttribute('srcset');this.removeAttribute('sizes');"` : '';
   const eager = i === 0;
   const fp = eager ? ' fetchpriority="high"' : '';
   const loading = eager ? 'eager' : 'lazy';
   return `
 <div role="listitem" class="collection-blog-item w-dyn-item">
   <a item="permalink" href="${escapeAttr(href)}" class="collection-item__card-blog w-inline-block">
-    <div class="card-blog__wrapper-image"><img item="featured-image" src="${escapeAttr(src)}"${ssAttr} alt="${escapeAttr(d.titulek||'')}" width="800" height="600" loading="${loading}"${fp} class="wrapper-image__img"></div>
+    <div class="card-blog__wrapper-image"><img item="featured-image" src="${escapeAttr(src)}"${ssAttr}${onErr} alt="${escapeAttr(d.titulek||'')}" width="800" height="600" loading="${loading}"${fp} class="wrapper-image__img"></div>
     <div class="card-blog__wrapper-text">
       <h2 item="title" class="wrapper--text__title">${escapeHtml(d.titulek||'')}</h2>
     </div>
@@ -197,10 +200,12 @@ function buildClanekCard(d, i) {
 function buildAkceCard(d, i) {
   const href = `/akce/${d.slug}/`;
   const resolved = d.imageUrl ? resolveUrl(d.imageUrl) : null;
-  const src = resolved ? toThumbUrl(resolved, '800x800') : PLACEHOLDER_URL;
+  // src = originál (vždy 200) — fallback pokud variant ze srcset 404
+  const src = resolved || PLACEHOLDER_URL;
   const srcset = resolved ? thumbSrcset(resolved) : '';
   const sizes = '(max-width: 767px) 100vw, (max-width: 991px) 50vw, 25vw';
   const ssAttr = srcset ? ` srcset="${escapeAttr(srcset)}" sizes="${escapeAttr(sizes)}"` : '';
+  const onErr = srcset ? ` onerror="this.onerror=null;this.removeAttribute('srcset');this.removeAttribute('sizes');"` : '';
   const eager = i === 0;
   const fp = eager ? ' fetchpriority="high"' : '';
   const loading = eager ? 'eager' : 'lazy';
@@ -218,7 +223,7 @@ function buildAkceCard(d, i) {
     </div>
     <div acf:text="akce-level" style="color:rgb(34,37,40)" class="akce-level">${escapeHtml(d.uroven||'')}</div>
     <div class="akce-image-blok">
-      <img item="featured-image" src="${escapeAttr(src)}"${ssAttr} alt="${escapeAttr(d.nazev||'')}" width="800" height="600" loading="${loading}"${fp} class="image-55">
+      <img item="featured-image" src="${escapeAttr(src)}"${ssAttr}${onErr} alt="${escapeAttr(d.nazev||'')}" width="800" height="600" loading="${loading}"${fp} class="image-55">
       <p item="excerpt" style="opacity:0" class="paragraph-2">${escapeHtml(excerpt)}</p>
     </div>
     <div style="color:rgb(255,255,255);background-color:rgb(45,96,171)" class="div-block-330">
@@ -378,7 +383,9 @@ function setItemImg(html, itemName, src, alt, w, h, fetchPriority, srcsetOpts) {
     const ss = (srcsetOpts && srcsetOpts.srcset)
       ? ` srcset="${escapeAttr(srcsetOpts.srcset)}" sizes="${escapeAttr(srcsetOpts.sizes || '100vw')}"`
       : '';
-    return `<img src="${escapeAttr(src)}"${ss} alt="${escapeAttr(alt||'')}"${loading}${wh}${fp}${attrs.replace(/\s+/g, ' ').replace(/\s+$/, '')}>`;
+    // onerror: pokud variant ze srcset 404, odstraň srcset/sizes → browser fallne na src=originál
+    const onErr = ss ? ` onerror="this.onerror=null;this.removeAttribute('srcset');this.removeAttribute('sizes');"` : '';
+    return `<img src="${escapeAttr(src)}"${ss}${onErr} alt="${escapeAttr(alt||'')}"${loading}${wh}${fp}${attrs.replace(/\s+/g, ' ').replace(/\s+$/, '')}>`;
   });
   return newHead + tail;
 }
@@ -422,12 +429,12 @@ function prerenderClanekDetail(template, d) {
   html = setMeta(html, 'twitter:description', desc);
   html = setMeta(html, 'twitter:image', hero);
   html = setCanonical(html, url);
-  // Preload hero
+  // Preload hero — href = ORIGINÁL (vždy 200), srcset jako progressive enhancement
   const heroResolved = heroOrig ? resolveUrl(heroOrig) : null;
-  const heroThumb = heroResolved ? toThumbUrl(heroResolved, '800x800') : null;
+  const heroPrimary = heroResolved;  // originál URL — fallback při 404 z variant
   const heroSrcset = heroResolved ? thumbSrcset(heroResolved) : '';
   const heroSizes = '(max-width: 991px) 100vw, 1280px';
-  if (heroThumb) html = injectPreloadHero(html, heroThumb, { srcset: heroSrcset, sizes: heroSizes });
+  if (heroPrimary) html = injectPreloadHero(html, heroPrimary, { srcset: heroSrcset, sizes: heroSizes });
 
   // JSON-LD
   const articleSchema = {
@@ -460,8 +467,8 @@ function prerenderClanekDetail(template, d) {
   html = setItemElementContent(html, 'div', 'date', escapeHtml(datum)).html;
   html = setItemElementContent(html, 'div', 'author-display-name', escapeHtml(d.autor || '')).html;
   html = setItemElementContent(html, 'div', 'content', resolveContentUrls(ensureHtml(processWpContent(d.obsah)))).html;
-  if (heroThumb) {
-    html = setItemImg(html, 'featured-image', heroThumb, titulek, 1280, 720, 'high', { srcset: heroSrcset, sizes: heroSizes });
+  if (heroPrimary) {
+    html = setItemImg(html, 'featured-image', heroPrimary, titulek, 1280, 720, 'high', { srcset: heroSrcset, sizes: heroSizes });
   }
 
   // Označit pre-rendered (cms-loader.js to detekuje)
@@ -493,10 +500,10 @@ function prerenderAkceDetail(template, d) {
   html = setMeta(html, 'twitter:image', hero);
   html = setCanonical(html, url);
   const heroResolved = heroOrig ? resolveUrl(heroOrig) : null;
-  const heroThumb = heroResolved ? toThumbUrl(heroResolved, '800x800') : null;
+  const heroPrimary = heroResolved;  // originál URL — fallback při 404 z variant
   const heroSrcset = heroResolved ? thumbSrcset(heroResolved) : '';
   const heroSizes = '(max-width: 991px) 100vw, 1280px';
-  if (heroThumb) html = injectPreloadHero(html, heroThumb, { srcset: heroSrcset, sizes: heroSizes });
+  if (heroPrimary) html = injectPreloadHero(html, heroPrimary, { srcset: heroSrcset, sizes: heroSizes });
 
   const eventSchema = {
     '@context':'https://schema.org','@type':'Event',
@@ -539,8 +546,8 @@ function prerenderAkceDetail(template, d) {
   html = setAcfText(html, 'akce-level', d.uroven || '');
   html = setItemElementContent(html, 'h2', 'title', escapeHtml(nazev)).html;
   html = setItemElementContent(html, 'div', 'content', resolveContentUrls(ensureHtml(d.popis))).html;
-  if (heroThumb) {
-    html = setItemImg(html, 'featured-image', heroThumb, nazev, 1280, 720, 'high', { srcset: heroSrcset, sizes: heroSizes });
+  if (heroPrimary) {
+    html = setItemImg(html, 'featured-image', heroPrimary, nazev, 1280, 720, 'high', { srcset: heroSrcset, sizes: heroSizes });
   }
   html = html.replace(/<html\b/, '<html data-prerendered="true"');
   return html;
