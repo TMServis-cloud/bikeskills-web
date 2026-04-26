@@ -137,6 +137,11 @@ html.cookies-show .cookie .banner-icon {
      │                                  │  ← mezera (margin-top:14px na textu)
      │ Cookies info text…               │  Row 3: text (bell skrytý — úspora místa)
      └──────────────────────────────────┘ */
+  /* .gdrp-section — žlutý wrapper kolem product-wrap.
+     Webflow default: padding-bottom:50px. Na mobile chceme jen 10px ze všech stran. */
+  html.cookies-show .cookie .gdrp-section {
+    padding: 10px !important;
+  }
   html.cookies-show .cookie .product-wrap {
     display: grid !important;
     grid-template-columns: auto auto 1fr !important;
@@ -147,7 +152,7 @@ html.cookies-show .cookie .banner-icon {
     column-gap: 10px !important;
     row-gap: 4px !important;
     align-items: center !important;
-    padding: 10px !important;
+    padding: 0 !important;
     min-height: 0 !important;
   }
   /* left-wrap rozbalit → bell + title-wrap jsou přímé grid items */
