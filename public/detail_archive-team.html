@@ -31,7 +31,6 @@
   <meta content="https://bikeskills.cz/images/og-image.jpg" property="twitter:image">
   <meta content="width=device-width, initial-scale=1" name="viewport">
   <meta content="Webflow" name="generator">
-  <script>(function(){if(document.cookie.match(/(?:^|; )cookieClosed=/))return;function s(){setTimeout(function(){document.documentElement.classList.add('cookies-show');},800);}if(document.readyState==='complete')s();else window.addEventListener('load',s,{once:true});})();</script>
   <link href="css/normalize.css" rel="stylesheet" type="text/css">
   <link href="css/webflow.css" rel="stylesheet" type="text/css">
   <link href="css/multy-webflow-to-wordpres-ea5f0e3d27991.webflow.css" rel="stylesheet" type="text/css">
@@ -1104,61 +1103,13 @@
     type="text/javascript" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"
     defer></script>
   <script src="js/webflow.js" type="text/javascript" defer></script>
-  <script>
-// Cookie banner — native, defer-friendly
-(function() {
-  var WFID = 'dc855bcd-7523-d583-8df1-cb2e9f6c7f30';
-  var COOKIE = 'cookieClosed';
-  function getCookie(n) {
-    var m = document.cookie.match(new RegExp('(?:^|; )' + n.replace(/[.$?*|{}()[\]\\/+^]/g, '\$&') + '=([^;]*)'));
-    return m ? decodeURIComponent(m[1]) : null;
-  }
-  function setCookie(n, v, days) {
-    var d = new Date(); d.setTime(d.getTime() + days*86400000);
-    document.cookie = n + '=' + encodeURIComponent(v) + '; expires=' + d.toUTCString() + '; path=/; SameSite=Lax';
-  }
-  function hideBanner() {
-    document.documentElement.classList.remove('cookies-show');
-    if (!document.getElementById('bs-cookie-hide')) {
-      var s = document.createElement('style');
-      s.id = 'bs-cookie-hide';
-      s.textContent = '[data-w-id="' + WFID + '"]{display:none!important}';
-      document.head.appendChild(s);
-    }
-    var b = document.querySelector('.cookie');
-    if (b && b.parentNode) b.parentNode.removeChild(b);
-  }
-  function init() {
-    var banner = document.querySelector('.cookie');
-    if (!banner) return;
-    if (getCookie(COOKIE)) {
-      hideBanner();
-      window.addEventListener('load', hideBanner, { once: true });
-      return;
-    }
-    ['.close-btn', '.banner-close-card'].forEach(function(sel) {
-      var btn = banner.querySelector(sel);
-      if (btn) btn.addEventListener('click', function(e) {
-        e.preventDefault();
-        setCookie(COOKIE, 'ok', 31);
-        hideBanner();
-      });
-    });
-  }
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
-  } else {
-    init();
-  }
-})();
-</script>
-
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js" defer></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js" defer></script>
 
   <!-- Bikeskills CMS Loader -->
   <script src="/js/cms-loader.js" defer></script>
+  <script src="/js/consent.js" defer></script>
 </body>
 
 </html>

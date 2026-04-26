@@ -56,16 +56,13 @@ function resolveUrl(url) {
   return `https://firebasestorage.googleapis.com/v0/b/${m[1]}/o/${m[2]}?alt=media`;
 }
 
-function toThumbUrl(resolvedUrl, size = '800x600') {
+function toThumbUrl(resolvedUrl, size = '800x800') {
   const m = resolvedUrl && resolvedUrl.match(/(https:\/\/firebasestorage\.googleapis\.com\/v0\/b\/[^/]+\/o\/)([^?]+)(\?alt=media)/);
   if (!m) return resolvedUrl;
   const p = decodeURIComponent(m[2]);
-  const lastSlash = p.lastIndexOf('/');
-  const dir = lastSlash >= 0 ? p.slice(0, lastSlash) : '';
-  const file = lastSlash >= 0 ? p.slice(lastSlash + 1) : p;
-  const dot = file.lastIndexOf('.');
-  const base = dot >= 0 ? file.slice(0, dot) : file;
-  const thumbPath = (dir ? dir + '/thumbs/' : 'thumbs/') + base + '_' + size + '.webp';
+  const dot = p.lastIndexOf('.');
+  const base = dot >= 0 ? p.slice(0, dot) : p;
+  const thumbPath = base + '_' + size + '.webp';
   const encoded = thumbPath.split('/').map(encodeURIComponent).join('%2F');
   return m[1] + encoded + m[3];
 }
@@ -73,6 +70,16 @@ function toThumbUrl(resolvedUrl, size = '800x600') {
 function imgSrc(url, size) {
   if (!url) return PLACEHOLDER_URL;
   return toThumbUrl(resolveUrl(url), size);
+}
+
+/** Vrátí "url1 400w, url2 800w, url3 1600w" srcset string z resolvedUrl. */
+function thumbSrcset(resolvedUrl) {
+  if (!resolvedUrl) return '';
+  return [
+    toThumbUrl(resolvedUrl, '400x400')   + ' 400w',
+    toThumbUrl(resolvedUrl, '800x800')   + ' 800w',
+    toThumbUrl(resolvedUrl, '1600x1600') + ' 1600w'
+  ].join(', ');
 }
 
 function plainText(html, max) {
@@ -162,14 +169,18 @@ function replaceListContainer(html, listClassMarker, newInnerHtml, extraAttr) {
 // ============================================================
 function buildClanekCard(d, i) {
   const href = `/blog/${d.slug}/`;
-  const src = d.imageUrl ? imgSrc(d.imageUrl, '800x600') : PLACEHOLDER_URL;
+  const resolved = d.imageUrl ? resolveUrl(d.imageUrl) : null;
+  const src = resolved ? toThumbUrl(resolved, '800x800') : PLACEHOLDER_URL;
+  const srcset = resolved ? thumbSrcset(resolved) : '';
+  const sizes = '(max-width: 767px) 100vw, (max-width: 991px) 50vw, 50vw';
+  const ssAttr = srcset ? ` srcset="${escapeAttr(srcset)}" sizes="${escapeAttr(sizes)}"` : '';
   const eager = i === 0;
   const fp = eager ? ' fetchpriority="high"' : '';
   const loading = eager ? 'eager' : 'lazy';
   return `
 <div role="listitem" class="collection-blog-item w-dyn-item">
   <a item="permalink" href="${escapeAttr(href)}" class="collection-item__card-blog w-inline-block">
-    <div class="card-blog__wrapper-image"><img item="featured-image" src="${escapeAttr(src)}" alt="${escapeAttr(d.titulek||'')}" width="800" height="600" loading="${loading}"${fp} class="wrapper-image__img"></div>
+    <div class="card-blog__wrapper-image"><img item="featured-image" src="${escapeAttr(src)}"${ssAttr} alt="${escapeAttr(d.titulek||'')}" width="800" height="600" loading="${loading}"${fp} class="wrapper-image__img"></div>
     <div class="card-blog__wrapper-text">
       <h2 item="title" class="wrapper--text__title">${escapeHtml(d.titulek||'')}</h2>
     </div>
@@ -185,7 +196,11 @@ function buildClanekCard(d, i) {
 
 function buildAkceCard(d, i) {
   const href = `/akce/${d.slug}/`;
-  const src = d.imageUrl ? imgSrc(d.imageUrl, '800x600') : PLACEHOLDER_URL;
+  const resolved = d.imageUrl ? resolveUrl(d.imageUrl) : null;
+  const src = resolved ? toThumbUrl(resolved, '800x800') : PLACEHOLDER_URL;
+  const srcset = resolved ? thumbSrcset(resolved) : '';
+  const sizes = '(max-width: 767px) 100vw, (max-width: 991px) 50vw, 25vw';
+  const ssAttr = srcset ? ` srcset="${escapeAttr(srcset)}" sizes="${escapeAttr(sizes)}"` : '';
   const eager = i === 0;
   const fp = eager ? ' fetchpriority="high"' : '';
   const loading = eager ? 'eager' : 'lazy';
@@ -203,7 +218,7 @@ function buildAkceCard(d, i) {
     </div>
     <div acf:text="akce-level" style="color:rgb(34,37,40)" class="akce-level">${escapeHtml(d.uroven||'')}</div>
     <div class="akce-image-blok">
-      <img item="featured-image" src="${escapeAttr(src)}" alt="${escapeAttr(d.nazev||'')}" width="800" height="600" loading="${loading}"${fp} class="image-55">
+      <img item="featured-image" src="${escapeAttr(src)}"${ssAttr} alt="${escapeAttr(d.nazev||'')}" width="800" height="600" loading="${loading}"${fp} class="image-55">
       <p item="excerpt" style="opacity:0" class="paragraph-2">${escapeHtml(excerpt)}</p>
     </div>
     <div style="color:rgb(255,255,255);background-color:rgb(45,96,171)" class="div-block-330">
@@ -220,15 +235,17 @@ function buildAkceCard(d, i) {
 // ============================================================
 // Listings — blog.html, akce-archive.html
 // ============================================================
-function injectPreloadHero(html, heroSrc) {
+function injectPreloadHero(html, heroSrc, opts) {
   if (!heroSrc) return html;
   // Idempotence: nejprve odstraň VŠECHNY existující preload-image tagy z <head>
-  // (staré běhy prerenderu nechávaly preloady akumulovat se před prvním <link>)
   const cleaned = html.replace(
-    /\n?\s*<link\s+rel="preload"\s+as="image"\s+href="[^"]*"\s+fetchpriority="[^"]*">\s*/gi,
+    /\n?\s*<link\s+rel="preload"\s+as="image"[^>]*>\s*/gi,
     ''
   );
-  const link = `<link rel="preload" as="image" href="${escapeAttr(heroSrc)}" fetchpriority="high">`;
+  const ss = (opts && opts.srcset)
+    ? ` imagesrcset="${escapeAttr(opts.srcset)}" imagesizes="${escapeAttr(opts.sizes || '100vw')}"`
+    : '';
+  const link = `<link rel="preload" as="image" href="${escapeAttr(heroSrc)}"${ss} fetchpriority="high">`;
   return cleaned.replace(/<head>([\s\S]*?)<link/, (m, headInner) => {
     return `<head>${headInner}${link}\n  <link`;
   });
@@ -244,7 +261,11 @@ function prerenderBlogListing(html, clanky) {
   }
   let out = result.html;
   if (top12[0] && top12[0].imageUrl) {
-    out = injectPreloadHero(out, imgSrc(top12[0].imageUrl, '800x600'));
+    const r = resolveUrl(top12[0].imageUrl);
+    out = injectPreloadHero(out, toThumbUrl(r, '800x800'), {
+      srcset: thumbSrcset(r),
+      sizes: '(max-width: 767px) 100vw, (max-width: 991px) 50vw, 50vw'
+    });
   }
   return out;
 }
@@ -258,7 +279,11 @@ function prerenderAkceListing(html, akceTop12) {
   }
   let out = result.html;
   if (akceTop12[0] && akceTop12[0].imageUrl) {
-    out = injectPreloadHero(out, imgSrc(akceTop12[0].imageUrl, '800x600'));
+    const r = resolveUrl(akceTop12[0].imageUrl);
+    out = injectPreloadHero(out, toThumbUrl(r, '800x800'), {
+      srcset: thumbSrcset(r),
+      sizes: '(max-width: 767px) 100vw, (max-width: 991px) 50vw, 25vw'
+    });
   }
   return out;
 }
@@ -326,7 +351,7 @@ function setItemElementContent(html, tagName, itemName, innerHtml) {
   return { html: newHead + tail, replaced };
 }
 
-function setItemImg(html, itemName, src, alt, w, h, fetchPriority) {
+function setItemImg(html, itemName, src, alt, w, h, fetchPriority, srcsetOpts) {
   // Match jen PRVNÍ výskyt v HEAD části (před related-posts/galerie)
   const { head, tail } = splitScope(html);
   // Match celý <img ... item="X" ... > tag jako jeden blok, pak rebuild atributů
@@ -337,6 +362,8 @@ function setItemImg(html, itemName, src, alt, w, h, fetchPriority) {
     let attrs = attrsStr;
     // Drop původní src/alt, sym-bind, w-dyn-bind-empty class fragment
     attrs = attrs.replace(/\s+src="[^"]*"/g, '');
+    attrs = attrs.replace(/\s+srcset="[^"]*"/gi, '');
+    attrs = attrs.replace(/\s+sizes="[^"]*"/gi, '');
     attrs = attrs.replace(/\s+alt="[^"]*"/g, '');
     attrs = attrs.replace(/\s+sym-bind="[^"]*"/g, '');
     attrs = attrs.replace(/\s+loading="[^"]*"/g, '');
@@ -348,7 +375,10 @@ function setItemImg(html, itemName, src, alt, w, h, fetchPriority) {
     const wh = (w && h) ? ` width="${w}" height="${h}"` : '';
     const fp = fetchPriority ? ` fetchpriority="${fetchPriority}"` : '';
     const loading = fetchPriority === 'high' ? ' loading="eager"' : ' loading="lazy"';
-    return `<img src="${escapeAttr(src)}" alt="${escapeAttr(alt||'')}"${loading}${wh}${fp}${attrs.replace(/\s+/g, ' ').replace(/\s+$/, '')}>`;
+    const ss = (srcsetOpts && srcsetOpts.srcset)
+      ? ` srcset="${escapeAttr(srcsetOpts.srcset)}" sizes="${escapeAttr(srcsetOpts.sizes || '100vw')}"`
+      : '';
+    return `<img src="${escapeAttr(src)}"${ss} alt="${escapeAttr(alt||'')}"${loading}${wh}${fp}${attrs.replace(/\s+/g, ' ').replace(/\s+$/, '')}>`;
   });
   return newHead + tail;
 }
@@ -393,8 +423,11 @@ function prerenderClanekDetail(template, d) {
   html = setMeta(html, 'twitter:image', hero);
   html = setCanonical(html, url);
   // Preload hero
-  const heroThumb = heroOrig ? imgSrc(heroOrig, '800x600') : null;
-  if (heroThumb) html = injectPreloadHero(html, heroThumb);
+  const heroResolved = heroOrig ? resolveUrl(heroOrig) : null;
+  const heroThumb = heroResolved ? toThumbUrl(heroResolved, '800x800') : null;
+  const heroSrcset = heroResolved ? thumbSrcset(heroResolved) : '';
+  const heroSizes = '(max-width: 991px) 100vw, 1280px';
+  if (heroThumb) html = injectPreloadHero(html, heroThumb, { srcset: heroSrcset, sizes: heroSizes });
 
   // JSON-LD
   const articleSchema = {
@@ -428,7 +461,7 @@ function prerenderClanekDetail(template, d) {
   html = setItemElementContent(html, 'div', 'author-display-name', escapeHtml(d.autor || '')).html;
   html = setItemElementContent(html, 'div', 'content', resolveContentUrls(ensureHtml(processWpContent(d.obsah)))).html;
   if (heroThumb) {
-    html = setItemImg(html, 'featured-image', heroThumb, titulek, 1280, 720, 'high');
+    html = setItemImg(html, 'featured-image', heroThumb, titulek, 1280, 720, 'high', { srcset: heroSrcset, sizes: heroSizes });
   }
 
   // Označit pre-rendered (cms-loader.js to detekuje)
@@ -459,8 +492,11 @@ function prerenderAkceDetail(template, d) {
   html = setMeta(html, 'twitter:description', desc);
   html = setMeta(html, 'twitter:image', hero);
   html = setCanonical(html, url);
-  const heroThumb = heroOrig ? imgSrc(heroOrig, '800x600') : null;
-  if (heroThumb) html = injectPreloadHero(html, heroThumb);
+  const heroResolved = heroOrig ? resolveUrl(heroOrig) : null;
+  const heroThumb = heroResolved ? toThumbUrl(heroResolved, '800x800') : null;
+  const heroSrcset = heroResolved ? thumbSrcset(heroResolved) : '';
+  const heroSizes = '(max-width: 991px) 100vw, 1280px';
+  if (heroThumb) html = injectPreloadHero(html, heroThumb, { srcset: heroSrcset, sizes: heroSizes });
 
   const eventSchema = {
     '@context':'https://schema.org','@type':'Event',
@@ -504,7 +540,7 @@ function prerenderAkceDetail(template, d) {
   html = setItemElementContent(html, 'h2', 'title', escapeHtml(nazev)).html;
   html = setItemElementContent(html, 'div', 'content', resolveContentUrls(ensureHtml(d.popis))).html;
   if (heroThumb) {
-    html = setItemImg(html, 'featured-image', heroThumb, nazev, 1280, 720, 'high');
+    html = setItemImg(html, 'featured-image', heroThumb, nazev, 1280, 720, 'high', { srcset: heroSrcset, sizes: heroSizes });
   }
   html = html.replace(/<html\b/, '<html data-prerendered="true"');
   return html;

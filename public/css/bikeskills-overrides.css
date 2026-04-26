@@ -46,6 +46,14 @@
  *    Sticky je v normal flow → display:none→flex přidá 100vh k page height,
  *    což může u Lighthouse způsobit indirect layout shift hero-home-v2.
  *  - Override na `position:fixed` ho dostane mimo flow → 0 layout impact.
+ *
+ * UX fix (2026-04-25):
+ *  - Webflow má `.cookie{height:100vh; background:#222528cc}` → tmavý
+ *    fullscreen overlay přes celý web, blokuje interakci. Špatné UX
+ *    a mimo aktuální best-practice (cookie-wall je pod GDPR problematická).
+ *  - Override: height:auto, bg:transparent, fixed bottom 0 — zůstane
+ *    jen žlutá .gdrp-section dole, web je plně použitelný i bez kliknutí
+ *    PŘIJÍMÁM. Necháváme původní z-index 99999, aby lišta byla nad obsahem.
  * ============================================================ */
 .cookie {
   display: none !important;
@@ -53,6 +61,38 @@
 html.cookies-show .cookie {
   display: flex !important;
   position: fixed !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  top: auto !important;
+  height: auto !important;
+  min-height: 0 !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+  pointer-events: none !important;  /* prázdná plocha kolem .gdrp-section neblokuje klik */
+  overflow: visible !important;
+}
+html.cookies-show .cookie .gdrp-section,
+html.cookies-show .cookie .product-wrap,
+html.cookies-show .cookie .close-btn,
+html.cookies-show .cookie .banner-close-card,
+html.cookies-show .cookie a {
+  pointer-events: auto !important;  /* uvnitř lišty klik funguje normálně */
+}
+
+/* ODMÍTNOUT button — outline secondary, vedle PŘIJÍMÁM.
+ * GDPR/ÚOOÚ: reject musí být stejně viditelný a snadno klikatelný
+ * jako accept. Stejný shape, stejné padding, jen invertované barvy
+ * (transparent bg + black border vs. black bg + light border u accept). */
+html.cookies-show .cookie .bs-reject-btn {
+  background-color: transparent !important;
+  color: var(--black, #1a1a1a) !important;
+  border: 2px solid var(--black, #1a1a1a) !important;
+  margin-right: 12px !important;  /* menší mezera mezi ODMÍTNOUT a PŘIJÍMÁM */
+}
+html.cookies-show .cookie .bs-reject-btn:hover {
+  background-color: var(--black, #1a1a1a) !important;
+  color: var(--bílo-seda, #f5f5f5) !important;
 }
 
 /* ============================================================

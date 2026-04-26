@@ -464,10 +464,16 @@ function renderAkceItem(template, data) {
 
   const imgEl = item.querySelector('[item="featured-image"], img.image-55');
   if (imgEl) {
-    imgEl.src = data.imageUrl ? resolveUrl(data.imageUrl) : PLACEHOLDER_URL;
+    if (data.imageUrl) {
+      setImgWithThumb(imgEl, resolveUrl(data.imageUrl), {
+        sizes: '(max-width: 767px) 100vw, (max-width: 991px) 50vw, 25vw'
+      });
+    } else {
+      imgEl.src = PLACEHOLDER_URL;
+      imgEl.onerror = makeImgErrorHandler();
+    }
     imgEl.alt = data.nazev || '';
     imgEl.width = 800; imgEl.height = 600;
-    imgEl.onerror = makeImgErrorHandler();
     imgEl.classList.remove('w-dyn-bind-empty');
   }
 
@@ -676,35 +682,59 @@ const PLACEHOLDER_URL = 'https://firebasestorage.googleapis.com/v0/b/bikeskills-
 
 /**
  * Transformuje Storage URL na thumbnail generovaný Firebase Extension "Resize Images".
- * Výstup: {dir}/thumbs/{name}_{size}.webp — public read, bez tokenu.
+ * Výstup: stejný folder jako originál, název s `_{w}x{h}.webp` suffixem.
+ * (Odpovídá Firebase ext. parametru RESIZED_IMAGES_PATH=prázdný + IMG_TYPE=webp.)
  * Pokud thumb neexistuje, onerror handler nastaví src zpět na originál.
  */
-function toThumbUrl(resolvedUrl, size = '800x600') {
+function toThumbUrl(resolvedUrl, size = '800x800') {
   const m = resolvedUrl.match(/(https:\/\/firebasestorage\.googleapis\.com\/v0\/b\/[^/]+\/o\/)([^?]+)(\?alt=media)/);
   if (!m) return resolvedUrl;
   const path = decodeURIComponent(m[2]);
-  const lastSlash = path.lastIndexOf('/');
-  const dir = lastSlash >= 0 ? path.slice(0, lastSlash) : '';
-  const file = lastSlash >= 0 ? path.slice(lastSlash + 1) : path;
-  const dot = file.lastIndexOf('.');
-  const base = dot >= 0 ? file.slice(0, dot) : file;
-  const thumbPath = (dir ? dir + '/thumbs/' : 'thumbs/') + base + '_' + size + '.webp';
+  const dot = path.lastIndexOf('.');
+  const base = dot >= 0 ? path.slice(0, dot) : path;
+  const thumbPath = base + '_' + size + '.webp';
   const encoded = thumbPath.split('/').map(encodeURIComponent).join('%2F');
   return m[1] + encoded + m[3];
 }
 
+/** Default srcset varianty pro Firebase Image Resize ext (IMG_SIZES=400x400,800x800,1600x1600) */
+const DEFAULT_THUMB_VARIANTS = [
+  { size: '400x400',   width: 400  },
+  { size: '800x800',   width: 800  },
+  { size: '1600x1600', width: 1600 }
+];
+
 /**
- * Nastaví img src + srcset na thumbnaily; při chybě přepne na originál.
- * srcset: 400x300 pro mobil (< 767px), 800x600 pro desktop.
+ * Nastaví img src + srcset na thumbnaily; při chybě (missing thumb) přepne na originál.
+ * Default sizes attribute pokrývá mobile/tablet/desktop layout.
  * Lightbox čte data-full-url = originál v plné kvalitě.
+ *
+ * @param {HTMLImageElement} imgEl
+ * @param {string} origUrl  Vyřešená Storage URL (resolveUrl-applied).
+ * @param {object} [opts]
+ * @param {Array<{size:string,width:number}>} [opts.variants]  srcset varianty
+ * @param {string} [opts.fallbackSize]  src fallback když browser srcset neumí
+ * @param {string} [opts.sizes]  HTML sizes attribute
  */
-function setImgWithThumb(imgEl, origUrl) {
-  const thumb800 = toThumbUrl(origUrl, '800x600');
-  imgEl.src = thumb800;
+function setImgWithThumb(imgEl, origUrl, opts) {
+  opts = opts || {};
+  const variants = opts.variants || DEFAULT_THUMB_VARIANTS;
+  const fallbackSize = opts.fallbackSize || '800x800';
+  const sizes = opts.sizes || '(max-width: 767px) 400px, (max-width: 991px) 800px, 1600px';
+  const srcset = variants.map(v => toThumbUrl(origUrl, v.size) + ' ' + v.width + 'w').join(', ');
+  imgEl.src = toThumbUrl(origUrl, fallbackSize);
+  imgEl.srcset = srcset;
+  imgEl.sizes = sizes;
   imgEl.setAttribute('data-full-url', origUrl);
   imgEl.onerror = function() {
-    if (this.src !== origUrl) { this.src = origUrl; this.onerror = makeImgErrorHandler(); }
-    else showImgPlaceholder(this);
+    if (this.src !== origUrl) {
+      this.removeAttribute('srcset');
+      this.removeAttribute('sizes');
+      this.src = origUrl;
+      this.onerror = makeImgErrorHandler();
+    } else {
+      showImgPlaceholder(this);
+    }
   };
 }
 
@@ -1030,10 +1060,16 @@ async function loadAkceDetail(slug) {
 
     const imgEl = item.querySelector('img[item="featured-image"]');
     if (imgEl) {
-      imgEl.src = data.imageUrl ? resolveUrl(data.imageUrl) : PLACEHOLDER_URL;
+      if (data.imageUrl) {
+        setImgWithThumb(imgEl, resolveUrl(data.imageUrl), {
+          sizes: '(max-width: 991px) 100vw, 1280px'
+        });
+      } else {
+        imgEl.src = PLACEHOLDER_URL;
+        imgEl.onerror = makeImgErrorHandler();
+      }
       imgEl.alt = data.nazev || '';
       imgEl.width = 1280; imgEl.height = 720;
-      imgEl.onerror = makeImgErrorHandler();
       imgEl.classList.remove('w-dyn-bind-empty');
     }
 
@@ -1127,10 +1163,16 @@ function renderClanekItem(template, data) {
 
   const imgEl = item.querySelector('[item="featured-image"], .wrapper-image__img');
   if (imgEl) {
-    imgEl.src = data.imageUrl ? resolveUrl(data.imageUrl) : PLACEHOLDER_URL;
+    if (data.imageUrl) {
+      setImgWithThumb(imgEl, resolveUrl(data.imageUrl), {
+        sizes: '(max-width: 767px) 100vw, (max-width: 991px) 50vw, 50vw'
+      });
+    } else {
+      imgEl.src = PLACEHOLDER_URL;
+      imgEl.onerror = makeImgErrorHandler();
+    }
     imgEl.alt = data.titulek || '';
     imgEl.width = 800; imgEl.height = 600;
-    imgEl.onerror = makeImgErrorHandler();
     imgEl.classList.remove('w-dyn-bind-empty');
   }
 
@@ -1330,9 +1372,11 @@ async function loadClanekDetail(slug) {
       const imgEl = document.querySelector('.div-block-324 img[item="featured-image"], img[item="featured-image"].image-53');
       if (imgEl) {
         if (data.imageUrl) {
-          imgEl.src = resolveUrl(data.imageUrl); imgEl.alt = data.titulek || '';
+          setImgWithThumb(imgEl, resolveUrl(data.imageUrl), {
+            sizes: '(max-width: 991px) 100vw, 1280px'
+          });
+          imgEl.alt = data.titulek || '';
           imgEl.width = 1280; imgEl.height = 720;
-          imgEl.onerror = makeImgErrorHandler();
           imgEl.classList.remove('w-dyn-bind-empty');
           const wrap = imgEl.parentElement;
           if (wrap) wrap.style.display = '';
@@ -1453,10 +1497,16 @@ function renderTeamItem(template, data) {
 
   const imgEl = item.querySelector('[item="featured-image"], .image-49');
   if (imgEl) {
-    imgEl.src = data.imageUrl ? resolveUrl(data.imageUrl) : PLACEHOLDER_URL;
+    if (data.imageUrl) {
+      setImgWithThumb(imgEl, resolveUrl(data.imageUrl), {
+        sizes: '(max-width: 767px) 50vw, (max-width: 991px) 33vw, 25vw'
+      });
+    } else {
+      imgEl.src = PLACEHOLDER_URL;
+      imgEl.onerror = makeImgErrorHandler();
+    }
     imgEl.alt = data.jmeno || '';
     imgEl.width = 800; imgEl.height = 1000;
-    imgEl.onerror = makeImgErrorHandler();
     imgEl.classList.remove('w-dyn-bind-empty');
   }
 
@@ -1526,10 +1576,16 @@ async function loadTeamDetail(slug) {
     // Hlavní fotka
     const imgEl = container.querySelector('img[item="featured-image"]');
     if (imgEl) {
-      imgEl.src = data.imageUrl ? resolveUrl(data.imageUrl) : PLACEHOLDER_URL;
+      if (data.imageUrl) {
+        setImgWithThumb(imgEl, resolveUrl(data.imageUrl), {
+          sizes: '(max-width: 767px) 100vw, 800px'
+        });
+      } else {
+        imgEl.src = PLACEHOLDER_URL;
+        imgEl.onerror = makeImgErrorHandler();
+      }
       imgEl.alt = data.jmeno || '';
       imgEl.width = 1280; imgEl.height = 1600;
-      imgEl.onerror = makeImgErrorHandler();
       imgEl.classList.remove('w-dyn-bind-empty');
     }
 
