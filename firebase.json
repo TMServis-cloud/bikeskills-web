@@ -492,6 +492,31 @@
         "source": "/galavecer-bigmat/",
         "destination": "/blog/galavecer-bigmat/",
         "type": 301
+      },
+      {
+        "source": "/product-tag/**",
+        "destination": "https://shop.bikeskills.cz/",
+        "type": 301
+      },
+      {
+        "source": "/shop-kategorie/**",
+        "destination": "https://shop.bikeskills.cz/",
+        "type": 301
+      },
+      {
+        "source": "/produkt/**",
+        "destination": "https://shop.bikeskills.cz/",
+        "type": 301
+      },
+      {
+        "source": "/velikost/**",
+        "destination": "https://shop.bikeskills.cz/",
+        "type": 301
+      },
+      {
+        "source": "/shop",
+        "destination": "https://shop.bikeskills.cz/",
+        "type": 301
       }
     ],
     "rewrites": [
