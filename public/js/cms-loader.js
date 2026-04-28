@@ -883,7 +883,10 @@ async function loadAkceList() {
 
     if (prerenderedList && currentAkcePage === 1 &&
         akceYearFilter === 'all' && akceZamereniFilter === 'all' && akceCenaFilter === 'all') {
-      // Pre-rendered DOM už zobrazuje prvních 12 — jen napojit filtry/paginaci
+      // Pre-rendered DOM už zobrazuje prvních 12 — jen napojit filtry/paginaci.
+      // Webflow .w-dyn-empty je v sablone defaultne viditelny ("No items found"),
+      // pri prerenderu mame items takze ho skryjeme.
+      toggleEmpty(emptyEl, true);
       buildAkceFilterBar(_akceFilterBar, _akceYears, _akceTypy);
       updatePaginationState(_akcePrevBtn, _akceNextBtn, currentAkcePage, getFilteredAkce().length);
     } else {
@@ -1311,7 +1314,10 @@ async function loadClankyList() {
     _clankyYears = Array.from(yearSet).sort((a, b) => b - a);
 
     if (prerenderedList && currentClankyPage === 1 && clankyYearFilter === 'all') {
-      // Pre-rendered DOM už zobrazuje prvních 12 — jen napojit filtry/paginaci
+      // Pre-rendered DOM už zobrazuje prvních 12 — jen napojit filtry/paginaci.
+      // Webflow .w-dyn-empty je v sablone defaultne viditelny ("No items found"),
+      // pri prerenderu mame items takze ho skryjeme.
+      toggleEmpty(emptyEl, true);
       buildClankyFilterBar(_clankyFilterBar, _clankyYears);
       updatePaginationState(_clankyPrevBtn, _clankyNextBtn, currentClankyPage, getFilteredClanky().length);
     } else {
