@@ -62,6 +62,69 @@ auth.onAuthStateChanged(user => {
   }
 });
 
+// ============================================================
+// HTML SOURCE EDITOR - prepinac pro primou editaci HTML kodu obsahu
+// ============================================================
+function attachHtmlSourceButton(quill) {
+  if (!quill) return;
+  const toolbarEl = quill.getModule('toolbar').container;
+  if (!toolbarEl || toolbarEl.querySelector('.ql-html-source')) return;
+
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'ql-html-source';
+  btn.title = 'Editovat HTML zdrojovy kod';
+  btn.innerHTML = '<svg viewBox="0 0 18 18" width="18" height="18" fill="none"><polyline class="ql-stroke" points="6 13 3 9 6 5" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/><polyline class="ql-stroke" points="12 5 15 9 12 13" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>';
+
+  // Vlozit jako posledni
+  const lastGroup = toolbarEl.querySelector('.ql-formats:last-child') || toolbarEl;
+  const wrap = document.createElement('span');
+  wrap.className = 'ql-formats';
+  wrap.appendChild(btn);
+  toolbarEl.appendChild(wrap);
+
+  btn.addEventListener('click', () => openHtmlSourceModal(quill));
+}
+
+function openHtmlSourceModal(quill) {
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9999;display:flex;align-items:center;justify-content:center;padding:24px;';
+  overlay.innerHTML = `
+    <div style="background:#1e2021;color:#d0d3c9;border-radius:8px;width:100%;max-width:900px;max-height:90vh;display:flex;flex-direction:column;border:1px solid #545a4f;overflow:hidden;">
+      <div style="padding:16px 20px;border-bottom:1px solid #545a4f;display:flex;justify-content:space-between;align-items:center;">
+        <strong>HTML zdrojovy kod</strong>
+        <button type="button" id="html-src-close" style="background:transparent;border:none;color:#d0d3c9;font-size:24px;cursor:pointer;line-height:1;">&times;</button>
+      </div>
+      <textarea id="html-src-textarea" style="flex:1;min-height:400px;padding:16px 20px;background:#11141a;color:#d0d3c9;border:none;font-family:'SF Mono',Menlo,Consolas,monospace;font-size:13px;line-height:1.5;resize:none;outline:none;tab-size:2;" spellcheck="false"></textarea>
+      <div style="padding:12px 20px;border-top:1px solid #545a4f;display:flex;justify-content:space-between;align-items:center;gap:12px;">
+        <small style="color:#9ca3af;">Tip: barvu textu nastav primo pres atribut <code style="background:#11141a;padding:1px 4px;border-radius:3px;">style="color: #ffffff"</code></small>
+        <div style="display:flex;gap:8px;">
+          <button type="button" id="html-src-cancel" style="padding:8px 16px;background:transparent;border:1.5px solid #545a4f;color:#d0d3c9;border-radius:4px;cursor:pointer;">Zrusit</button>
+          <button type="button" id="html-src-apply" style="padding:8px 16px;background:#2d60ab;border:none;color:#fff;border-radius:4px;cursor:pointer;font-weight:600;">Pouzit</button>
+        </div>
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+
+  const ta = overlay.querySelector('#html-src-textarea');
+  // Naplnit aktualnim HTML obsahem editoru
+  ta.value = quill.root.innerHTML;
+  ta.focus();
+
+  const close = () => overlay.remove();
+  overlay.querySelector('#html-src-close').addEventListener('click', close);
+  overlay.querySelector('#html-src-cancel').addEventListener('click', close);
+  overlay.addEventListener('click', e => { if (e.target === overlay) close(); });
+  overlay.querySelector('#html-src-apply').addEventListener('click', () => {
+    // Pouzit clipboard.dangerouslyPasteHTML aby Quill spravne reparsoval HTML
+    // a vytvoril platnou Delta strukturu (nezbytne pro spravnou ulozeni do Firestore).
+    quill.clipboard.dangerouslyPasteHTML(ta.value);
+    close();
+  });
+}
+
+
 function showLogin() {
   document.getElementById('login-screen').style.display = 'flex';
   document.getElementById('admin-dashboard').style.display = 'none';
@@ -94,9 +157,17 @@ function showDashboard(user) {
     };
   }
 
+  // Predefinovane barvy odpovidaji firemnim akcentum + bezne pouzivane svetle barvy
+  // pro tmave pozadi blogu
+  const PALETTE = [
+    '#ffffff', '#efc101', '#2d60ab', '#22c55e',  // bila, zluta logo, modra, zelena
+    '#ef4444', '#f97316', '#a855f7', '#ec4899',  // cervena, oranzova, fialova, ruzova
+    '#1f1f1f', '#545a4f', '#9ca3af', '#d0d3c9'   // tmave odstiny + sedotonove
+  ];
   const toolbarOptions = [
     [{ 'header': [1, 2, 3, false] }],
     ['bold', 'italic', 'underline', 'strike'],
+    [{ 'color': PALETTE }, { 'background': PALETTE }],
     [{ 'list': 'ordered' }, { 'list': 'bullet' }],
     ['link', 'image'],
     ['blockquote'],
@@ -132,6 +203,11 @@ function showDashboard(user) {
     });
     quillTeamPopis.getModule('toolbar').addHandler('image', makeQuillImageHandler(quillTeamPopis, 'team/content'));
   }
+
+  // Pridat tlacitko "Zdrojovy HTML kod" ke vsem editorum
+  attachHtmlSourceButton(quillEditor);
+  attachHtmlSourceButton(quillAkcePopis);
+  attachHtmlSourceButton(quillTeamPopis);
 
   // Load data
   loadAkce();
