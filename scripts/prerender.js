@@ -298,11 +298,22 @@ function prerenderAkceListing(html, akceTop12) {
 // ============================================================
 function setMeta(html, prop, value, by) {
   const attr = by === 'name' ? 'name' : 'property';
-  const re = new RegExp(`(<meta[^>]*\\b${attr}="${prop}"[^>]*\\bcontent=")[^"]*("[^>]*>)`);
-  if (re.test(html)) {
-    return html.replace(re, `$1${escapeAttr(value)}$2`);
+  // Najit meta tag s danou property/name v libovolnem poradi atributu.
+  // Webflow generuje <meta content="..." property="...">, my musime obe poradi prepsat.
+  const tagRe = new RegExp(`<meta\\b[^>]*\\b${attr}="${prop}"[^>]*>`, 'i');
+  const m = html.match(tagRe);
+  if (m) {
+    const oldTag = m[0];
+    let newTag;
+    if (/\bcontent="[^"]*"/.test(oldTag)) {
+      newTag = oldTag.replace(/\bcontent="[^"]*"/, `content="${escapeAttr(value)}"`);
+    } else {
+      // Pokud content atribut chybi, vloz ho pred uzavreni tagu
+      newTag = oldTag.replace(/\s*\/?>$/, ` content="${escapeAttr(value)}">`);
+    }
+    return html.replace(oldTag, newTag);
   }
-  // Pokud meta neexistuje, vlož ji za <title>
+  // Pokud meta neexistuje vubec, vloz ji za <title>
   return html.replace(/(<title>[^<]*<\/title>)/, `$1\n  <meta ${attr}="${prop}" content="${escapeAttr(value)}">`);
 }
 
@@ -412,7 +423,9 @@ function prerenderClanekDetail(template, d) {
     ? new Date(d.datumZmeny.seconds ? d.datumZmeny.seconds * 1000 : d.datumZmeny).toISOString()
     : datumISO;
   const galerie = (d.galerie && d.galerie.length) ? d.galerie.filter(Boolean) : [];
-  const heroOrig = galerie[0] || d.imageUrl;
+  // Pro hero/og:image preferujeme uvodni obrazek clanku (d.imageUrl) pred prvni fotkou galerie.
+  // Uvodni obrazek je co admin vybere v "Hlavni obrazek" - i tady je videt ve sdileni na FB.
+  const heroOrig = d.imageUrl || galerie[0];
   const hero = heroOrig ? resolveUrl(heroOrig) : `${BASE_URL}/images/og-image.jpg`;
   const desc = plainText(d.popis || d.perex, 160);
 
