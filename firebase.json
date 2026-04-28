@@ -6,7 +6,8 @@
       "firebase.json",
       "**/.*",
       "**/node_modules/**",
-      "**/*.bak"
+      "**/*.bak",
+      "**/blog/*/index.html"
     ],
     "redirects": [
       {
@@ -521,6 +522,20 @@
       }
     ],
     "rewrites": [
+      {
+        "source": "/blog/*/",
+        "function": {
+          "functionId": "serveBlogDetail",
+          "region": "europe-west1"
+        }
+      },
+      {
+        "source": "/blog/*",
+        "function": {
+          "functionId": "serveBlogDetail",
+          "region": "europe-west1"
+        }
+      },
       {
         "source": "/blog/**",
         "destination": "/detail_post.html"
