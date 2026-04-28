@@ -469,6 +469,10 @@ function renderAkceItem(template, data) {
         sizes: '(max-width: 767px) 100vw, (max-width: 991px) 50vw, 25vw'
       });
     } else {
+      imgEl.removeAttribute('onerror');
+      imgEl.removeAttribute('srcset');
+      imgEl.removeAttribute('sizes');
+      imgEl.removeAttribute('data-full-url');
       imgEl.src = PLACEHOLDER_URL;
       imgEl.onerror = makeImgErrorHandler();
     }
@@ -722,6 +726,12 @@ function setImgWithThumb(imgEl, origUrl, opts) {
   const fallbackSize = opts.fallbackSize || '800x800';
   const sizes = opts.sizes || '(max-width: 767px) 400px, (max-width: 991px) 800px, 1600px';
   const srcset = variants.map(v => toThumbUrl(origUrl, v.size) + ' ' + v.width + 'w').join(', ');
+  // Cleanup atributu z prerendered template (cloneNode zachova puvodni inline onerror,
+  // srcset a sizes - bez ocisteni interferuji s novymi hodnotami a v archivu se pak
+  // u vsech karet ukaze obrazek z templatu misto vlastniho).
+  imgEl.removeAttribute("onerror");
+  imgEl.removeAttribute("srcset");
+  imgEl.removeAttribute("sizes");
   imgEl.src = toThumbUrl(origUrl, fallbackSize);
   imgEl.srcset = srcset;
   imgEl.sizes = sizes;
@@ -1065,6 +1075,10 @@ async function loadAkceDetail(slug) {
           sizes: '(max-width: 991px) 100vw, 1280px'
         });
       } else {
+        imgEl.removeAttribute('onerror');
+        imgEl.removeAttribute('srcset');
+        imgEl.removeAttribute('sizes');
+        imgEl.removeAttribute('data-full-url');
         imgEl.src = PLACEHOLDER_URL;
         imgEl.onerror = makeImgErrorHandler();
       }
@@ -1168,6 +1182,13 @@ function renderClanekItem(template, data) {
         sizes: '(max-width: 767px) 100vw, (max-width: 991px) 50vw, 50vw'
       });
     } else {
+      // Cleanup atributu z prerendered template (cloneNode zachova puvodni inline onerror,
+      // srcset a sizes - bez ocisteni se v archivu u placeholder karty zobrazi obrazek
+      // z templatu misto sedeho placeholderu).
+      imgEl.removeAttribute('onerror');
+      imgEl.removeAttribute('srcset');
+      imgEl.removeAttribute('sizes');
+      imgEl.removeAttribute('data-full-url');
       imgEl.src = PLACEHOLDER_URL;
       imgEl.onerror = makeImgErrorHandler();
     }
@@ -1502,6 +1523,10 @@ function renderTeamItem(template, data) {
         sizes: '(max-width: 767px) 50vw, (max-width: 991px) 33vw, 25vw'
       });
     } else {
+      imgEl.removeAttribute('onerror');
+      imgEl.removeAttribute('srcset');
+      imgEl.removeAttribute('sizes');
+      imgEl.removeAttribute('data-full-url');
       imgEl.src = PLACEHOLDER_URL;
       imgEl.onerror = makeImgErrorHandler();
     }
@@ -1581,6 +1606,10 @@ async function loadTeamDetail(slug) {
           sizes: '(max-width: 767px) 100vw, 800px'
         });
       } else {
+        imgEl.removeAttribute('onerror');
+        imgEl.removeAttribute('srcset');
+        imgEl.removeAttribute('sizes');
+        imgEl.removeAttribute('data-full-url');
         imgEl.src = PLACEHOLDER_URL;
         imgEl.onerror = makeImgErrorHandler();
       }
