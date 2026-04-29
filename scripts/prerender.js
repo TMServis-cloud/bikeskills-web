@@ -87,6 +87,36 @@ function plainText(html, max) {
   return max && stripped.length > max ? stripped.substring(0, max - 1) + '…' : stripped;
 }
 
+/**
+ * Vrátí ISO datum YYYY-MM-DD pro Event.startDate, nebo null když nelze určit.
+ * Pořadí zdrojů: d.datum (Timestamp/ISO) → d.datumSort (YYYYMMDD) → parse "D.M.YYYY" z d.datumText.
+ */
+function computeAkceISOStart(d) {
+  if (d && d.datum) {
+    try {
+      const ms = d.datum.seconds ? d.datum.seconds * 1000 : d.datum;
+      const iso = new Date(ms).toISOString();
+      return iso.split('T')[0];
+    } catch (_) { /* fallthrough */ }
+  }
+  if (d && d.datumSort) {
+    const s = String(d.datumSort);
+    const m = s.match(/^(\d{4})(\d{2})(\d{2})$/);
+    if (m) return `${m[1]}-${m[2]}-${m[3]}`;
+  }
+  if (d && d.datumText) {
+    const t = String(d.datumText);
+    const m = t.match(/(\d{1,2})\.\s*(\d{1,2})\.\s*(\d{4})/);
+    if (m) {
+      const dd = m[1].padStart(2, '0');
+      const mm = m[2].padStart(2, '0');
+      return `${m[3]}-${mm}-${dd}`;
+    }
+  }
+  return null;
+}
+
+
 function ensureHtml(text) {
   if (!text) return '';
   if (/<[a-z][^>]*>/i.test(text)) return text;
@@ -496,9 +526,7 @@ function prerenderAkceDetail(template, d) {
   const hero = heroOrig ? resolveUrl(heroOrig) : `${BASE_URL}/images/og-image.jpg`;
   const desc = plainText(d.popis, 160);
   const labelTyp = resolveAkceLabel(d) || '';
-  const akceISOStart = d.datum
-    ? new Date(d.datum.seconds ? d.datum.seconds * 1000 : d.datum).toISOString().split('T')[0]
-    : null;
+  const akceISOStart = computeAkceISOStart(d);
 
   let html = template;
   html = setTitle(html, `${nazev} | BikeSkills`);
@@ -527,9 +555,11 @@ function prerenderAkceDetail(template, d) {
       address: { '@type':'PostalAddress', streetAddress:'Na Vyhlídce 285', addressLocality:'Tehov', postalCode:'25101', addressCountry:'CZ' } },
     organizer: { '@type':'Organization', name:'BikeSkills', url: BASE_URL }
   };
-  if (akceISOStart) eventSchema.startDate = akceISOStart;
-  if (d.cena) eventSchema.offers = { '@type':'Offer', price: String(d.cena), priceCurrency:'CZK', url, availability:'https://schema.org/InStock' };
-  html = injectJsonLd(html, eventSchema, 'event');
+  if (akceISOStart) {
+    eventSchema.startDate = akceISOStart;
+    if (d.cena) eventSchema.offers = { '@type':'Offer', price: String(d.cena), priceCurrency:'CZK', url, availability:'https://schema.org/InStock' };
+    html = injectJsonLd(html, eventSchema, 'event');
+  }
   html = injectJsonLd(html, {
     '@context':'https://schema.org','@type':'BreadcrumbList',
     itemListElement: [

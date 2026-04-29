@@ -194,6 +194,32 @@ function resolveAkceLabel(d) {
 }
 
 
+
+function computeAkceISOStart(data) {
+  if (data && data.datum) {
+    try {
+      var ms = data.datum.seconds ? data.datum.seconds * 1000 : data.datum;
+      var iso = new Date(ms).toISOString();
+      return iso.split('T')[0];
+    } catch (_) {}
+  }
+  if (data && data.datumSort) {
+    var s = String(data.datumSort);
+    var m = s.match(/^(\d{4})(\d{2})(\d{2})$/);
+    if (m) return m[1] + '-' + m[2] + '-' + m[3];
+  }
+  if (data && data.datumText) {
+    var t = String(data.datumText);
+    var m2 = t.match(/(\d{1,2})\.\s*(\d{1,2})\.\s*(\d{4})/);
+    if (m2) {
+      var dd = m2[1].length < 2 ? '0' + m2[1] : m2[1];
+      var mm = m2[2].length < 2 ? '0' + m2[2] : m2[2];
+      return m2[3] + '-' + mm + '-' + dd;
+    }
+  }
+  return null;
+}
+
 function injectJsonLd(schema, id) {
   const elId = id || 'json-ld-schema';
   const existing = document.getElementById(elId);
@@ -998,10 +1024,8 @@ async function loadAkceDetail(slug) {
     }
 
     setPageMeta(`${data.nazev} | BikeSkills`, data.popis, data.imageUrl, 'event');
-    // Datum na ISO 8601 (YYYY-MM-DD) pro schema.org
-    const akceISOStart = data.datum
-      ? new Date(data.datum.seconds ? data.datum.seconds * 1000 : data.datum).toISOString().split('T')[0]
-      : null;
+    // Datum na ISO 8601 (YYYY-MM-DD) pro schema.org (Event vyžaduje startDate)
+    const akceISOStart = computeAkceISOStart(data);
     const akceImage = (data.imageUrl ? resolveUrl(data.imageUrl) : 'https://bikeskills.cz/images/og-image.jpg');
     const eventSchema = {
       '@context': 'https://schema.org',
@@ -1029,17 +1053,19 @@ async function loadAkceDetail(slug) {
         'url': 'https://bikeskills.cz'
       }
     };
-    if (akceISOStart) eventSchema.startDate = akceISOStart;
-    if (data.cena) {
-      eventSchema.offers = {
-        '@type': 'Offer',
-        'price': String(data.cena),
-        'priceCurrency': 'CZK',
-        'url': window.location.href,
-        'availability': 'https://schema.org/InStock'
-      };
+    if (akceISOStart) {
+      eventSchema.startDate = akceISOStart;
+      if (data.cena) {
+        eventSchema.offers = {
+          '@type': 'Offer',
+          'price': String(data.cena),
+          'priceCurrency': 'CZK',
+          'url': window.location.href,
+          'availability': 'https://schema.org/InStock'
+        };
+      }
+      injectJsonLd(eventSchema);
     }
-    injectJsonLd(eventSchema);
     injectBreadcrumb([
       { name: 'Domů', item: 'https://bikeskills.cz/' },
       { name: 'Akce', item: 'https://bikeskills.cz/akce-archive' },
