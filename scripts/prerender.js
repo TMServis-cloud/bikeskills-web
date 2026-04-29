@@ -559,6 +559,19 @@ function prerenderAkceDetail(template, d) {
     eventSchema.startDate = akceISOStart;
     if (d.cena) eventSchema.offers = { '@type':'Offer', price: String(d.cena), priceCurrency:'CZK', url, availability:'https://schema.org/InStock' };
     html = injectJsonLd(html, eventSchema, 'event');
+  } else {
+    // Bez data → Course (kurz, opakující se / sezónní). Course nevyžaduje startDate.
+    const courseSchema = {
+      '@context': 'https://schema.org',
+      '@type': 'Course',
+      name: nazev,
+      description: plainText(d.popis, 300),
+      image: hero,
+      url,
+      provider: { '@type':'Organization', name:'BikeSkills', url: BASE_URL, sameAs: BASE_URL }
+    };
+    if (d.cena) courseSchema.offers = { '@type':'Offer', price: String(d.cena), priceCurrency:'CZK', url, availability:'https://schema.org/InStock' };
+    html = injectJsonLd(html, courseSchema, 'event');
   }
   html = injectJsonLd(html, {
     '@context':'https://schema.org','@type':'BreadcrumbList',

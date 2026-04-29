@@ -1065,6 +1065,32 @@ async function loadAkceDetail(slug) {
         };
       }
       injectJsonLd(eventSchema);
+    } else {
+      // Bez data → Course (opakující se / sezónní kurz)
+      const courseSchema = {
+        '@context': 'https://schema.org',
+        '@type': 'Course',
+        'name': data.nazev || '',
+        'description': (data.popis || '').replace(/<[^>]*>/g, '').trim().substring(0, 300),
+        'image': akceImage,
+        'url': window.location.href,
+        'provider': {
+          '@type': 'Organization',
+          'name': 'BikeSkills',
+          'url': 'https://bikeskills.cz',
+          'sameAs': 'https://bikeskills.cz'
+        }
+      };
+      if (data.cena) {
+        courseSchema.offers = {
+          '@type': 'Offer',
+          'price': String(data.cena),
+          'priceCurrency': 'CZK',
+          'url': window.location.href,
+          'availability': 'https://schema.org/InStock'
+        };
+      }
+      injectJsonLd(courseSchema);
     }
     injectBreadcrumb([
       { name: 'Domů', item: 'https://bikeskills.cz/' },
