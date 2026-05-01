@@ -553,11 +553,13 @@ function prerenderAkceDetail(template, d) {
     eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
     location: { '@type':'Place', name:'BikeSkills — Tehov / Říčany u Prahy',
       address: { '@type':'PostalAddress', streetAddress:'Na Vyhlídce 285', addressLocality:'Tehov', postalCode:'25101', addressCountry:'CZ' } },
-    organizer: { '@type':'Organization', name:'BikeSkills', url: BASE_URL }
+    organizer: { '@type':'Organization', name:'BikeSkills', url: BASE_URL },
+    performer: { '@type':'Organization', name:'BikeSkills', url: BASE_URL }
   };
   if (akceISOStart) {
     eventSchema.startDate = akceISOStart;
-    if (d.cena) eventSchema.offers = { '@type':'Offer', price: String(d.cena), priceCurrency:'CZK', url, availability:'https://schema.org/InStock' };
+    eventSchema.endDate = akceISOStart;
+    if (d.cena) eventSchema.offers = { '@type':'Offer', price: String(d.cena), priceCurrency:'CZK', url, availability:'https://schema.org/InStock', validFrom: akceISOStart };
     html = injectJsonLd(html, eventSchema, 'event');
   } else {
     // Bez data → Course (kurz, opakující se / sezónní). Course nevyžaduje startDate.
@@ -570,7 +572,10 @@ function prerenderAkceDetail(template, d) {
       url,
       provider: { '@type':'Organization', name:'BikeSkills', url: BASE_URL, sameAs: BASE_URL }
     };
-    if (d.cena) courseSchema.offers = { '@type':'Offer', price: String(d.cena), priceCurrency:'CZK', url, availability:'https://schema.org/InStock' };
+    if (d.cena) {
+      const todayIso = new Date().toISOString().split('T')[0];
+      courseSchema.offers = { '@type':'Offer', price: String(d.cena), priceCurrency:'CZK', url, availability:'https://schema.org/InStock', validFrom: todayIso };
+    }
     html = injectJsonLd(html, courseSchema, 'event');
   }
   html = injectJsonLd(html, {

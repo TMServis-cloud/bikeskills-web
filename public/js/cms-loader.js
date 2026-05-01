@@ -1051,17 +1051,24 @@ async function loadAkceDetail(slug) {
         '@type': 'Organization',
         'name': 'BikeSkills',
         'url': 'https://bikeskills.cz'
+      },
+      'performer': {
+        '@type': 'Organization',
+        'name': 'BikeSkills',
+        'url': 'https://bikeskills.cz'
       }
     };
     if (akceISOStart) {
       eventSchema.startDate = akceISOStart;
+      eventSchema.endDate = akceISOStart;
       if (data.cena) {
         eventSchema.offers = {
           '@type': 'Offer',
           'price': String(data.cena),
           'priceCurrency': 'CZK',
           'url': window.location.href,
-          'availability': 'https://schema.org/InStock'
+          'availability': 'https://schema.org/InStock',
+          'validFrom': akceISOStart
         };
       }
       injectJsonLd(eventSchema);
@@ -1082,12 +1089,14 @@ async function loadAkceDetail(slug) {
         }
       };
       if (data.cena) {
+        const todayIso = new Date().toISOString().split('T')[0];
         courseSchema.offers = {
           '@type': 'Offer',
           'price': String(data.cena),
           'priceCurrency': 'CZK',
           'url': window.location.href,
-          'availability': 'https://schema.org/InStock'
+          'availability': 'https://schema.org/InStock',
+          'validFrom': todayIso
         };
       }
       injectJsonLd(courseSchema);

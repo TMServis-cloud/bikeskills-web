@@ -659,3 +659,177 @@ Před implementací doporučuji:
 3. **Rozhodnout se pro variantu** (A / B / C / D). Po potvrzení připravím implementační plán a skripty.
 
 **Status:** analýza, neimplementováno. Čeká na rozhodnutí.
+
+
+---
+
+## Aktualizace 1. 5. 2026 — Optimalizační kolo 2
+
+**Kontext:** Mezi baseline (24. 4. 2026) a tímto kolem byla nasazena řada optimalizací (commits 06ec181 → 7a29567), takže i kdyby nedošlo k žádnému dalšímu zásahu, PSI metriky by se měly výrazně zlepšit oproti původnímu měření. Toto kolo (a) ověřuje stav v produkci, (b) identifikuje a opravuje skryté regrese, (c) dodává low-hanging-fruit zlepšení.
+
+### Co je v produkci nasazeno (od 25. 4.)
+
+Z `git log --since 25.4.` vyplývá, že byla provedena tato práce, kterou jsem ověřil curl-em proti živému webu:
+
+| Optimalizace | Kde | Ověření |
+|---|---|---|
+| **SSG / pre-render** listing kartiček (12 ks) | `blog.html`, `akce-archive.html` (commit `0e7129a` + `9fbd35f`) | `data-prerendered="true"` v HTML přímo z curl-u, žádné čekání na Firestore. |
+| **Hero LCP image** s `<link rel="preload"> + imagesrcset + fetchpriority="high"` | `<head>` všech listing stránek (commit `e2272a9` + `e963625`) | preload tag přítomen, image má `loading="eager" fetchpriority="high"`. |
+| **Responsive srcset** 400/800/1600 WebP | všechny listing kartičky (commit `0240917`) | `srcset` + `sizes` přítomen u 12 kartiček. |
+| **Cookie banner CLS fix** | `consent.js` + CSS (`a55e860`, `06ec181`, `4cb5660`, `12c3244`) | Banner má `display:none` výchozí, ukazuje se s 800 ms delay PO `window.load` přes třídu `cookies-show` na `<html>`. |
+| **Lobster font self-hosted + preload + display:optional** | listing stránky (`06ec181`) | `<link rel="preload" as="font">` na 2 woff2 soubory. |
+| **Lato + Montserrat lazy** přes `rel=preload as=style onload=this.rel='stylesheet'` | všechny stránky (`25b31c8`) | non-blocking pattern v HTML. |
+| **Brotli compression** | Firebase Hosting auto | `content-encoding: br` na `webflow.css` i `webflow.js` (ověřeno curl -I). |
+| **HSTS** `max-age=31556926` | Firebase auto | response header přítomen. |
+| **JSON-LD Course schema** pro kurzové stránky bez fixních datumů | prerenderer (`7a29567`) | nasazeno. |
+| **GDPR consent gating** GA4 + Meta Pixel | `consent.js` (`a55e860`) | trackery se nenačtou bez `cookieConsent=accepted`. |
+
+Tj. obě P1 položky z baseline byly mezitím adresovány na úrovni kódu. Praktickou efektivitu je ale nutné potvrdit svěží PSI měřením — viz „Limity tohoto kola".
+
+### Nově nalezený kritický problém — chybějící image variants
+
+**Spuštěný diagnostický nástroj:** `node scripts/diagnose-variants.js`
+
+**Nález:** Storage bucket `bikeskills-web.firebasestorage.app` má **13 originálních obrázků bez vygenerovaných WebP variant** `_400x400`, `_800x800`, `_1600x1600` (Firebase Image Resize Extension je nezpracovala — pravděpodobně extension queue selhal pro tyto konkrétní soubory). Per-year breakdown z diagnostického skriptu:
+
+```
+1776 (timestamp ~04/2026): 11 missing
+1777 (~04-05/2026):         0 missing
+2024 (legacy import):       1 missing (jeden 8.87 MB JPG)
+unknown (placeholder):      1 missing
+```
+
+**Proč to bolí LCP `/akce-archive` desktopu:**
+
+První karta v prerendered listingu (LCP element) odkazovala na `images/akce/1776888296311_trenink.webp`. HTML obsahoval:
+
+```html
+<link rel="preload" as="image"
+  href="…1776888296311_trenink_800x800.webp"   ← HTTP 404
+  imagesrcset="…_400x400.webp 400w, …_800x800.webp 800w, …_1600x1600.webp 1600w"  ← všechny 404
+  fetchpriority="high">
+```
+
+Browser tedy:
+
+1. Vystřelil `fetchpriority=high` request → **404** v ~50–200 ms (zbytečná kritická request).
+2. `<img>` srcset rovněž 404 → onerror handler odebere `srcset` → fallback na `src` (originál 309 KB, **nikoli** 800x800 verze ~150 KB).
+3. Originál se začne stahovat až **po** failure srcsetu, mimo preload prioritu.
+
+Při Lighthouse Slow 4G to znamená několik sekund navíc na LCP kvůli zbytečným retries + downloadu velké originály místo komprese.
+
+**Fix (proveden):** `node scripts/local-resize-fallback.js $(cat /tmp/missing-originals.txt)` — Sharp lokálně vygeneroval všech 13×3 = 39 chybějících variant a uploadnul je do Storage. Ověřeno curl-em — `1776888296311_trenink_400x400.webp`, `_800x800.webp`, `_1600x1600.webp` nyní vrací HTTP 200, `image/webp`, content-length 41/148/259 KB.
+
+**Seznam obnovených originálů:**
+
+```
+images/akce/1776888209747_trenink.webp                                  ← druhý akce hero
+images/akce/1776888296311_trenink.webp                                  ← /akce-archive LCP hero
+images/akce/gallery/1776888189537_trenink.webp                          ← gallery
+images/akce/gallery/1776945535669_…Kreslici-platno…                     ← gallery (3 ks)
+images/akce/gallery/1776945551758_…
+images/akce/gallery/1776945680823_…
+images/placeholder.webp                                                  ← fallback pro blog karty
+images/team/gallery/1776692843360_…20232663…                            ← team gallery (5 ks)
+images/team/gallery/1776692844619_…Rasochy-cup-6…
+images/team/gallery/1776692845843_…DSCN5501…
+images/team/gallery/1776692847023_…FB_IMG…
+images/team/gallery/1776692848440_…20180421-124130…
+wp-content/uploads/2024/12/20240427_102854.jpg                          ← legacy upload (8.87 MB)
+```
+
+**Riziko:** Nízké. Skript reprodukuje výstup Image Resize Extension (stejný formát názvů, stejná logika `fit:'inside', withoutEnlargement:true, quality:80`). Originální soubory zůstávají nedotčené.
+
+**Sekundární doporučení (nezavádět teď):** Sledovat, zda Image Resize Extension při dalších uploadech přes admin panel (Quill upload) opět nezapadne — pokud ano, doplnit do `admin.js` post-upload hook, který po nahrání do `images/akce/` nebo `images/blog/` zavolá triggeringovou logiku ručně, případně vyčte logy z extension queue. Diagnostický skript by měl běžet 1× měsíčně.
+
+### Security hygiene — security headers do `firebase.json`
+
+**Stav před:** Firebase auto-přidává `strict-transport-security` (HSTS) `max-age=31556926`. Žádné jiné security headers.
+
+**Změna:** přidán nový blok do `hosting.headers` aplikující se na `**/*`:
+
+```json
+{
+  "source": "**/*",
+  "headers": [
+    { "key": "X-Content-Type-Options", "value": "nosniff" },
+    { "key": "X-Frame-Options", "value": "SAMEORIGIN" },
+    { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
+    { "key": "Permissions-Policy", "value": "geolocation=(), microphone=(), camera=(), payment=(), usb=(), magnetometer=(), gyroscope=(), accelerometer=()" }
+  ]
+}
+```
+
+**Zdůvodnění voleb:**
+
+- **X-Content-Type-Options: nosniff** — zákaz MIME sniffingu (univerzálně doporučováno, žádné vedlejší efekty).
+- **X-Frame-Options: SAMEORIGIN** — povolen embed na vlastní doméně, blokován cross-origin (zabrání clickjackingu). `DENY` by zlomil potenciální vlastní iframe v admin UI; `SAMEORIGIN` je bezpečný kompromis.
+- **Referrer-Policy: strict-origin-when-cross-origin** — moderní default (Chrome už toto chování má, ale explicitní hlavička pomáhá Firefoxu/Safari starší verze).
+- **Permissions-Policy** — vypíná hardware API, která web nepoužívá. Neovlivní funkčnost partner widgetů (Comgate, Finsweet slider dots, Webflow IX2).
+
+**CSP záměrně NEPŘIDÁNO.** Web načítá dynamicky inline scripty (Webflow IX2, GA4 přes consent.js, Meta Pixel), inline styly a externí domény (Firebase, Google Fonts, gstatic, cloudfront). Smysluplná CSP by vyžadovala audit a `nonce`-based whitelisting — to je samostatná práce, ne low-hanging fruit. **Doporučuji odložit do dedikovaného sprintu** s testovací doménou a Report-Only fází.
+
+**Po deployi otestovat:**
+
+- `curl -I https://bikeskills.cz/` — měly by se objevit 4 nové hlavičky.
+- Mozilla Observatory `https://observatory.mozilla.org/analyze/bikeskills.cz` — očekávaný posun ze D/F na B (CSP chybí, takže A není dostupné).
+- Smoke test: navigace po webu, fungují cookie banner, GA load po accept, Webflow animace, Comgate redirect z patičky. Nic z toho není dotčeno přidanými hlavičkami.
+
+### Limity tohoto kola
+
+**PSI nezměřeno.** Důvody:
+
+1. **Anonymous PageSpeed Insights API quota = 0** — služba `pagespeedonline.googleapis.com` pro project 583797351490 vrací `RESOURCE_EXHAUSTED`. Memory záznam `project_bikeskills_psi_results.md` to potvrzuje.
+2. **Chrome MCP extension není připojen** — `mcp__Claude_in_Chrome__list_connected_browsers` vrátil `[]`. Naše plánovaná cesta přes `pagespeed.web.dev` UI tedy nelze spustit.
+3. **Bikeskills není v cowork-egress allowlistu pro browserless / WebPageTest** — pokus o jiný měřící endpoint by skončil stejně.
+
+**Co dělat dál:** Spustit PSI ručně z prohlížeče po deployi:
+
+- `https://pagespeed.web.dev/analysis?url=https%3A%2F%2Fbikeskills.cz%2Fakce-archive&hl=cs&form_factor=desktop`
+- `https://pagespeed.web.dev/analysis?url=https%3A%2F%2Fbikeskills.cz%2Fblog&hl=cs&form_factor=mobile`
+
+Zachytit screenshot a před/po porovnat s baseline tabulkou ze sekce „PageSpeed Insights baseline".
+
+### Očekávané dopady (kvalifikovaný odhad bez měření)
+
+| Stránka | Metrika | Baseline | Očekávaný pokles po nasazení | Zdroj zlepšení |
+|---|---|---:|---:|---|
+| `/blog` mobil | LCP | 22,6 s | **3–5 s** | SSG (eliminuje Firebase SDK + Firestore z kritické cesty), preload+fetchpriority, srcset, WebP |
+| `/akce-archive` desktop | LCP | 4,0 s | **1,5–2,5 s** | + dnešní fix variant (uvolní preload + správnou velikost přes srcset místo 309 KB originálu) |
+| `/akce-archive` desktop | CLS | 0,713 | **< 0,1** | Fix Akce zoomu (height:240px), font-display:optional, cookie banner ukázaný až po window.load+800ms |
+| Mobil TBT napříč | TBT | 290–620 ms | **150–350 ms** | Lobster preload (snížení FCP→LCP gap), méně dynamického DOM rebuiltu díky SSG |
+
+**Pozor:** Toto jsou modelové odhady ze změn v kódu, NE měřené hodnoty. Je nezbytné PSI manuálně přeměřit po dnešním deployi (image variants + security headers) a přepsat hodnoty v této tabulce skutečným naměřením.
+
+### Provedené změny v repu
+
+- `scripts/local-resize-fallback.js` (existoval) — spuštěn na 13 chybějících originálů. **Žádná změna kódu**, jen runtime invocation. Storage diff: +39 nových WebP souborů (suma ~3,5 MB).
+- `firebase.json` — přidán 4. blok do `hosting.headers` (řádky 590–608), 18 přidaných řádků JSON.
+- `SEO-AUDIT-2026-04.md` — tato sekce.
+
+### Co se NEdotklo (ale stojí za úvahu pro kolo 3)
+
+| Návrh | Riziko | Odhadovaný benefit | Proč ne teď |
+|---|---|---|---|
+| Critical CSS extrakce z `webflow.css` (205 KB → ~12 KB inline) | **Vysoké** — Webflow IX2 a animace závisí na celém stylesheetu. | Mobilní LCP −0,3–0,8 s | Vyžaduje regresní vizuální test napříč ~22 stránkami. Vyžaduje rozhodnutí uživatele. |
+| Trim `webflow.js` (2,4 MB → 800 KB) — odstranit unused moduly (commerce, lightbox) | **Vysoké** — slider, dropdown, IX2 mohou přestat fungovat. | TBT −150–300 ms | Nutný regresní test. Vyžaduje rozhodnutí uživatele. |
+| FAQPage JSON-LD na `/servis` | Nízké | SEO rich snippets | Potřeba obsah Q&A — uživatel musí dodat. |
+| LocalBusiness Service JSON-LD pro lokální vyhledávání | Nízké | SEO local pack | Potřeba ověřit, že již není v `index.html` Organization/LocalBusiness. |
+| CSP s nonce-based whitelisting | Střední | Security A+ | Samostatný sprint, Report-Only fáze. |
+| Lighthouse Accessibility 81→95+ | Nízké | Score, ne hard SEO | Vyžaduje audit (kontrast, aria, focus-visible, skip link). |
+
+### Kontrolní seznam před commitem (provedeno mnou)
+
+- [x] `python3 -c "import json; json.load(open('firebase.json'))"` → JSON valid
+- [x] curl ověřil HTTP 200 + `image/webp` na 3 nové variantach `1776888296311_trenink_*x*.webp`
+- [x] curl ověřil, že stávající SSG, preload tagy, brotli, HSTS jsou na živém webu
+- [x] `git status` před zápisem: clean (všechny předchozí commits flushnuté)
+
+### Doporučený další krok pro uživatele
+
+1. **Deploy** — `firebase deploy --only hosting` (Storage změny už jsou live, security headers se aktivují až po deploy).
+2. **Smoke test** — ověřit, že nic vizuálně neregredovalo (homepage, akce-archive, blog, individuální kurzy, kontakt).
+3. **Manuální PSI měření** — viz odkazy výše. Hodnoty zapsat do tabulky v této sekci.
+4. **Rozhodnutí pro kolo 3** — který z odložených návrhů (critical CSS, JS trimming, CSP, FAQPage) je prioritou.
+
+**Status:** dnes provedeno (1) backfill 13 chybějících image variants, (2) přidání 4 security headers do `firebase.json`, (3) ověření, že předchozí P1 fixy z 25–29. 4. jsou v produkci. Čeká na deploy + PSI re-measurement.
