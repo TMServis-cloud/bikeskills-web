@@ -11,6 +11,81 @@
     ],
     "redirects": [
       {
+        "source": "/feed",
+        "destination": "/blog",
+        "type": 301
+      },
+      {
+        "source": "/feed/",
+        "destination": "/blog",
+        "type": 301
+      },
+      {
+        "source": "/comments/feed",
+        "destination": "/blog",
+        "type": 301
+      },
+      {
+        "source": "/comments/feed/",
+        "destination": "/blog",
+        "type": 301
+      },
+      {
+        "source": "/sitemap_index.xml",
+        "destination": "/sitemap.xml",
+        "type": 301
+      },
+      {
+        "source": "/category/**",
+        "destination": "/blog",
+        "type": 301
+      },
+      {
+        "source": "/tag/**",
+        "destination": "/blog",
+        "type": 301
+      },
+      {
+        "source": "/author/**",
+        "destination": "/",
+        "type": 301
+      },
+      {
+        "source": "/page/**",
+        "destination": "/",
+        "type": 301
+      },
+      {
+        "source": "/wp-login.php",
+        "destination": "/",
+        "type": 301
+      },
+      {
+        "source": "/wp-admin",
+        "destination": "/",
+        "type": 301
+      },
+      {
+        "source": "/wp-admin/**",
+        "destination": "/",
+        "type": 301
+      },
+      {
+        "source": "/xmlrpc.php",
+        "destination": "/",
+        "type": 301
+      },
+      {
+        "source": "/wp-json",
+        "destination": "/",
+        "type": 301
+      },
+      {
+        "source": "/wp-json/**",
+        "destination": "/",
+        "type": 301
+      },
+      {
         "source": "/shop.html",
         "destination": "https://shop.bikeskills.cz/",
         "type": 301
