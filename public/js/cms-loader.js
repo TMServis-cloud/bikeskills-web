@@ -302,7 +302,7 @@ function setPageMeta(title, description, imageUrl, ogType) {
   if (ogUrl) ogUrl.setAttribute('content', window.location.href);
   let canonical = document.querySelector('link[rel="canonical"]');
   if (!canonical) { canonical = document.createElement('link'); canonical.rel = 'canonical'; document.head.appendChild(canonical); }
-  canonical.href = window.location.href.split('?')[0];
+  canonical.href = window.location.href.split('?')[0].replace(/^https?:\/\/(www\.)?bikeskills\.cz/, 'https://bikeskills.cz');
 }
 
 /** Sestaví HTML pro YouTube embed */
