@@ -1,0 +1,23 @@
+[debug] [2026-05-11T18:17:52.364Z] ----------------------------------------------------------------------
+[debug] [2026-05-11T18:17:52.365Z] Command:       /usr/bin/node /sessions/vigilant-quirky-goodall/mnt/bikeskills-web/node_modules/.bin/firebase deploy --only hosting
+[debug] [2026-05-11T18:17:52.366Z] CLI Version:   13.35.1
+[debug] [2026-05-11T18:17:52.366Z] Platform:      linux
+[debug] [2026-05-11T18:17:52.366Z] Node Version:  v22.22.0
+[debug] [2026-05-11T18:17:52.366Z] Time:          Mon May 11 2026 18:17:52 GMT+0000 (Coordinated Universal Time)
+[debug] [2026-05-11T18:17:52.366Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2026-05-11T18:17:52.368Z] >>> [apiv2][query] GET https://firebase-public.firebaseio.com/cli.json [none]
+[debug] [2026-05-11T18:17:52.482Z] Object "/extensions" in "firebase.json" has unknown property: {"additionalProperty":"storage-resize-images"}
+[debug] [2026-05-11T18:17:52.486Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2026-05-11T18:17:52.493Z] Error: Could not load the default credentials. Browse to https://cloud.google.com/docs/authentication/getting-started for more information.
+    at GoogleAuth.getApplicationDefaultAsync (/sessions/vigilant-quirky-goodall/mnt/bikeskills-web/node_modules/google-auth-library/build/src/auth/googleauth.js:287:15)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async GoogleAuth._GoogleAuth_determineClient (/sessions/vigilant-quirky-goodall/mnt/bikeskills-web/node_modules/google-auth-library/build/src/auth/googleauth.js:834:32)
+    at async GoogleAuth.getClient (/sessions/vigilant-quirky-goodall/mnt/bikeskills-web/node_modules/google-auth-library/build/src/auth/googleauth.js:698:20)
+    at async GoogleAuth.getAccessToken (/sessions/vigilant-quirky-goodall/mnt/bikeskills-web/node_modules/google-auth-library/build/src/auth/googleauth.js:722:24)
+    at async autoAuth (/sessions/vigilant-quirky-goodall/mnt/bikeskills-web/node_modules/firebase-tools/lib/requireAuth.js:26:19)
+    at async requireAuth (/sessions/vigilant-quirky-goodall/mnt/bikeskills-web/node_modules/firebase-tools/lib/requireAuth.js:81:20)
+    at async requirePermissions (/sessions/vigilant-quirky-goodall/mnt/bikeskills-web/node_modules/firebase-tools/lib/requirePermissions.js:17:5)
+    at async /sessions/vigilant-quirky-goodall/mnt/bikeskills-web/node_modules/firebase-tools/lib/command.js:241:17
+[error] 
+[error] Error: Failed to authenticate, have you run firebase login?

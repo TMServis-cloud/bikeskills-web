@@ -594,6 +594,251 @@
         "source": "/shop",
         "destination": "https://shop.bikeskills.cz/",
         "type": 301
+      },
+      {
+        "source": "/bikefestival-ricanske-slapacky-2022/**",
+        "destination": "/blog/bikefestival-ricanske-slapacky-2022/",
+        "type": 301
+      },
+      {
+        "source": "/cestlicky-pumptrack-otevren/**",
+        "destination": "/blog/cestlicky-pumptrack-otevren/",
+        "type": 301
+      },
+      {
+        "source": "/mcr-masters-v-cyklistice-prazske-sluzby-otovicke-slavnosti-a-slavnosti-v-prznu/**",
+        "destination": "/blog/mcr-masters-v-cyklistice-prazske-sluzby-otovicke-slavnosti-a-slavnosti-v-prznu/",
+        "type": 301
+      },
+      {
+        "source": "/otevirani-loucovicke-cyklostezky-loucovice-u-lipna/**",
+        "destination": "/blog/otevirani-loucovicke-cyklostezky-loucovice-u-lipna/",
+        "type": 301
+      },
+      {
+        "source": "/ples-zemedelske-university-v-praze/**",
+        "destination": "/blog/ples-zemedelske-university-v-praze/",
+        "type": 301
+      },
+      {
+        "source": "/holky-ladi-bikeskills-camp-report/**",
+        "destination": "/blog/",
+        "type": 301
+      },
+      {
+        "source": "/shop/**",
+        "destination": "https://shop.bikeskills.cz/",
+        "type": 301
+      },
+      {
+        "source": "/27-28-5-campy-bikeskills-a-exhibice-v-laznich/",
+        "destination": "/blog/27-28-5-campy-bikeskills-a-exhibice-v-laznich/",
+        "type": 301
+      },
+      {
+        "source": "/4-tydny-10-exhibic-ci-workshopu/",
+        "destination": "/blog/4-tydny-10-exhibic-ci-workshopu/",
+        "type": 301
+      },
+      {
+        "source": "/bikeskills-camp-mix-2/",
+        "destination": "/blog/bikeskills-camp-mix-2/",
+        "type": 301
+      },
+      {
+        "source": "/bikeskills-campy-no-1/",
+        "destination": "/blog/bikeskills-campy-no-1/",
+        "type": 301
+      },
+      {
+        "source": "/exhibice-galerie-ep1-umelecka-cyklovystava-trutnov/",
+        "destination": "/blog/exhibice-galerie-ep1-umelecka-cyklovystava-trutnov/",
+        "type": 301
+      },
+      {
+        "source": "/exhibice-ples-sportovnich-klubu-kralupy-nad-vltavou/",
+        "destination": "/blog/exhibice-ples-sportovnich-klubu-kralupy-nad-vltavou/",
+        "type": 301
+      },
+      {
+        "source": "/exhibice-travcice-a-pelhrimovske-rekordy/",
+        "destination": "/blog/exhibice-travcice-a-pelhrimovske-rekordy/",
+        "type": 301
+      },
+      {
+        "source": "/holky-ladi-bikeskills-camp-report/",
+        "destination": "/blog/",
+        "type": 301
+      },
+      {
+        "source": "/naloz-4-exhibic-napric-republikou/",
+        "destination": "/blog/naloz-4-exhibic-napric-republikou/",
+        "type": 301
+      },
+      {
+        "source": "/posledni-letosni-campy-bikeskills/",
+        "destination": "/blog/posledni-letosni-campy-bikeskills/",
+        "type": 301
+      },
+      {
+        "source": "/primestsky-tabor-no-1/",
+        "destination": "/blog/primestsky-tabor-no-1/",
+        "type": 301
+      },
+      {
+        "source": "/srpen-ve-znameni-kurzu-i-exhibic/",
+        "destination": "/blog/srpen-ve-znameni-kurzu-i-exhibic/",
+        "type": 301
+      },
+      {
+        "source": "/super-fast-camp/",
+        "destination": "/blog/super-fast-camp/",
+        "type": 301
+      },
+      {
+        "source": "/testovani-bikeparku-a-mensi-vikendove-exhibice/",
+        "destination": "/blog/testovani-bikeparku-a-mensi-vikendove-exhibice/",
+        "type": 301
+      },
+      {
+        "source": "/kurz/**",
+        "destination": "/akce/",
+        "type": 301
+      },
+      {
+        "source": "/kurzy-archive/",
+        "destination": "/blog/",
+        "type": 301
+      },
+      {
+        "source": "/kurzy-archive",
+        "destination": "/blog/",
+        "type": 301
+      },
+      {
+        "source": "/reset-password/",
+        "destination": "https://shop.bikeskills.cz/cs/obnova-hesla",
+        "type": 301
+      },
+      {
+        "source": "/simon/",
+        "destination": "/team/",
+        "type": 301
+      },
+      {
+        "source": "/vlasta/",
+        "destination": "/team/",
+        "type": 301
+      },
+      {
+        "source": "/index.php",
+        "destination": "/",
+        "type": 301
+      },
+      {
+        "source": "/dscf8171/",
+        "destination": "/",
+        "type": 301
+      },
+      {
+        "source": "/spank-orech-xx1-pro-naboje-spoon-spike-race-2/",
+        "destination": "https://shop.bikeskills.cz/",
+        "type": 301
+      },
+      {
+        "source": "/spike-oozy-spoon-pedal-pin-kit-2/",
+        "destination": "https://shop.bikeskills.cz/",
+        "type": 301
+      },
+      {
+        "source": "/432-2_classic-03-2/",
+        "destination": "/",
+        "type": 301
+      },
+      {
+        "source": "/387-2_4way-pink-2/",
+        "destination": "/",
+        "type": 301
+      },
+      {
+        "source": "/477-1_beige-box-75-2/",
+        "destination": "/",
+        "type": 301
+      },
+      {
+        "source": "/563-3_black-01-2/",
+        "destination": "/",
+        "type": 301
+      },
+      {
+        "source": "/279_grey-01-2/",
+        "destination": "/",
+        "type": 301
+      },
+      {
+        "source": "/267_cross-tape-01-2/",
+        "destination": "/",
+        "type": 301
+      },
+      {
+        "source": "/258-1_love-02-2/",
+        "destination": "/",
+        "type": 301
+      },
+      {
+        "source": "/590-3_set-2/",
+        "destination": "/",
+        "type": 301
+      },
+      {
+        "source": "/429-4_classic-02-2/",
+        "destination": "/",
+        "type": 301
+      },
+      {
+        "source": "/639-1_01-set-massage-oils-1364x1024px-2/",
+        "destination": "/",
+        "type": 301
+      },
+      {
+        "source": "/291_black-2/",
+        "destination": "/",
+        "type": 301
+      },
+      {
+        "source": "/632-2_kine-max-tape-super-pro-rayon-7-5cm-kinesiologicky-tejp-modry-175/",
+        "destination": "/",
+        "type": 301
+      },
+      {
+        "source": "/645_relaxing-1364x1024px-2/",
+        "destination": "/",
+        "type": 301
+      },
+      {
+        "source": "/501-8_radian-green-detail-2/",
+        "destination": "/",
+        "type": 301
+      },
+      {
+        "source": "/429_beige-box-2/",
+        "destination": "/",
+        "type": 301
+      },
+      {
+        "source": "/587-3_super-loops-03-2/",
+        "destination": "/",
+        "type": 301
+      },
+      {
+        "source": "/525-3_blue-set-2/",
+        "destination": "/",
+        "type": 301
+      },
+      {
+        "source": "/489-8_colours-01-2/",
+        "destination": "/",
+        "type": 301
       }
     ],
     "rewrites": [
