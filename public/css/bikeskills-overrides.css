@@ -395,29 +395,26 @@ html.cookies-show .cookie .banner-icon {
 }
 
 /* ============================================================
- * .image-53 (CMS hero / featured image) — fix CLS 0.137 on mobile
+ * .image-53 (CMS hero / featured image)
  *
- * Pozadí (PSI mobile blog detail 2026-04-26):
- *  - HTML attrs: width="1280" height="720" (16:9) — browser z nich
- *    odvodí aspect-ratio a před načtením rezervuje 100vw × 9/16.
- *  - Inline <style> v detail_post.html: { width:100%; max-height:480px;
- *    object-fit:cover; object-position:center top }.
- *  - Reálné CMS hero obrázky jsou často portrait (např. 1200×1800).
- *    Po načtení browser přepočítá výšku z reálného aspect-ratio (1.5×
- *    šířky), narazí na max-height:480px → výsledná výška ~480px.
- *  - Mobile 360px viewport: rezervace 360 × 9/16 = 202 px → po loadu 480 px.
- *    Shift +278 px = CLS 0.137 (PSI mobile only — na desktopu side-by-side
- *    grid izoluje shift do pravé kolonky → CLS 0).
+ * 2026-05-18: změna z 16:9 na 1:1 čtverec, vystředění, bez zaoblení.
+ *  Původní 16:9 fix CLS byl z 2026-04-26; na mobilu byl CLS 0.137.
+ *  S 1:1 aspect-ratio je rezervovaná i renderovaná výška vždy stejná
+ *  (browser odvodí z CSS aspect-ratio, ne z HTML width/height attrs).
  *
- * Fix: vynutit aspect-ratio 16:9 + zrušit max-height cap, takže rezervovaná
- *  i renderovaná výška je vždy stejná (cover crop u portrait obrázků
- *  zachová horní část díky object-position:center top, který už je tam).
+ * Webflow CSS obsahuje:
+ *  .image-53 { border-radius: .25rem }  → override na 0
+ *  .image-53 { max-width: 500px }       → override na none
  * ============================================================ */
 .image-53 {
-  aspect-ratio: 16 / 9 !important;
+  aspect-ratio: 1 / 1 !important;
   height: auto !important;
   max-height: none !important;
+  max-width: none !important;
   width: 100% !important;
   object-fit: cover !important;
-  object-position: center top !important;
+  object-position: center center !important;
+  border-radius: 0 !important;
+  display: block !important;
+  cursor: zoom-in;
 }

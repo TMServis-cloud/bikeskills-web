@@ -1518,6 +1518,8 @@ async function loadClanekDetail(slug) {
         });
         const emptyState = document.querySelector('.collection-list-wrapper-6 .w-dyn-empty');
         if (emptyState) emptyState.style.display = 'none';
+        // Lightbox na fotky galerie
+        attachLightbox(galItems);
       } else {
         const galBlock = document.querySelector('.div-block-341');
         if (galBlock) galBlock.style.display = 'none';
@@ -1555,8 +1557,10 @@ async function loadClanekDetail(slug) {
       document.body.appendChild(s);
     }
 
-    // Lightbox na fotky obsahu + externí linky v novém panelu
-    attachLightbox(contentEl);
+    // Lightbox na fotky obsahu + úvodní fotku + externí linky v novém panelu
+    // Querujeme přímo (contentEl je definován jen v !PAGE_PRERENDERED větvi)
+    attachLightbox(document.querySelector('[item="content"].rich-text-block-3, .div-block-325 [item="content"]'));
+    attachLightbox(document.querySelector('.div-block-324'));
     externalLinksNewTab(document.querySelector('.div-block-325'));
 
   } catch (err) {
