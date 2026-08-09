@@ -839,6 +839,61 @@
         "source": "/489-8_colours-01-2/",
         "destination": "/",
         "type": 301
+      },
+      {
+        "source": "/ochrana-osobnich-udaju/",
+        "destination": "/zasady-ochrany-osobnich-udaju/",
+        "type": 301
+      },
+      {
+        "source": "/primestsky-tabor-tehov/",
+        "destination": "/blog/primestsky-tabor-tehov/",
+        "type": 301
+      },
+      {
+        "source": "/katarina-tothova/",
+        "destination": "/team/katarina-tothova/",
+        "type": 301
+      },
+      {
+        "source": "/duse-tubolito-road-700x18-28c-black_2_o/",
+        "destination": "https://shop.bikeskills.cz/",
+        "type": 301
+      },
+      {
+        "source": "/spank-predstavec-spike-standard-director-6061-31-8-50mm-1/",
+        "destination": "https://shop.bikeskills.cz/",
+        "type": 301
+      },
+      {
+        "source": "/516-7_balance-pad-set-pink-2/",
+        "destination": "/",
+        "type": 301
+      },
+      {
+        "source": "/569_xlight-logo/",
+        "destination": "/",
+        "type": 301
+      },
+      {
+        "source": "/599-3_light-2/",
+        "destination": "/",
+        "type": 301
+      },
+      {
+        "source": "/611-5_mini-loops-set-2/",
+        "destination": "/",
+        "type": 301
+      },
+      {
+        "source": "/dscf8164/",
+        "destination": "/",
+        "type": 301
+      },
+      {
+        "source": "/dscf8229/",
+        "destination": "/",
+        "type": 301
       }
     ],
     "rewrites": [
