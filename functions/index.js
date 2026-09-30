@@ -397,3 +397,8 @@ exports.serveBlogDetail = functions
       res.status(500).send('Server error');
     }
   });
+
+// ============================================================
+// RESIZE IMAGES (náhrada extension storage-resize-images, v2, europe-west3)
+// ============================================================
+exports.resizeImages = require('./resize-images').resizeImages;

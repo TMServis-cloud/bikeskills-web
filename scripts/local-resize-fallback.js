@@ -14,6 +14,9 @@ const inputs = process.argv.slice(2).length
   ? process.argv.slice(2)
   : fs.readFileSync('/tmp/sample-paths.txt', 'utf8').split('\n').map((s) => s.trim()).filter(Boolean);
 
+// Variant files must never be fed back in: they already carry a _NxN suffix.
+const VARIANT_RE = /_\d+x\d+\.[a-z]+$/i;
+
 function variantPath(orig, size) {
   // matches extension behavior: foo.jpg -> foo_800x800.webp (always WebP output)
   return orig.replace(/(\.[a-z]+)$/i, `_${size}x${size}.webp`);
@@ -23,6 +26,7 @@ function variantPath(orig, size) {
   console.log(`Processing ${inputs.length} originals…`);
   for (const p of inputs) {
     console.log(`\n→ ${p}`);
+    if (VARIANT_RE.test(p)) { console.log('  ⤳ skip: already a _NxN variant'); continue; }
     try {
       const [buf] = await bucket.file(p).download();
       console.log(`  downloaded ${(buf.length/1024/1024).toFixed(2)} MB`);
@@ -37,7 +41,13 @@ function variantPath(orig, size) {
         const vp = variantPath(p, s);
         await bucket.file(vp).save(out, {
           contentType: 'image/webp',
-          metadata: { metadata: { generatedBy: 'local-fallback' } },
+          metadata: {
+            cacheControl: 'public, max-age=31536000, immutable',
+            // resizedImage=true is the flag the resize extension / function kit
+            // checks to skip already-resized files. Without it the upload
+            // re-triggers the resizer and creates foo_400x400_800x800.webp.
+            metadata: { generatedBy: 'local-fallback', resizedImage: 'true' },
+          },
           resumable: false,
         });
         console.log(`  ✓ ${vp} (${(out.length/1024).toFixed(0)} KB)`);

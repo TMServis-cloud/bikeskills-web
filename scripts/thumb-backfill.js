@@ -46,6 +46,9 @@ async function main() {
     // Přeskoč již existující thumbnaile a placeholder
     if (f.name.includes(`/${THUMBS_PATH}/`)) return false;
     if (f.name.includes('placeholder')) return false;
+    // Přeskoč varianty _NxN (re-upload by smazal metadata resizedImage
+    // a resizer by z nich udělal foo_400x400_800x800.webp)
+    if (/_\d+x\d+\.[a-z]+$/i.test(f.name)) return false;
     return IMAGE_EXTS.has(ext);
   });
 
