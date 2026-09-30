@@ -5,9 +5,7 @@
   "targets": {},
   "etags": {
     "bikeskills-web": {
-      "extensionInstances": {
-        "storage-resize-images": "fd6ced6059cfc2e715927034d113054aa12cfac221691d7071518065bb8cc31e"
-      }
+      "extensionInstances": {}
     }
   }
 }
