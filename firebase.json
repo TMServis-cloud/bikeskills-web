@@ -10,9 +10,15 @@
       "**/.*",
       "**/node_modules/**",
       "**/*.bak",
-      "**/blog/*/index.html"
+      "**/blog/*/index.html",
+      "wp-content/**"
     ],
     "redirects": [
+      {
+        "source": "/pojisteni-bikeplan",
+        "destination": "/servis",
+        "type": 301
+      },
       {
         "source": "/feed",
         "destination": "/blog",

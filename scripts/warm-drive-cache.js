@@ -52,6 +52,8 @@ function walk(p, out) {
   const stat = fs.lstatSync(p);
   if (stat.isSymbolicLink()) return; // .git / node_modules jsou symlinky mimo Drive — přeskočit
   if (stat.isDirectory()) {
+    // wp-content je ve firebase.json hosting.ignore — nenasazuje se, neprohřívat
+    if (path.basename(p) === 'wp-content') return;
     for (const name of fs.readdirSync(p)) {
       walk(path.join(p, name), out);
     }

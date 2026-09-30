@@ -42,7 +42,6 @@ const STATIC_PAGES = [
   { loc: '/kompletni-servis-hardtail',       priority: '0.7', changefreq: 'monthly' },
   { loc: '/kompletni-servis-full',           priority: '0.7', changefreq: 'monthly' },
   { loc: '/kompletni-cenik-servisnich-praci',priority: '0.6', changefreq: 'monthly' },  { loc: '/pujcovna',                        priority: '0.7', changefreq: 'monthly' },
-  { loc: '/pojisteni-bikeplan',              priority: '0.7', changefreq: 'monthly' },
   { loc: '/blog',                            priority: '0.8', changefreq: 'weekly' },
   { loc: '/team',                            priority: '0.7', changefreq: 'monthly' },
   { loc: '/kontakt',                         priority: '0.7', changefreq: 'monthly' },
