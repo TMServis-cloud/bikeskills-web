@@ -20,6 +20,16 @@
         "type": 301
       },
       {
+        "source": "/pojisteni-bikeplan/",
+        "destination": "/servis",
+        "type": 301
+      },
+      {
+        "source": "/pojisteni-bikeplan.html",
+        "destination": "/servis",
+        "type": 301
+      },
+      {
         "source": "/feed",
         "destination": "/blog",
         "type": 301
