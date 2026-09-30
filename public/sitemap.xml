@@ -278,6 +278,13 @@
   </url>
 
   <url>
+    <loc>https://bikeskills.cz/blog/exhibice-sokol-cyrilometodejsky-den-obecni-slavnosti-radonice-primestsky-tabor/</loc>
+    <lastmod>2026-07-04</lastmod>
+    <priority>0.6</priority>
+    <changefreq>yearly</changefreq>
+  </url>
+
+  <url>
     <loc>https://bikeskills.cz/blog/bikeskills-camp-mix-2/</loc>
     <lastmod>2025-05-15</lastmod>
     <priority>0.6</priority>
@@ -308,6 +315,13 @@
   <url>
     <loc>https://bikeskills.cz/blog/primestsky-tabor-tehov/</loc>
     <lastmod>2025-07-21</lastmod>
+    <priority>0.6</priority>
+    <changefreq>yearly</changefreq>
+  </url>
+
+  <url>
+    <loc>https://bikeskills.cz/blog/video-elektrobike-festival/</loc>
+    <lastmod>2026-05-26</lastmod>
     <priority>0.6</priority>
     <changefreq>yearly</changefreq>
   </url>
@@ -488,6 +502,13 @@
   </url>
 
   <url>
+    <loc>https://bikeskills.cz/blog/exhibice-vodaren-transport/</loc>
+    <lastmod>2026-06-13</lastmod>
+    <priority>0.6</priority>
+    <changefreq>yearly</changefreq>
+  </url>
+
+  <url>
     <loc>https://bikeskills.cz/blog/primestsky-camp-2/</loc>
     <lastmod>2023-08-14</lastmod>
     <priority>0.6</priority>
@@ -497,6 +518,13 @@
   <url>
     <loc>https://bikeskills.cz/blog/holky-ladi-bikeskills-vol-2/</loc>
     <lastmod>2020-09-21</lastmod>
+    <priority>0.6</priority>
+    <changefreq>yearly</changefreq>
+  </url>
+
+  <url>
+    <loc>https://bikeskills.cz/blog/exhibice-a-workshopy-bartosovice-vrbatky-a-male-zernoseky/</loc>
+    <lastmod>2026-05-30</lastmod>
     <priority>0.6</priority>
     <changefreq>yearly</changefreq>
   </url>
@@ -621,6 +649,13 @@
   </url>
 
   <url>
+    <loc>https://bikeskills.cz/blog/exhibice-a-workshopy-rasochy-mesice-a-lubne-u-policky/</loc>
+    <lastmod>2026-09-05</lastmod>
+    <priority>0.6</priority>
+    <changefreq>yearly</changefreq>
+  </url>
+
+  <url>
     <loc>https://bikeskills.cz/blog/sraz-americkych-aut-a-motorek-na-zamku-pacov/</loc>
     <lastmod>2024-08-16</lastmod>
     <priority>0.6</priority>
@@ -693,6 +728,13 @@
   <url>
     <loc>https://bikeskills.cz/blog/super-fast-camp/</loc>
     <lastmod>2024-05-14</lastmod>
+    <priority>0.6</priority>
+    <changefreq>yearly</changefreq>
+  </url>
+
+  <url>
+    <loc>https://bikeskills.cz/blog/exhibice-a-workshopy-cernovice-ricky-kvitkov-a-novy-oldrichov/</loc>
+    <lastmod>2026-08-15</lastmod>
     <priority>0.6</priority>
     <changefreq>yearly</changefreq>
   </url>
@@ -784,6 +826,13 @@
   <url>
     <loc>https://bikeskills.cz/blog/trenujeme-lvicata/</loc>
     <lastmod>2022-02-24</lastmod>
+    <priority>0.6</priority>
+    <changefreq>yearly</changefreq>
+  </url>
+
+  <url>
+    <loc>https://bikeskills.cz/blog/exhibice-a-workshop-dolni-dubnany/</loc>
+    <lastmod>2026-06-06</lastmod>
     <priority>0.6</priority>
     <changefreq>yearly</changefreq>
   </url>
@@ -971,6 +1020,13 @@
   </url>
 
   <url>
+    <loc>https://bikeskills.cz/blog/dny-javornicka-lesnicky-den-solfest-sokolov-i-trial-kurz-a-prirodni-katastrofa/</loc>
+    <lastmod>2026-06-21</lastmod>
+    <priority>0.6</priority>
+    <changefreq>yearly</changefreq>
+  </url>
+
+  <url>
     <loc>https://bikeskills.cz/blog/campy-pro-holky-a-chlapi-no-1/</loc>
     <lastmod>2026-04-14</lastmod>
     <priority>0.6</priority>
@@ -1064,6 +1120,20 @@
   <url>
     <loc>https://bikeskills.cz/blog/camp-holky-ladi-bikeskill-3-a-exhibice-ledenicke-bramborovani/</loc>
     <lastmod>2021-09-26</lastmod>
+    <priority>0.6</priority>
+    <changefreq>yearly</changefreq>
+  </url>
+
+  <url>
+    <loc>https://bikeskills.cz/blog/bikeskills-campy-2-2026/</loc>
+    <lastmod>2026-04-28</lastmod>
+    <priority>0.6</priority>
+    <changefreq>yearly</changefreq>
+  </url>
+
+  <url>
+    <loc>https://bikeskills.cz/blog/elektrobikefestival-a-exhibice-pro-mestskou-policii-praha/</loc>
+    <lastmod>2026-05-18</lastmod>
     <priority>0.6</priority>
     <changefreq>yearly</changefreq>
   </url>
@@ -1252,7 +1322,7 @@
 
   <url>
     <loc>https://bikeskills.cz/akce/holky-ladi-bikeskills-2-3/</loc>
-    <lastmod>2026-04-23</lastmod>
+    <lastmod>2026-04-28</lastmod>
     <priority>0.7</priority>
     <changefreq>monthly</changefreq>
   </url>
@@ -1260,6 +1330,13 @@
   <url>
     <loc>https://bikeskills.cz/akce/holky-ladi-bikeskills-3-2023/</loc>
     <lastmod>2026-04-17</lastmod>
+    <priority>0.7</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+
+  <url>
+    <loc>https://bikeskills.cz/akce/camp-pro-holky-a-chlapi-o-prazdninach/</loc>
+    <lastmod>2026-07-15</lastmod>
     <priority>0.7</priority>
     <changefreq>monthly</changefreq>
   </url>
@@ -1294,7 +1371,7 @@
 
   <url>
     <loc>https://bikeskills.cz/akce/chlapi-ladi-bikeskills-2-3/</loc>
-    <lastmod>2026-04-23</lastmod>
+    <lastmod>2026-04-28</lastmod>
     <priority>0.7</priority>
     <changefreq>monthly</changefreq>
   </url>
@@ -1337,6 +1414,13 @@
   <url>
     <loc>https://bikeskills.cz/akce/patecni-kids-campy/</loc>
     <lastmod>2026-04-22</lastmod>
+    <priority>0.7</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+
+  <url>
+    <loc>https://bikeskills.cz/akce/elektro-camp-o-prazdninach/</loc>
+    <lastmod>2026-07-15</lastmod>
     <priority>0.7</priority>
     <changefreq>monthly</changefreq>
   </url>

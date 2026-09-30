@@ -907,17 +907,10 @@ async function loadAkceList() {
     _akceYears = Array.from(yearSet).sort((a, b) => b - a);
     _akceTypy = Array.from(typSet).sort();
 
-    if (prerenderedList && currentAkcePage === 1 &&
-        akceYearFilter === 'all' && akceZamereniFilter === 'all' && akceCenaFilter === 'all') {
-      // Pre-rendered DOM už zobrazuje prvních 12 — jen napojit filtry/paginaci.
-      // Webflow .w-dyn-empty je v sablone defaultne viditelny ("No items found"),
-      // pri prerenderu mame items takze ho skryjeme.
-      toggleEmpty(emptyEl, true);
-      buildAkceFilterBar(_akceFilterBar, _akceYears, _akceTypy);
-      updatePaginationState(_akcePrevBtn, _akceNextBtn, currentAkcePage, getFilteredAkce().length);
-    } else {
-      renderAkceListPage();
-    }
+    // Vzdy prekreslit z cerstvych dat z Firestore — prerenderovane HTML
+    // ze static exportu muze byt zastarale (nove/aktualni akce pridane po
+    // poslednim nasazeni se jinak nezobrazi, dokud se stranka znovu nevyexportuje).
+    renderAkceListPage();
   } catch (err) {
     console.error('Chyba načítání akce list:', err);
   }
@@ -1374,16 +1367,10 @@ async function loadClankyList() {
     });
     _clankyYears = Array.from(yearSet).sort((a, b) => b - a);
 
-    if (prerenderedList && currentClankyPage === 1 && clankyYearFilter === 'all') {
-      // Pre-rendered DOM už zobrazuje prvních 12 — jen napojit filtry/paginaci.
-      // Webflow .w-dyn-empty je v sablone defaultne viditelny ("No items found"),
-      // pri prerenderu mame items takze ho skryjeme.
-      toggleEmpty(emptyEl, true);
-      buildClankyFilterBar(_clankyFilterBar, _clankyYears);
-      updatePaginationState(_clankyPrevBtn, _clankyNextBtn, currentClankyPage, getFilteredClanky().length);
-    } else {
-      renderClankyListPage();
-    }
+    // Vzdy prekreslit z cerstvych dat z Firestore — prerenderovane HTML
+    // ze static exportu muze byt zastarale (nove clanky pridane po poslednim
+    // nasazeni se jinak nezobrazi, dokud se stranka znovu nevyexportuje).
+    renderClankyListPage();
   } catch (err) {
     console.error('Chyba načítání clanky list:', err);
   }

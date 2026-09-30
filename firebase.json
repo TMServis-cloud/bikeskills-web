@@ -2,6 +2,9 @@
   "hosting": {
     "site": "bikeskills-web",
     "public": "public",
+    "predeploy": [
+      "node scripts/warm-drive-cache.js"
+    ],
     "ignore": [
       "firebase.json",
       "**/.*",

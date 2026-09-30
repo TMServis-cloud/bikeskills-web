@@ -20,7 +20,7 @@ Ověř SEO a výkonové metriky webu **bikeskills.cz** po 28 dnech od optimaliza
 ### Kontext projektu
 
 - Web: bikeskills.cz (Webflow → WordPress → Firebase Hosting migrace)
-- Workspace: `/Users/kabelcihiworkstation/Library/CloudStorage/GoogleDrive-cihacek@chytreit.cz/Můj disk/Google Antigravity projekty/bikeskills-web`
+- Workspace: `/Users/kabelcihiworkstation/Library/CloudStorage/GoogleDrive-cihacek@chytreit.cz/Můj disk/!CODING projekty/bikeskills-web`
 - Hosting: Firebase Hosting + Fastly CDN, region europe-west3
 - CMS: Firestore + cms-loader.js + prerendrované HTML
 

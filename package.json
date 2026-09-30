@@ -5,9 +5,10 @@
   "private": true,
   "scripts": {
     "serve": "firebase emulators:start",
-    "deploy": "firebase deploy",
-    "deploy:hosting": "node scripts/generate-sitemap.js && node scripts/prerender.js && firebase deploy --only hosting",
-    "deploy:rules": "firebase deploy --only firestore:rules,storage",
+    "warm-cache": "node scripts/warm-drive-cache.js",
+    "deploy": "npm run warm-cache && firebase deploy",
+    "deploy:hosting": "npm run warm-cache && node scripts/generate-sitemap.js && node scripts/prerender.js && firebase deploy --only hosting",
+    "deploy:rules": "npm run warm-cache && firebase deploy --only firestore:rules,storage",
     "import": "node scripts/wp-import.js",
     "sitemap": "node scripts/generate-sitemap.js",
     "prerender": "node scripts/prerender.js"
