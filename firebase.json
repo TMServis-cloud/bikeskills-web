@@ -913,6 +913,16 @@
         "source": "/dscf8229/",
         "destination": "/",
         "type": 301
+      },
+      {
+        "source": "/blog/https-bikeskills-web-firebaseapp-com",
+        "destination": "/blog/oteviracky-exhibice-a-workshopy-visky-u-letovic-ostrava-straznice-klanovice/",
+        "type": 301
+      },
+      {
+        "source": "/blog/https-bikeskills-web-firebaseapp-com/",
+        "destination": "/blog/oteviracky-exhibice-a-workshopy-visky-u-letovic-ostrava-straznice-klanovice/",
+        "type": 301
       }
     ],
     "rewrites": [
