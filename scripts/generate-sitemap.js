@@ -86,7 +86,7 @@ async function main() {
   const akce = akceSnap.docs.map(d => d.data()).filter(d => d.slug && d.publikovano !== false);
   console.log(`  🚴 Akce: ${akce.length}`);
   akce.forEach(d => entries.push(urlEntry({
-    loc: `/akce/${d.slug}/`,
+    loc: `/akce/${d.slug}`,
     priority: '0.7',
     changefreq: 'monthly',
     lastmod: toLastmod(d.datum || d.updatedAt || d.createdAt),
@@ -97,7 +97,7 @@ async function main() {
   const team = teamSnap.docs.map(d => d.data()).filter(d => d.slug);
   console.log(`  👤 Tým: ${team.length}`);
   team.forEach(d => entries.push(urlEntry({
-    loc: `/team/${d.slug}/`,
+    loc: `/team/${d.slug}`,
     priority: '0.6',
     changefreq: 'monthly',
   })));

@@ -228,7 +228,7 @@ function buildClanekCard(d, i) {
 }
 
 function buildAkceCard(d, i) {
-  const href = `/akce/${d.slug}/`;
+  const href = `/akce/${d.slug}`;
   const resolved = d.imageUrl ? resolveUrl(d.imageUrl) : null;
   // src = originál (vždy 200) — fallback pokud variant ze srcset 404
   const src = resolved || PLACEHOLDER_URL;
@@ -520,7 +520,7 @@ function prerenderClanekDetail(template, d) {
 }
 
 function prerenderAkceDetail(template, d) {
-  const url = `${BASE_URL}/akce/${d.slug}/`;
+  const url = `${BASE_URL}/akce/${d.slug}`;
   const nazev = d.nazev || '';
   const heroOrig = d.imageUrl;
   const hero = heroOrig ? resolveUrl(heroOrig) : `${BASE_URL}/images/og-image.jpg`;

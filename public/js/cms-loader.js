@@ -476,7 +476,7 @@ document.addEventListener('DOMContentLoaded', () => {
 function renderAkceItem(template, data) {
   const item = template.cloneNode(true);
 
-  const href = `/akce/${data.slug}/`;
+  const href = `/akce/${data.slug}`;
   item.querySelectorAll('[item="permalink"], a.akce-box').forEach(el => { el.href = href; });
 
   const titleEl = item.querySelector('[item="title"], .akce-heading');
@@ -1561,7 +1561,7 @@ async function loadClanekDetail(slug) {
 function renderTeamItem(template, data) {
   const item = template.cloneNode(true);
 
-  const href = `/team/${data.slug}/`;
+  const href = `/team/${data.slug}`;
   item.querySelectorAll('[item="permalink"]').forEach(el => { el.href = href; });
 
   const titleEl = item.querySelector('[item="title"], .text-block-135');
