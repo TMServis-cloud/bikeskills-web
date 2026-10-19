@@ -6,7 +6,7 @@
  *  1) Odstraní inline GA4 + Meta Pixel + noscript (4 řádky v <head>)
  *  2) Odstraní inline 'cookies-show' delay <script> (1 řádek v <head>)
  *  3) Odstraní inline cookie banner JS blok (před </body>)
- *  4) Přidá <script src="/js/consent.js" defer></script> před </body>
+ *  4) Přidá <script src="/js/consent.js?v=20261019" defer></script> před </body>
  *
  * Vše idempotentní — opakované spuštění nic nerozbije.
  */
@@ -38,7 +38,7 @@ const PATTERN_HEAD_SHOW = /\s*<script>\(function\(\)\{if\(document\.cookie\.matc
 
 const PATTERN_BANNER_JS = /\s*<script>\s*\n\s*\/\/ Cookie banner — native, defer-friendly[\s\S]*?\}\)\(\);\s*\n<\/script>\s*\n/g;
 
-const CONSENT_SCRIPT_TAG = '  <script src="/js/consent.js" defer></script>\n';
+const CONSENT_SCRIPT_TAG = '  <script src="/js/consent.js?v=20261019" defer></script>\n';
 
 const files = walkHtml(PUBLIC_DIR);
 console.log(`Scanning ${files.length} HTML files...`);

@@ -20,7 +20,8 @@
   var LEGACY_COOKIE = 'cookieClosed';
   var COOKIE_DAYS = 180; // ~6 měsíců — pak se znovu zeptáme (typický GDPR refresh)
   var SHOW_DELAY_MS = 800; // delay aby banner nebyl LCP element na PSI mobile
-  var GA_ID = 'G-DG5KF7PX48';
+  // G-Y1GJE85WDX = aktuální GA4 property (stream bikeskills-web-app), G-DG5KF7PX48 = původní property (kvůli návaznosti dat)
+  var GA_IDS = ['G-Y1GJE85WDX', 'G-DG5KF7PX48'];
   var FB_PIXEL_ID = '537412813575132';
 
   // ---------------- cookie helpers ----------------
@@ -46,12 +47,12 @@
     // Google Analytics 4
     var gaScript = document.createElement('script');
     gaScript.async = true;
-    gaScript.src = 'https://www.googletagmanager.com/gtag/js?id=' + GA_ID;
+    gaScript.src = 'https://www.googletagmanager.com/gtag/js?id=' + GA_IDS[0];
     document.head.appendChild(gaScript);
     window.dataLayer = window.dataLayer || [];
     window.gtag = function () { window.dataLayer.push(arguments); };
     window.gtag('js', new Date());
-    window.gtag('config', GA_ID);
+    GA_IDS.forEach(function (id) { window.gtag('config', id); });
 
     // Meta Pixel (Facebook)
     !function (f, b, e, v, n, t, s) {
