@@ -250,7 +250,9 @@ exports.sendServisForm = functions
 // nutnosti znovu spoustet `npm run deploy:hosting`.
 
 const bucket = admin.storage().bucket();
-const STORAGE_PRERENDER_PATH = (slug) => `prerendered-blog/${slug}/index.html`;
+// v2 = HTML včetně textu článku (dřív jen meta). Nová cesta = stará cache se automaticky nepoužije.
+const STORAGE_PRERENDER_PATH = (slug) => `prerendered-blog-v2/${slug}/index.html`;
+const { prerenderClanekDetail } = require('./lib/clanek-detail');
 const SITE_URL = 'https://bikeskills.cz';
 const DEFAULT_OG_IMAGE = `${SITE_URL}/images/og-image.jpg`;
 
@@ -307,27 +309,10 @@ function _setCanonical(html, url) {
 }
 
 async function buildClanekDetailHtml(d) {
-  const slug = d.slug;
-  const titulek = d.titulek || '';
-  const desc = _plainText(d.popis || d.perex, 160);
-  const url = `${SITE_URL}/blog/${slug}/`;
-  // Preferujeme uvodni obrazek (admin > "Hlavni obrazek"); fallback prvni z galerie.
-  const heroOrig = d.imageUrl || ((d.galerie && d.galerie.length) ? d.galerie[0] : null);
-  const hero = heroOrig ? _resolveStorageUrl(heroOrig) : DEFAULT_OG_IMAGE;
-
-  let html = await loadDetailTemplate();
-  html = _setTitle(html, `${titulek} | BikeSkills`);
-  html = _setMeta(html, 'description', desc, 'name');
-  html = _setMeta(html, 'og:title', `${titulek} | BikeSkills`);
-  html = _setMeta(html, 'og:description', desc);
-  html = _setMeta(html, 'og:image', hero);
-  html = _setMeta(html, 'og:url', url);
-  html = _setMeta(html, 'og:type', 'article');
-  html = _setMeta(html, 'twitter:title', `${titulek} | BikeSkills`);
-  html = _setMeta(html, 'twitter:description', desc);
-  html = _setMeta(html, 'twitter:image', hero);
-  html = _setCanonical(html, url);
-  return html;
+  // Plný detail: meta + JSON-LD + titulek, datum, autor, text a hlavní obrázek přímo v HTML
+  // (dřív jen meta – text doplňoval až JavaScript, SeznamBot ho neviděl).
+  const template = await loadDetailTemplate();
+  return prerenderClanekDetail(template, d);
 }
 
 // Firestore trigger: pri zmene clanku smaze Storage cache (lazy regenerate)
