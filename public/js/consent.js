@@ -20,8 +20,9 @@
   var LEGACY_COOKIE = 'cookieClosed';
   var COOKIE_DAYS = 180; // ~6 měsíců — pak se znovu zeptáme (typický GDPR refresh)
   var SHOW_DELAY_MS = 800; // delay aby banner nebyl LCP element na PSI mobile
-  // G-Y1GJE85WDX = aktuální GA4 property (stream bikeskills-web-app), G-DG5KF7PX48 = původní property (kvůli návaznosti dat)
-  var GA_IDS = ['G-Y1GJE85WDX', 'G-DG5KF7PX48'];
+  // G-DG5KF7PX48 = hlavní GA4 property bikeskills.cz (účet BikeSkills.cz, má historii dat).
+  // Duplicitní měření do G-Y1GJE85WDX (chytreit.cz / bikeskills-web-app) odebráno 2026-10-21.
+  var GA_IDS = ['G-DG5KF7PX48'];
   var FB_PIXEL_ID = '537412813575132';
 
   // ---------------- cookie helpers ----------------
