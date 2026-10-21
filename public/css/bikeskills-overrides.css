@@ -80,11 +80,13 @@ html.cookies-show .cookie a {
   pointer-events: auto !important;  /* uvnitř lišty klik funguje normálně */
 }
 
-/* ODMÍTNOUT — vizuálně jako text link s podtržením (jako 'NAŠE AKCE A CAMPY'
- * v hero sekci). GDPR-compliant je důležité, aby reject byl viditelný a snadno
- * klikatelný — text link s podtržením to splňuje (stejně viditelný jako accept,
- * ale vizuálně méně agresivní než button → lepší vyvážení nátlaku k souhlasu). */
+/* ODMÍTNOUT VŠE má stejnou vizuální váhu jako PŘIJMOUT VŠE (dědí .close-btn
+ * z Webflow) — GDPR: odmítnutí musí být stejně snadné a viditelné jako přijetí.
+ * NASTAVENÍ je sekundární text link s podtržením. */
 html.cookies-show .cookie .bs-reject-btn {
+  margin-right: 12px !important;
+}
+html.cookies-show .cookie .bs-settings-btn {
   display: inline-block;
   background: transparent !important;
   border: none !important;
@@ -99,9 +101,10 @@ html.cookies-show .cookie .bs-reject-btn {
   text-decoration: underline !important;
   text-underline-offset: 3px;
   cursor: pointer;
+  pointer-events: auto !important;
   transition: opacity .2s;
 }
-html.cookies-show .cookie .bs-reject-btn:hover {
+html.cookies-show .cookie .bs-settings-btn:hover {
   opacity: .65 !important;
 }
 
@@ -144,11 +147,11 @@ html.cookies-show .cookie .banner-icon {
   }
   html.cookies-show .cookie .product-wrap {
     display: grid !important;
-    grid-template-columns: auto auto 1fr !important;
+    grid-template-columns: auto auto auto 1fr !important;
     grid-template-areas:
-      ".      .      close"
-      "reject accept .    "
-      "text   text   text " !important;
+      ".      .      .        close"
+      "reject accept settings ."
+      "text   text   text     text" !important;
     column-gap: 10px !important;
     row-gap: 4px !important;
     align-items: center !important;
@@ -170,12 +173,14 @@ html.cookies-show .cookie .banner-icon {
     inset: auto !important;
     margin: 0 !important;
   }
-  /* ODMÍTNOUT + PŘIJÍMÁM — Row 2 vlevo */
+  /* ODMÍTNOUT VŠE + PŘIJMOUT VŠE + NASTAVENÍ — Row 2 vlevo */
   html.cookies-show .cookie .bs-reject-btn {
     grid-area: reject !important;
+    display: inline-block !important;
+    padding: 6px 12px !important;
     font-size: 11px !important;
     margin: 0 !important;
-    text-underline-offset: 2px;
+    line-height: 1.4 !important;
     justify-self: start !important;
   }
   html.cookies-show .cookie .close-btn:not(.bs-reject-btn) {
@@ -185,6 +190,13 @@ html.cookies-show .cookie .banner-icon {
     font-size: 11px !important;
     margin: 0 !important;
     line-height: 1.4 !important;
+    justify-self: start !important;
+  }
+  html.cookies-show .cookie .bs-settings-btn {
+    grid-area: settings !important;
+    font-size: 11px !important;
+    margin: 0 !important;
+    text-underline-offset: 2px;
     justify-self: start !important;
   }
   /* Bell — skrýt na mobile (uvolní místo, ikona není kritická pro porozumění) */
