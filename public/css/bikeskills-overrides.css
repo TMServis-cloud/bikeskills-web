@@ -93,8 +93,6 @@ html.cookies-show .cookie .close-btn {
   line-height: 1.2 !important;
   text-align: center !important;
   white-space: nowrap !important;
-  font-size: 15px !important;
-  font-weight: 600 !important;
 }
 html.cookies-show .cookie .bs-reject-btn,
 html.cookies-show .cookie .bs-settings-btn {
@@ -195,7 +193,6 @@ html.cookies-show .cookie .banner-icon {
     min-height: 34px !important;
     padding: 0 16px !important;
     font-size: 12px !important;
-    font-weight: 600 !important;
     margin: 0 !important;
     justify-self: center !important;
   }
@@ -444,4 +441,10 @@ html.cookies-show .cookie .banner-icon {
   border-radius: 0 !important;
   display: block !important;
   cursor: zoom-in;
+}
+
+
+/* Patička: „© … 2026   |   Trialshow.cz tým“ — mezery kolem oddělovače */
+.copyright-wrap .text-block-143 {
+  margin: 0 14px;
 }
