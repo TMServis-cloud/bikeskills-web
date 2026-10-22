@@ -80,15 +80,21 @@ html.cookies-show .cookie a {
   pointer-events: auto !important;  /* uvnitř lišty klik funguje normálně */
 }
 
-/* ODMÍTNOUT VŠE má stejnou vizuální váhu jako PŘIJMOUT VŠE (dědí .close-btn
- * z Webflow) — GDPR: odmítnutí musí být stejně snadné a viditelné jako přijetí.
- * NASTAVENÍ je sekundární text link s podtržením. */
-html.cookies-show .cookie .bs-reject-btn {
-  margin-right: 12px !important;
-}
+/* PŘIJMOUT VŠE = hlavní tlačítko (Webflow .close-btn, černá pilulka).
+ * Text vertikálně na střed: inline-flex + symetrické odsazení + pevná výška.
+ * ODMÍTNOUT VŠE a NASTAVENÍ = sekundární textové odkazy s podtržením. */
 html.cookies-show .cookie .close-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-height: 42px !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  line-height: 1.2 !important;
+  text-align: center !important;
   white-space: nowrap !important;
 }
+html.cookies-show .cookie .bs-reject-btn,
 html.cookies-show .cookie .bs-settings-btn {
   display: inline-block;
   background: transparent !important;
@@ -100,13 +106,16 @@ html.cookies-show .cookie .bs-settings-btn {
   font-size: 13px !important;
   font-weight: 600 !important;
   letter-spacing: .025rem;
+  line-height: 1.4 !important;
   text-transform: uppercase;
   text-decoration: underline !important;
   text-underline-offset: 3px;
+  white-space: nowrap;
   cursor: pointer;
   pointer-events: auto !important;
   transition: opacity .2s;
 }
+html.cookies-show .cookie .bs-reject-btn:hover,
 html.cookies-show .cookie .bs-settings-btn:hover {
   opacity: .65 !important;
 }
@@ -153,7 +162,7 @@ html.cookies-show .cookie .banner-icon {
     grid-template-columns: auto auto auto 1fr !important;
     grid-template-areas:
       ".      .      .        close"
-      "reject accept settings ."
+      "accept reject settings ."
       "text   text   text     text" !important;
     column-gap: 10px !important;
     row-gap: 4px !important;
@@ -176,23 +185,20 @@ html.cookies-show .cookie .banner-icon {
     inset: auto !important;
     margin: 0 !important;
   }
-  /* ODMÍTNOUT VŠE + PŘIJMOUT VŠE + NASTAVENÍ — Row 2 vlevo */
-  html.cookies-show .cookie .bs-reject-btn {
-    grid-area: reject !important;
-    display: inline-block !important;
-    padding: 6px 12px !important;
-    font-size: 11px !important;
-    margin: 0 !important;
-    line-height: 1.4 !important;
-    justify-self: start !important;
-  }
+  /* PŘIJMOUT VŠE (hlavní) + ODMÍTNOUT VŠE + NASTAVENÍ (sekundární odkazy) — Row 2 vlevo */
   html.cookies-show .cookie .close-btn:not(.bs-reject-btn) {
     grid-area: accept !important;
-    display: inline-block !important;
-    padding: 6px 12px !important;
+    min-height: 34px !important;
+    padding: 0 16px !important;
     font-size: 11px !important;
     margin: 0 !important;
-    line-height: 1.4 !important;
+    justify-self: start !important;
+  }
+  html.cookies-show .cookie .bs-reject-btn {
+    grid-area: reject !important;
+    font-size: 11px !important;
+    margin: 0 !important;
+    text-underline-offset: 2px;
     justify-self: start !important;
   }
   html.cookies-show .cookie .bs-settings-btn {

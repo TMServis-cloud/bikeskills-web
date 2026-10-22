@@ -156,10 +156,10 @@
     acceptBtn.textContent = 'PŘIJMOUT VŠE';
     acceptBtn.removeAttribute('target');
 
-    // ODMÍTNOUT VŠE — stejná vizuální váha jako PŘIJMOUT VŠE (.close-btn)
-    var rejectBtn = makeBtn('close-btn w-button bs-reject-btn', 'ODMÍTNOUT VŠE', 'Odmítnout všechny nepovinné cookies');
+    // ODMÍTNOUT VŠE + NASTAVENÍ — sekundární textové odkazy; hlavní tlačítko je PŘIJMOUT VŠE
+    var rejectBtn = makeBtn('bs-reject-btn', 'ODMÍTNOUT VŠE', 'Odmítnout všechny nepovinné cookies');
     var settingsBtn = makeBtn('bs-settings-btn', 'NASTAVENÍ', 'Nastavit cookies podle účelů');
-    // Layout: [text] ... [NASTAVENÍ] [ODMÍTNOUT VŠE] [PŘIJMOUT VŠE] [×]
+    // Layout: [text] ... NASTAVENÍ  ODMÍTNOUT VŠE  [PŘIJMOUT VŠE] [×]
     acceptBtn.parentNode.insertBefore(settingsBtn, acceptBtn);
     acceptBtn.parentNode.insertBefore(rejectBtn, acceptBtn);
   }
@@ -234,13 +234,15 @@
       '#bs-cc-modal .bs-cc-row label{display:flex !important;align-items:center;gap:10px;font-weight:700 !important;font-size:14px !important;cursor:pointer;margin:0 !important}' +
       '#bs-cc-modal .bs-cc-row input{width:18px;height:18px;flex-shrink:0;margin:0 !important}' +
       '#bs-cc-modal .bs-cc-row p{margin:6px 0 0 28px !important;font-size:13px !important;color:#444 !important}' +
-      '#bs-cc-modal .bs-cc-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px;border-top:1px solid #e3e3e3;padding-top:16px}' +
-      '#bs-cc-modal .bs-cc-actions button{all:unset;box-sizing:border-box;font-family:proxima-nova,Arial,sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.025rem;font-size:12px;line-height:1.2;padding:10px 14px;border:2px solid #1a1a1a;background:#fff;color:#1a1a1a;border-radius:4px;cursor:pointer;text-align:center;white-space:nowrap}' +
-      '#bs-cc-modal .bs-cc-actions button.bs-primary{background:#ffcc00}' +
-      '#bs-cc-modal .bs-cc-actions button:hover{opacity:.85}' +
-      '#bs-cc-modal .bs-cc-actions button:focus-visible,#bs-cc-modal a:focus-visible,#bs-cc-modal input:focus-visible{outline:3px solid #0057d8;outline-offset:2px}' +
+      '#bs-cc-modal .bs-cc-actions{display:flex;flex-wrap:wrap;align-items:center;gap:14px 24px;margin-top:16px;border-top:1px solid #e3e3e3;padding-top:16px}' +
+      /* hlavní tlačítko = stejné jako ostatní hlavní tlačítka webu (černá pilulka, 64px, obrys v akcentní barvě) */
+      '#bs-cc-modal .bs-cc-actions button.bs-primary{all:unset;box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;min-height:42px;padding:0 28px;border:2px solid #efc101;border-radius:64px;background:#000;color:#efc101;font-family:proxima-nova,Arial,sans-serif;font-size:14.4px;font-weight:500;letter-spacing:.4px;line-height:1.2;text-transform:uppercase;text-align:center;white-space:nowrap;cursor:pointer;transition:opacity .2s}' +
+      /* ostatní = sekundární textové odkazy s podtržením */
+      '#bs-cc-modal .bs-cc-actions button.bs-link{all:unset;box-sizing:border-box;display:inline-block;font-family:proxima-nova,Arial,sans-serif;font-size:13px;font-weight:600;letter-spacing:.025rem;line-height:1.4;text-transform:uppercase;text-decoration:underline;text-underline-offset:3px;color:#1a1a1a;cursor:pointer;white-space:nowrap;transition:opacity .2s}' +
+      '#bs-cc-modal .bs-cc-actions button:hover{opacity:.65}' +
+      '#bs-cc-modal .bs-cc-actions button:focus-visible,#bs-cc-modal a:focus-visible,#bs-cc-modal input:focus-visible{outline:3px solid #0057d8;outline-offset:3px}' +
       '#bs-cc-modal .bs-cc-more{display:inline-block;margin-top:12px;color:#1a1a1a !important;text-decoration:underline !important;font-size:14px}' +
-      '@media (max-width:480px){#bs-cc-modal .bs-cc-box{padding:18px}#bs-cc-modal .bs-cc-actions button{flex:1 1 100%}}';
+      '@media (max-width:480px){#bs-cc-modal .bs-cc-box{padding:18px}#bs-cc-modal .bs-cc-actions button.bs-primary{flex:1 1 100%}}';
     document.head.appendChild(s);
   }
 
@@ -264,8 +266,8 @@
           '<p>Umožňují měřit účinnost reklamy a zobrazovat reklamu na Facebooku a Instagramu. Data zpracovává Meta.</p></div>' +
         '<div class="bs-cc-actions">' +
           '<button type="button" data-act="save" class="bs-primary">Uložit výběr</button>' +
-          '<button type="button" data-act="all">Přijmout vše</button>' +
-          '<button type="button" data-act="none">Odmítnout vše</button>' +
+          '<button type="button" data-act="all" class="bs-link">Přijmout vše</button>' +
+          '<button type="button" data-act="none" class="bs-link">Odmítnout vše</button>' +
         '</div>' +
         '<a class="bs-cc-more" href="' + PRIVACY_URL + '">Zásady ochrany osobních údajů</a>' +
       '</div>';
