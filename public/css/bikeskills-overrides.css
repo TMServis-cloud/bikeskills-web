@@ -86,6 +86,9 @@ html.cookies-show .cookie a {
 html.cookies-show .cookie .bs-reject-btn {
   margin-right: 12px !important;
 }
+html.cookies-show .cookie .close-btn {
+  white-space: nowrap !important;
+}
 html.cookies-show .cookie .bs-settings-btn {
   display: inline-block;
   background: transparent !important;
