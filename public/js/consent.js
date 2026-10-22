@@ -225,13 +225,17 @@
     s.textContent =
       '#bs-cc-modal{position:fixed;inset:0;z-index:2147483000;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.55);padding:16px}' +
       '#bs-cc-modal.bs-open{display:flex}' +
-      '#bs-cc-modal .bs-cc-box{background:#222528;color:#fff;max-width:560px;width:100%;max-height:90vh;overflow:auto;border-radius:6px;padding:24px;font-family:proxima-nova,sans-serif;font-size:14px;line-height:1.5;box-shadow:0 10px 40px rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.08)}' +
+      '#bs-cc-modal .bs-cc-box{background:#222528;color:#fff;position:relative;max-width:560px;width:100%;max-height:90vh;overflow:auto;border-radius:6px;padding:24px;font-family:proxima-nova,sans-serif;font-size:14px;line-height:1.5;box-shadow:0 10px 40px rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.08)}' +
       '#bs-cc-modal,#bs-cc-modal *{box-sizing:border-box}' +
       '#bs-cc-modal h2,#bs-cc-modal p,#bs-cc-modal label,#bs-cc-modal span{color:#fff !important;font-family:proxima-nova,Arial,sans-serif !important;text-transform:none !important;letter-spacing:normal !important}' +
-      '#bs-cc-modal h2{margin:0 0 8px !important;font-size:20px !important;line-height:1.25 !important;font-weight:700 !important}' +
+      '#bs-cc-modal .bs-cc-close{all:unset;position:absolute;top:14px;right:14px;display:flex;align-items:center;justify-content:center;padding:10px;cursor:pointer;transition:transform .2s ease-out}' +
+      '#bs-cc-modal .bs-cc-close:hover{transform:scale(1.3) rotate(180deg)}' +
+      '#bs-cc-modal .bs-cc-close:focus-visible{outline:3px solid #efc101;outline-offset:2px}' +
+      '#bs-cc-modal h2{padding-right:40px !important;margin:0 0 8px !important;font-size:20px !important;line-height:1.25 !important;font-weight:700 !important}' +
       '#bs-cc-modal p{margin:0 0 12px !important;font-size:14px !important;line-height:1.5 !important}' +
       '#bs-cc-modal .bs-cc-row{border-top:1px solid rgba(255,255,255,.15);padding:12px 0}' +
-      '#bs-cc-modal .bs-cc-row label{display:flex !important;align-items:center;gap:10px;font-weight:700 !important;color:#efc101 !important;font-size:14px !important;cursor:pointer;margin:0 !important}' +
+      '#bs-cc-modal .bs-cc-row label{display:flex !important;align-items:center;gap:10px;font-weight:700 !important;color:#fff !important;transition:color .15s;font-size:14px !important;cursor:pointer;margin:0 !important}' +
+      '#bs-cc-modal .bs-cc-row.bs-on label{color:#efc101 !important}' +
       '#bs-cc-modal .bs-cc-row input{-webkit-appearance:none;appearance:none;width:18px;height:18px;flex-shrink:0;margin:0 !important;border:2px solid #efc101;border-radius:0;background:transparent center/14px 14px no-repeat;cursor:pointer}' +
       '#bs-cc-modal .bs-cc-row input:checked{background-color:#efc101;background-image:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 16 16%22%3E%3Cpath d=%22M3 8.5l3 3 7-7%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%222.4%22 stroke-linecap=%22square%22/%3E%3C/svg%3E")}' +
       '#bs-cc-modal .bs-cc-row input:disabled{opacity:.55;cursor:default}' +
@@ -244,7 +248,7 @@
       '#bs-cc-modal .bs-cc-actions button:hover{opacity:.65}' +
       '#bs-cc-modal .bs-cc-actions button:focus-visible,#bs-cc-modal a:focus-visible,#bs-cc-modal input:focus-visible{outline:3px solid #efc101;outline-offset:3px}' +
       '#bs-cc-modal .bs-cc-more{color:#efc101 !important;text-decoration:underline !important;text-underline-offset:2px}' +
-      '@media (max-width:480px){#bs-cc-modal .bs-cc-box{padding:18px}}';
+      '@media (max-width:480px){#bs-cc-modal .bs-cc-box{padding:18px}#bs-cc-modal .bs-cc-close{top:8px;right:8px}#bs-cc-modal .bs-cc-actions{display:grid;grid-template-columns:auto auto;justify-content:center;justify-items:center;gap:16px 24px}#bs-cc-modal .bs-cc-actions button.bs-primary{grid-column:1/-1}}';
     document.head.appendChild(s);
   }
 
@@ -258,6 +262,7 @@
     modal.setAttribute('aria-labelledby', 'bs-cc-title');
     modal.innerHTML =
       '<div class="bs-cc-box">' +
+        '<button type="button" class="bs-cc-close" aria-label="Zavřít"><svg viewBox="0 0 11 11" width="17" height="17" aria-hidden="true" focusable="false"><path d="M1.1 9.9L9.9 1.1M1.09 1.1l8.82 8.8" fill="none" stroke="#fff" stroke-linecap="round" stroke-width="2"/></svg></button>' +
         '<h2 id="bs-cc-title">Nastavení cookies</h2>' +
         '<p>Vyberte, které cookies smíme používat. Souhlas můžete kdykoli změnit nebo odvolat přes odkaz „Nastavení cookies“ v patičce webu. Odmítnutí nijak neomezuje funkčnost webu. Podrobnosti najdete v <a class="bs-cc-more" href="' + PRIVACY_URL + '">Zásadách ochrany osobních údajů</a>.</p>' +
         '<div class="bs-cc-row"><label><input type="checkbox" checked disabled> Nezbytné cookies</label>' +
@@ -275,7 +280,8 @@
     document.body.appendChild(modal);
 
     modal.addEventListener('click', function (e) {
-      if (e.target === modal) closeSettings();
+      if (e.target === modal || (e.target.closest && e.target.closest('.bs-cc-close'))) { closeSettings(); return; }
+      if (e.target.type === 'checkbox') syncRows();
       var act = e.target && e.target.getAttribute && e.target.getAttribute('data-act');
       if (!act) return;
       var c;
@@ -300,11 +306,22 @@
     return modal;
   }
 
+  // nadpis kategorie je žlutý jen u zaškrtnuté volby
+  function syncRows() {
+    if (!modal) return;
+    var rows = modal.querySelectorAll('.bs-cc-row');
+    for (var i = 0; i < rows.length; i++) {
+      var inp = rows[i].querySelector('input');
+      rows[i].classList.toggle('bs-on', !!(inp && inp.checked));
+    }
+  }
+
   function openSettings() {
     var m = buildModal();
     var c = readConsent() || { analytics: false, marketing: false }; // nic předzaškrtnuto
     m.querySelector('#bs-cc-a').checked = c.analytics;
     m.querySelector('#bs-cc-m').checked = c.marketing;
+    syncRows();
     lastFocus = document.activeElement;
     m.classList.add('bs-open');
     m.querySelector('#bs-cc-a').focus();

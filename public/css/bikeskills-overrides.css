@@ -159,13 +159,13 @@ html.cookies-show .cookie .banner-icon {
   }
   html.cookies-show .cookie .product-wrap {
     display: grid !important;
-    grid-template-columns: minmax(24px,1fr) auto auto auto minmax(24px,1fr) !important;
+    grid-template-columns: auto auto 1fr !important;
     grid-template-areas:
-      ". .      .      .        close"
-      ". accept reject settings ."
-      "text text text text text" !important;
-    column-gap: 10px !important;
-    row-gap: 4px !important;
+      "accept accept   close"
+      "reject settings ."
+      "text   text     text" !important;
+    column-gap: 20px !important;
+    row-gap: 12px !important;
     align-items: center !important;
     padding: 0 !important;
     min-height: 0 !important;
@@ -194,21 +194,21 @@ html.cookies-show .cookie .banner-icon {
     padding: 0 16px !important;
     font-size: 12px !important;
     margin: 0 !important;
-    justify-self: center !important;
+    justify-self: start !important;
   }
   html.cookies-show .cookie .bs-reject-btn {
     grid-area: reject !important;
     font-size: 11px !important;
     margin: 0 !important;
     text-underline-offset: 2px;
-    justify-self: center !important;
+    justify-self: start !important;
   }
   html.cookies-show .cookie .bs-settings-btn {
     grid-area: settings !important;
     font-size: 11px !important;
     margin: 0 !important;
     text-underline-offset: 2px;
-    justify-self: center !important;
+    justify-self: start !important;
   }
   /* Bell — skrýt na mobile (uvolní místo, ikona není kritická pro porozumění) */
   html.cookies-show .cookie .con-wrap-2 {
@@ -218,7 +218,7 @@ html.cookies-show .cookie .banner-icon {
   html.cookies-show .cookie .banner-title-wrap {
     grid-area: text !important;
     margin: 14px 0 0 0 !important;
-    text-align: center !important;
+    text-align: left !important;
   }
   /* Texty menší */
   html.cookies-show .cookie .banner-author,
