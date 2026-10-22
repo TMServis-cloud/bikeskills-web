@@ -231,19 +231,20 @@
       '#bs-cc-modal h2{margin:0 0 8px !important;font-size:20px !important;line-height:1.25 !important;font-weight:700 !important}' +
       '#bs-cc-modal p{margin:0 0 12px !important;font-size:14px !important;line-height:1.5 !important}' +
       '#bs-cc-modal .bs-cc-row{border-top:1px solid rgba(255,255,255,.15);padding:12px 0}' +
-      '#bs-cc-modal .bs-cc-row label{display:flex !important;align-items:center;gap:10px;font-weight:700 !important;font-size:14px !important;cursor:pointer;margin:0 !important}' +
-      '#bs-cc-modal .bs-cc-row input{width:18px;height:18px;flex-shrink:0;margin:0 !important}' +
-      '#bs-cc-modal input[type=checkbox]{accent-color:#efc101}' +
-      '#bs-cc-modal .bs-cc-row p{margin:6px 0 0 28px !important;font-size:13px !important;color:#bdbdbd !important}' +
+      '#bs-cc-modal .bs-cc-row label{display:flex !important;align-items:center;gap:10px;font-weight:700 !important;color:#efc101 !important;font-size:14px !important;cursor:pointer;margin:0 !important}' +
+      '#bs-cc-modal .bs-cc-row input{-webkit-appearance:none;appearance:none;width:18px;height:18px;flex-shrink:0;margin:0 !important;border:2px solid #efc101;border-radius:0;background:transparent center/14px 14px no-repeat;cursor:pointer}' +
+      '#bs-cc-modal .bs-cc-row input:checked{background-color:#efc101;background-image:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 16 16%22%3E%3Cpath d=%22M3 8.5l3 3 7-7%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%222.4%22 stroke-linecap=%22square%22/%3E%3C/svg%3E")}' +
+      '#bs-cc-modal .bs-cc-row input:disabled{opacity:.55;cursor:default}' +
+            '#bs-cc-modal .bs-cc-row p{margin:6px 0 0 28px !important;font-size:13px !important;color:#bdbdbd !important}' +
       '#bs-cc-modal .bs-cc-actions{display:flex;flex-wrap:wrap;align-items:center;gap:14px 24px;margin-top:16px;border-top:1px solid rgba(255,255,255,.15);padding-top:16px}' +
       /* hlavní tlačítko = stejné jako ostatní hlavní tlačítka webu (černá pilulka, 64px, obrys v akcentní barvě) */
-      '#bs-cc-modal .bs-cc-actions button.bs-primary{all:unset;box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;padding:9px 30px;border:2px solid #efc101;border-radius:64px;background:#000;color:#efc101;font-family:proxima-nova,sans-serif;font-size:16px;font-weight:500;letter-spacing:.4px;line-height:27px;text-transform:uppercase;text-align:center;white-space:nowrap;cursor:pointer;transition:opacity .2s}' +
+      '#bs-cc-modal .bs-cc-actions button.bs-primary{all:unset;box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;min-height:42px;padding:0 28px;border:2px solid #efc101;border-radius:64px;background:#000;color:#efc101;font-family:proxima-nova,sans-serif;font-size:14.4px;font-weight:500;letter-spacing:.4px;line-height:1.2;text-transform:uppercase;text-align:center;white-space:nowrap;cursor:pointer;transition:opacity .2s}' +
       /* ostatní = sekundární textové odkazy s podtržením */
       '#bs-cc-modal .bs-cc-actions button.bs-link{all:unset;box-sizing:border-box;display:inline-block;font-family:proxima-nova,Arial,sans-serif;font-size:13px;font-weight:600;letter-spacing:.025rem;line-height:1.4;text-transform:uppercase;text-decoration:underline;text-underline-offset:3px;color:#fff;cursor:pointer;white-space:nowrap;transition:opacity .2s}' +
       '#bs-cc-modal .bs-cc-actions button:hover{opacity:.65}' +
       '#bs-cc-modal .bs-cc-actions button:focus-visible,#bs-cc-modal a:focus-visible,#bs-cc-modal input:focus-visible{outline:3px solid #efc101;outline-offset:3px}' +
-      '#bs-cc-modal .bs-cc-more{display:inline-block;margin-top:12px;color:#fff !important;text-decoration:underline !important;font-size:14px}' +
-      '@media (max-width:480px){#bs-cc-modal .bs-cc-box{padding:18px}#bs-cc-modal .bs-cc-actions button.bs-primary{flex:1 1 100%}}';
+      '#bs-cc-modal .bs-cc-more{color:#efc101 !important;text-decoration:underline !important;text-underline-offset:2px}' +
+      '@media (max-width:480px){#bs-cc-modal .bs-cc-box{padding:18px}}';
     document.head.appendChild(s);
   }
 
@@ -258,7 +259,7 @@
     modal.innerHTML =
       '<div class="bs-cc-box">' +
         '<h2 id="bs-cc-title">Nastavení cookies</h2>' +
-        '<p>Vyberte, které cookies smíme používat. Souhlas můžete kdykoli změnit nebo odvolat přes odkaz „Nastavení cookies“ v patičce webu. Odmítnutí nijak neomezuje funkčnost webu.</p>' +
+        '<p>Vyberte, které cookies smíme používat. Souhlas můžete kdykoli změnit nebo odvolat přes odkaz „Nastavení cookies“ v patičce webu. Odmítnutí nijak neomezuje funkčnost webu. Podrobnosti najdete v <a class="bs-cc-more" href="' + PRIVACY_URL + '">Zásadách ochrany osobních údajů</a>.</p>' +
         '<div class="bs-cc-row"><label><input type="checkbox" checked disabled> Nezbytné cookies</label>' +
           '<p>Zajišťují základní chod webu a uložení vaší volby. Nevyžadují souhlas a nelze je vypnout.</p></div>' +
         '<div class="bs-cc-row"><label><input type="checkbox" id="bs-cc-a"> Analytické cookies (Google Analytics)</label>' +
@@ -270,7 +271,6 @@
           '<button type="button" data-act="all" class="bs-link">Přijmout vše</button>' +
           '<button type="button" data-act="none" class="bs-link">Odmítnout vše</button>' +
         '</div>' +
-        '<a class="bs-cc-more" href="' + PRIVACY_URL + '">Zásady ochrany osobních údajů</a>' +
       '</div>';
     document.body.appendChild(modal);
 

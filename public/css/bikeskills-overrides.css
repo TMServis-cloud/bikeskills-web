@@ -448,3 +448,7 @@ html.cookies-show .cookie .banner-icon {
 .copyright-wrap .text-block-143 {
   margin: 0 14px 0 6px;
 }
+
+/* Cookie lišta: „Více informací získáte zde“ jako součást věty, ne samostatný řádek */
+html.cookies-show .cookie .banner-author-wrap { display: block !important; }
+html.cookies-show .cookie .banner-author-wrap .banner-author { display: inline !important; margin: 0 !important; padding: 0 !important; }
