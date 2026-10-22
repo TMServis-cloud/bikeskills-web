@@ -244,7 +244,7 @@
       /* hlavní tlačítko = stejné jako ostatní hlavní tlačítka webu (černá pilulka, 64px, obrys v akcentní barvě) */
       '#bs-cc-modal .bs-cc-actions button.bs-primary{all:unset;box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;min-height:42px;padding:0 28px;border:2px solid #efc101;border-radius:64px;background:#000;color:#efc101;font-family:proxima-nova,sans-serif;font-size:14.4px;font-weight:500;letter-spacing:.4px;line-height:1.2;text-transform:uppercase;text-align:center;white-space:nowrap;cursor:pointer;transition:opacity .2s}' +
       /* ostatní = sekundární textové odkazy s podtržením */
-      '#bs-cc-modal .bs-cc-actions button.bs-link{all:unset;box-sizing:border-box;display:inline-block;font-family:proxima-nova,Arial,sans-serif;font-size:13px;font-weight:600;letter-spacing:.025rem;line-height:1.4;text-transform:uppercase;text-decoration:underline;text-underline-offset:3px;color:#fff;cursor:pointer;white-space:nowrap;transition:opacity .2s}' +
+      '#bs-cc-modal .bs-cc-actions button.bs-link{all:unset;box-sizing:border-box;display:inline-block;font-family:proxima-nova,Arial,sans-serif;font-size:13px;font-weight:500;letter-spacing:.025rem;line-height:1.4;text-transform:uppercase;text-decoration:underline;text-underline-offset:3px;color:#fff;cursor:pointer;white-space:nowrap;transition:opacity .2s}' +
       '#bs-cc-modal .bs-cc-actions button:hover{opacity:.65}' +
       '#bs-cc-modal .bs-cc-actions button:focus-visible,#bs-cc-modal a:focus-visible,#bs-cc-modal input:focus-visible{outline:3px solid #efc101;outline-offset:3px}' +
       '#bs-cc-modal .bs-cc-more{color:#efc101 !important;text-decoration:underline !important;text-underline-offset:2px}' +

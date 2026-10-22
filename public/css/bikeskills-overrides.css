@@ -104,7 +104,7 @@ html.cookies-show .cookie .bs-settings-btn {
   color: var(--black, #1a1a1a) !important;
   font-family: proxima-nova, sans-serif !important;
   font-size: 13px !important;
-  font-weight: 600 !important;
+  font-weight: 500 !important;
   letter-spacing: .025rem;
   line-height: 1.4 !important;
   text-transform: uppercase;
@@ -159,12 +159,11 @@ html.cookies-show .cookie .banner-icon {
   }
   html.cookies-show .cookie .product-wrap {
     display: grid !important;
-    grid-template-columns: auto auto 1fr !important;
+    grid-template-columns: auto auto auto 1fr !important;
     grid-template-areas:
-      "accept accept   close"
-      "reject settings ."
-      "text   text     text" !important;
-    column-gap: 20px !important;
+      "accept reject settings close"
+      "text   text   text     text" !important;
+    column-gap: 14px !important;
     row-gap: 12px !important;
     align-items: center !important;
     padding: 0 !important;
@@ -217,7 +216,7 @@ html.cookies-show .cookie .banner-icon {
   /* Text — Row 3, větší margin-top = vizuální mezera nad textem */
   html.cookies-show .cookie .banner-title-wrap {
     grid-area: text !important;
-    margin: 14px 0 0 0 !important;
+    margin: 5px 0 0 0 !important;
     text-align: left !important;
   }
   /* Texty menší */
