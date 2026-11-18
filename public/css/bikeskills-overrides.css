@@ -451,3 +451,13 @@ html.cookies-show .cookie .banner-icon {
 /* Cookie lišta: „Více informací získáte zde“ jako součást věty, ne samostatný řádek */
 html.cookies-show .cookie .banner-author-wrap { display: block !important; }
 html.cookies-show .cookie .banner-author-wrap .banner-author { display: inline !important; margin: 0 !important; padding: 0 !important; }
+
+/* HP shop sekce: 12 dlaždic značek (vč. brzd Hope/Magura/Hayes) vyplní mřížku 4/3/2/1 sloupců beze zbytku,
+   tlačítko „všechny kategorie" proto dostane vlastní řádek přes celou šířku (původně buňka 17rem natvrdo v řádku 4/5) */
+.collection-grid-category > #w-node-_166a1076-6f2f-eef5-24d9-8c2018cc669a-19f13d99 {
+  grid-column: 1 / -1;
+  grid-row: auto;
+  height: auto;
+  padding: 1.5rem 0;
+  background-color: transparent;
+}
