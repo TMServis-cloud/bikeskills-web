@@ -268,8 +268,8 @@ exports.sendServisForm = functions
 
 const bucket = admin.storage().bucket();
 // v2 = HTML včetně textu článku (dřív jen meta). Nová cesta = stará cache se automaticky nepoužije.
-// v4 = přepínač CZ | EN v horní liště, GDPR v zápatí
-const STORAGE_PRERENDER_PATH = (slug) => `prerendered-blog-v4/${slug}/index.html`;
+// v5 = větší mezera přepínače jazyka (nová verze CSS)
+const STORAGE_PRERENDER_PATH = (slug) => `prerendered-blog-v5/${slug}/index.html`;
 const { prerenderClanekDetail } = require('./lib/clanek-detail');
 const SITE_URL = 'https://bikeskills.cz';
 const DEFAULT_OG_IMAGE = `${SITE_URL}/images/og-image.jpg`;
