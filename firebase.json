@@ -10,7 +10,7 @@
       "**/.*",
       "**/node_modules/**",
       "**/*.bak",
-      "**/blog/*/index.html",
+      "blog/*/index.html",
       "wp-content/**"
     ],
     "redirects": [
@@ -926,6 +926,18 @@
       }
     ],
     "rewrites": [
+      {
+        "source": "/en/blog/**",
+        "destination": "/en/blog-post.html"
+      },
+      {
+        "source": "/en/events/**",
+        "destination": "/en/event-detail.html"
+      },
+      {
+        "source": "/en/team/**",
+        "destination": "/en/team-member.html"
+      },
       {
         "source": "/blog/*/",
         "function": {

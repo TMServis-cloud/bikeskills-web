@@ -30,7 +30,28 @@
   // Duplicitní měření do G-Y1GJE85WDX (chytreit.cz / bikeskills-web-app) odebráno 2026-10-21.
   var GA_IDS = ['G-DG5KF7PX48'];
   var FB_PIXEL_ID = '537412813575132';
-  var PRIVACY_URL = '/zasady-ochrany-osobnich-udaju';
+  var IS_EN = (document.documentElement.getAttribute('lang') || '').toLowerCase().indexOf('en') === 0;
+  var PRIVACY_URL = IS_EN ? '/en/privacy-policy' : '/zasady-ochrany-osobnich-udaju';
+  // Texty lišty a dialogu (CZ / EN podle <html lang>)
+  var TXT = IS_EN ? {
+    banner: 'THIS WEBSITE USES NECESSARY COOKIES. WITH YOUR CONSENT WE ALSO USE ANALYTICS (GOOGLE ANALYTICS) AND MARKETING (META PIXEL) COOKIES. ',
+    acceptAll: 'ACCEPT ALL', rejectAll: 'REJECT ALL', rejectAllLabel: 'Reject all optional cookies', settings: 'SETTINGS', settingsLabel: 'Set cookies by purpose',
+    close: 'Close', title: 'Cookie settings',
+    intro: 'Choose which cookies we may use. You can change or withdraw your consent at any time via the “Cookie settings” link in the website footer. Refusing does not limit the website in any way. Details are in our <a class="bs-cc-more" href="' + PRIVACY_URL + '">Privacy policy</a>.',
+    nec: 'Necessary cookies', necP: 'Ensure the basic operation of the website and store your choice. They do not require consent and cannot be switched off.',
+    ana: 'Analytics cookies (Google Analytics)', anaP: 'Measure traffic and behaviour on the website so we can improve it. Data is processed by Google.',
+    mar: 'Marketing cookies (Meta Pixel)', marP: 'Allow us to measure advertising effectiveness and show ads on Facebook and Instagram. Data is processed by Meta.',
+    save: 'Save selection', all: 'Accept all', none: 'Reject all', footer: 'Cookie settings'
+  } : {
+    banner: 'TENTO WEB POUŽÍVÁ NEZBYTNÉ COOKIES. S VAŠÍM SOUHLASEM POUŽÍVÁME TAKÉ ANALYTICKÉ (GOOGLE ANALYTICS) A MARKETINGOVÉ (META PIXEL) COOKIES. ',
+    acceptAll: 'PŘIJMOUT VŠE', rejectAll: 'ODMÍTNOUT VŠE', rejectAllLabel: 'Odmítnout všechny nepovinné cookies', settings: 'NASTAVENÍ', settingsLabel: 'Nastavit cookies podle účelů',
+    close: 'Zavřít', title: 'Nastavení cookies',
+    intro: 'Vyberte, které cookies smíme používat. Souhlas můžete kdykoli změnit nebo odvolat přes odkaz „Nastavení cookies“ v patičce webu. Odmítnutí nijak neomezuje funkčnost webu. Podrobnosti najdete v <a class="bs-cc-more" href="' + PRIVACY_URL + '">Zásadách ochrany osobních údajů</a>.',
+    nec: 'Nezbytné cookies', necP: 'Zajišťují základní chod webu a uložení vaší volby. Nevyžadují souhlas a nelze je vypnout.',
+    ana: 'Analytické cookies (Google Analytics)', anaP: 'Měří návštěvnost a chování na webu, abychom ho mohli zlepšovat. Data zpracovává Google.',
+    mar: 'Marketingové cookies (Meta Pixel)', marP: 'Umožňují měřit účinnost reklamy a zobrazovat reklamu na Facebooku a Instagramu. Data zpracovává Meta.',
+    save: 'Uložit výběr', all: 'Přijmout vše', none: 'Odmítnout vše', footer: 'Nastavení cookies'
+  };
 
   // ---------------- cookie helpers ----------------
   function getCookie(name) {
@@ -146,19 +167,19 @@
     // Text banneru — musí pojmenovat účely (analytika + marketing)
     var txt = banner.querySelector('.banner-author:not(.link)');
     if (txt) {
-      txt.textContent = 'TENTO WEB POUŽÍVÁ NEZBYTNÉ COOKIES. S VAŠÍM SOUHLASEM POUŽÍVÁME TAKÉ ANALYTICKÉ (GOOGLE ANALYTICS) A MARKETINGOVÉ (META PIXEL) COOKIES. ';
+      txt.textContent = TXT.banner;
       txt.removeAttribute('target');
       txt.setAttribute('href', PRIVACY_URL);
     }
     var more = banner.querySelector('.banner-author.link');
     if (more) { more.setAttribute('href', PRIVACY_URL); more.removeAttribute('target'); }
 
-    acceptBtn.textContent = 'PŘIJMOUT VŠE';
+    acceptBtn.textContent = TXT.acceptAll;
     acceptBtn.removeAttribute('target');
 
     // ODMÍTNOUT VŠE + NASTAVENÍ — sekundární textové odkazy; hlavní tlačítko je PŘIJMOUT VŠE
-    var rejectBtn = makeBtn('bs-reject-btn', 'ODMÍTNOUT VŠE', 'Odmítnout všechny nepovinné cookies');
-    var settingsBtn = makeBtn('bs-settings-btn', 'NASTAVENÍ', 'Nastavit cookies podle účelů');
+    var rejectBtn = makeBtn('bs-reject-btn', TXT.rejectAll, TXT.rejectAllLabel);
+    var settingsBtn = makeBtn('bs-settings-btn', TXT.settings, TXT.settingsLabel);
     // Layout: [text] ... NASTAVENÍ  ODMÍTNOUT VŠE  [PŘIJMOUT VŠE] [×]
     acceptBtn.parentNode.insertBefore(settingsBtn, acceptBtn);
     acceptBtn.parentNode.insertBefore(rejectBtn, acceptBtn);
@@ -262,19 +283,19 @@
     modal.setAttribute('aria-labelledby', 'bs-cc-title');
     modal.innerHTML =
       '<div class="bs-cc-box">' +
-        '<button type="button" class="bs-cc-close" aria-label="Zavřít"><svg viewBox="0 0 11 11" width="17" height="17" aria-hidden="true" focusable="false"><path d="M1.1 9.9L9.9 1.1M1.09 1.1l8.82 8.8" fill="none" stroke="#fff" stroke-linecap="round" stroke-width="2"/></svg></button>' +
-        '<h2 id="bs-cc-title">Nastavení cookies</h2>' +
-        '<p>Vyberte, které cookies smíme používat. Souhlas můžete kdykoli změnit nebo odvolat přes odkaz „Nastavení cookies“ v patičce webu. Odmítnutí nijak neomezuje funkčnost webu. Podrobnosti najdete v <a class="bs-cc-more" href="' + PRIVACY_URL + '">Zásadách ochrany osobních údajů</a>.</p>' +
-        '<div class="bs-cc-row"><label><input type="checkbox" checked disabled> Nezbytné cookies</label>' +
-          '<p>Zajišťují základní chod webu a uložení vaší volby. Nevyžadují souhlas a nelze je vypnout.</p></div>' +
-        '<div class="bs-cc-row"><label><input type="checkbox" id="bs-cc-a"> Analytické cookies (Google Analytics)</label>' +
-          '<p>Měří návštěvnost a chování na webu, abychom ho mohli zlepšovat. Data zpracovává Google.</p></div>' +
-        '<div class="bs-cc-row"><label><input type="checkbox" id="bs-cc-m"> Marketingové cookies (Meta Pixel)</label>' +
-          '<p>Umožňují měřit účinnost reklamy a zobrazovat reklamu na Facebooku a Instagramu. Data zpracovává Meta.</p></div>' +
+        '<button type="button" class="bs-cc-close" aria-label="' + TXT.close + '"><svg viewBox="0 0 11 11" width="17" height="17" aria-hidden="true" focusable="false"><path d="M1.1 9.9L9.9 1.1M1.09 1.1l8.82 8.8" fill="none" stroke="#fff" stroke-linecap="round" stroke-width="2"/></svg></button>' +
+        '<h2 id="bs-cc-title">' + TXT.title + '</h2>' +
+        '<p>' + TXT.intro + '</p>' +
+        '<div class="bs-cc-row"><label><input type="checkbox" checked disabled> ' + TXT.nec + '</label>' +
+          '<p>' + TXT.necP + '</p></div>' +
+        '<div class="bs-cc-row"><label><input type="checkbox" id="bs-cc-a"> ' + TXT.ana + '</label>' +
+          '<p>' + TXT.anaP + '</p></div>' +
+        '<div class="bs-cc-row"><label><input type="checkbox" id="bs-cc-m"> ' + TXT.mar + '</label>' +
+          '<p>' + TXT.marP + '</p></div>' +
         '<div class="bs-cc-actions">' +
-          '<button type="button" data-act="save" class="bs-primary">Uložit výběr</button>' +
-          '<button type="button" data-act="all" class="bs-link">Přijmout vše</button>' +
-          '<button type="button" data-act="none" class="bs-link">Odmítnout vše</button>' +
+          '<button type="button" data-act="save" class="bs-primary">' + TXT.save + '</button>' +
+          '<button type="button" data-act="all" class="bs-link">' + TXT.all + '</button>' +
+          '<button type="button" data-act="none" class="bs-link">' + TXT.none + '</button>' +
         '</div>' +
       '</div>';
     document.body.appendChild(modal);
@@ -337,13 +358,13 @@
   function addFooterLink() {
     try {
       if (document.getElementById('bs-cc-footer-link')) return;
-      var ref = document.querySelector('a.footer-link[href*="zasady-ochrany"]') || document.querySelector('a.footer-link');
+      var ref = document.querySelector('a.footer-link[href*="zasady-ochrany"]') || document.querySelector('a.footer-link[href*="privacy-policy"]') || document.querySelector('a.footer-link');
       if (!ref || !ref.parentNode) return;
       var l = ref.cloneNode(false);
       l.id = 'bs-cc-footer-link';
       l.href = '#';
       l.removeAttribute('target');
-      l.textContent = 'Nastavení cookies';
+      l.textContent = TXT.footer;
       l.addEventListener('click', function (e) { e.preventDefault(); openSettings(); });
       ref.parentNode.insertBefore(l, ref.nextSibling);
     } catch (err) { /* patička je jen doplněk */ }

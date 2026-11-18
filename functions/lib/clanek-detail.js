@@ -285,6 +285,14 @@ function prerenderClanekDetail(template, d) {
     html = setItemImg(html, 'featured-image', heroPrimary, titulek, 1280, 720, 'high', { srcset: heroSrcset, sizes: heroSizes });
   }
 
+  // hreflang + přepínač jazyka na anglický protějšek (enSlug z /en/data/clanky.json)
+  if (d.enSlug) {
+    const enUrl = `${BASE_URL}/en/blog/${d.enSlug}`;
+    html = html.replace(/\s*<!-- hreflang:start -->[\s\S]*?<!-- hreflang:end -->/, '');
+    html = html.replace('</head>', `  <!-- hreflang:start -->\n  <link rel="alternate" hreflang="cs" href="${url}">\n  <link rel="alternate" hreflang="en" href="${enUrl}">\n  <link rel="alternate" hreflang="x-default" href="${url}">\n  <!-- hreflang:end -->\n</head>`);
+    html = html.replace(/(<a\b[^>]*\bhref=")[^"]*("[^>]*\bbs-lang-switch\b)/, `$1/en/blog/${d.enSlug}$2`);
+  }
+
   // Označit pre-rendered (cms-loader.js to detekuje)
   // ZÁMĚRNĚ bez data-prerendered: cms-loader.js článek po načtení vykreslí stejně jako dosud,
   // HTML ze serveru jen navíc obsahuje text pro roboty (SeznamBot).

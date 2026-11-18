@@ -36,6 +36,36 @@ try {
 const db = admin.firestore();
 const PUBLIC_DIR = path.join(__dirname, '..', 'public');
 const BASE_URL = 'https://bikeskills.cz';
+// ============================================================
+// I18N – prerender běží 2× (cs, en). EN texty z translations/cms-docs-en.json
+// ============================================================
+let LANG = 'cs';
+const I18N = {
+  cs: { locale: 'cs-CZ', blogSlash: '/', blogBase: '/blog/', akceBase: '/akce/', blogList: '/blog', akceList: '/akce-archive', home: '/',
+        readMore: 'Číst dále', status: 'stav / obsazenost: ', price: 'cena za kurz: ', currency: ',- CZK', indiv: 'individuální kurzy →',
+        crumbHome: 'Domů', crumbAkce: 'Akce', ogLocale: 'cs_CZ',
+        labels: { camp:'Camp', kurz:'Kurz', trialovy:'Trialový kurz', deti:'Dětský kurz', workshop:'Workshop', jine:'Jiné' }, kids: 'Dětský kurz' },
+  en: { locale: 'en-GB', blogSlash: '', blogBase: '/en/blog/', akceBase: '/en/events/', blogList: '/en/blog', akceList: '/en/courses-and-events', home: '/en',
+        readMore: 'Read more', status: 'status / availability: ', price: 'course price: ', currency: ' CZK', indiv: 'individual courses →',
+        crumbHome: 'Home', crumbAkce: 'Events', ogLocale: 'en_US',
+        labels: { camp:'Camp', kurz:'Course', trialovy:'Trial course', deti:'Kids course', workshop:'Workshop', jine:'Other' }, kids: 'Kids course' },
+};
+const T = () => I18N[LANG];
+const EN_DOCS_PATH = path.join(__dirname, '..', 'translations', 'cms-docs-en.json');
+const EN_DOCS = fs.existsSync(EN_DOCS_PATH) ? JSON.parse(fs.readFileSync(EN_DOCS_PATH, 'utf8')) : { clanky: {}, akce: {}, team: {} };
+/** CZ dokument + EN překlad (podle CZ slugu) → EN dokument, nebo null když překlad chybí. */
+function toEn(col, d) { const e = EN_DOCS[col] && EN_DOCS[col][d.slug]; return e ? Object.assign({}, d, e, { slugCs: d.slug }) : null; }
+function setHreflang(html, csUrl, enUrl) {
+  html = html.replace(/\s*<!-- hreflang:start -->[\s\S]*?<!-- hreflang:end -->/, '');
+  if (!enUrl) return html;
+  const block = `  <!-- hreflang:start -->\n  <link rel="alternate" hreflang="cs" href="${csUrl}">\n  <link rel="alternate" hreflang="en" href="${enUrl}">\n  <link rel="alternate" hreflang="x-default" href="${csUrl}">\n  <!-- hreflang:end -->`;
+  return html.replace('</head>', `${block}\n</head>`);
+}
+/** Přepínač jazyka v menu (vložený build-en.js) – nasměruje na protějšek konkrétní položky. */
+function setLangSwitchHref(html, href) {
+  return html.replace(/(<a\b[^>]*\bbs-lang-switch\b[^>]*\bhref=")[^"]*(")|(<a\b[^>]*\bhref=")[^"]*("[^>]*\bbs-lang-switch\b)/, (m, a, b, c, d) => a ? a + href + b : c + href + d);
+}
+
 const PLACEHOLDER_URL = 'https://firebasestorage.googleapis.com/v0/b/bikeskills-web.firebasestorage.app/o/images%2Fplaceholder.webp?alt=media';
 
 // ============================================================
@@ -151,11 +181,11 @@ function processWpContent(html) {
   );
 }
 
-const KATEGORIE_LABELS = { camp:'Camp', kurz:'Kurz', trialovy:'Trialový kurz', deti:'Dětský kurz', workshop:'Workshop', jine:'Jiné' };
 function resolveAkceLabel(d) {
+  const KATEGORIE_LABELS = T().labels;
   if (d.kategorie && KATEGORIE_LABELS[d.kategorie]) return KATEGORIE_LABELS[d.kategorie];
   const typ = (d.typAkce || '').toLowerCase().trim();
-  if (typ === 'pro deti' || typ === 'detsky kurz') return 'Dětský kurz';
+  if (typ === 'pro deti' || typ === 'detsky kurz') return T().kids;
   return d.typAkce ? d.typAkce.charAt(0).toUpperCase() + d.typAkce.slice(1) : '';
 }
 
@@ -198,7 +228,7 @@ function replaceListContainer(html, listClassMarker, newInnerHtml, extraAttr) {
 // Card builders
 // ============================================================
 function buildClanekCard(d, i) {
-  const href = `/blog/${d.slug}/`;
+  const href = `${T().blogBase}${d.slug}${T().blogSlash}`;
   const resolved = d.imageUrl ? resolveUrl(d.imageUrl) : null;
   // src = originál (vždy 200) — fallback pokud variant ze srcset 404
   const src = resolved || PLACEHOLDER_URL;
@@ -220,7 +250,7 @@ function buildClanekCard(d, i) {
   </a>
   <div class="secondary-link-block blog">
     <div class="secondary-link-button">
-      <a item="permalink" style="color:rgb(255,255,255)" href="${escapeAttr(href)}" class="secondary-link">Číst dále</a>
+      <a item="permalink" style="color:rgb(255,255,255)" href="${escapeAttr(href)}" class="secondary-link">${T().readMore}</a>
       <div style="background-color:rgb(255,255,255)" class="secondary-button-line"></div>
     </div>
   </div>
@@ -228,7 +258,7 @@ function buildClanekCard(d, i) {
 }
 
 function buildAkceCard(d, i) {
-  const href = `/akce/${d.slug}`;
+  const href = `${T().akceBase}${d.slug}`;
   const resolved = d.imageUrl ? resolveUrl(d.imageUrl) : null;
   // src = originál (vždy 200) — fallback pokud variant ze srcset 404
   const src = resolved || PLACEHOLDER_URL;
@@ -242,8 +272,8 @@ function buildAkceCard(d, i) {
   const stripped = String(d.popis||'').replace(/<[^>]*>/g, '');
   const excerpt = stripped.length > 150 ? stripped.substring(0,150) + '…' : stripped;
   const cenaBlock = d.cena
-    ? `<div class="akce-popis">cena za kurz: </div><div acf:text="price" class="akce-cena">${escapeHtml(d.cena.toLocaleString('cs-CZ'))}</div><div class="akce-cena-after">,- CZK</div>`
-    : `<div acf:text="price" class="akce-cena" style="font-size:0.8em;letter-spacing:0.03em;opacity:0.85;">individuální kurzy →</div>`;
+    ? `<div class="akce-popis">${T().price}</div><div acf:text="price" class="akce-cena">${escapeHtml(d.cena.toLocaleString(T().locale))}</div><div class="akce-cena-after">${T().currency}</div>`
+    : `<div acf:text="price" class="akce-cena" style="font-size:0.8em;letter-spacing:0.03em;opacity:0.85;">${T().indiv}</div>`;
   return `
 <div role="listitem" class="collection-item-akce w-dyn-item" style="transform:translate3d(0,0,0)">
   <a item="permalink" href="${escapeAttr(href)}" class="akce-box w-inline-block">
@@ -258,7 +288,7 @@ function buildAkceCard(d, i) {
     </div>
     <div style="color:rgb(255,255,255);background-color:rgb(45,96,171)" class="div-block-330">
       <div class="akce-cena-block">
-        <div class="akce-popis">stav / obsazenost: </div>
+        <div class="akce-popis">${T().status}</div>
         <div acf:text="riders-number" class="akce-ridersnumber">${escapeHtml(d.stavLabel||d.stav||'')}</div>
       </div>
       <div class="akce-cena-block">${cenaBlock}</div>
@@ -441,10 +471,13 @@ function injectJsonLd(html, schemaObj, marker) {
 }
 
 function prerenderClanekDetail(template, d) {
-  const url = `${BASE_URL}/blog/${d.slug}/`;
+  const url = `${BASE_URL}${T().blogBase}${d.slug}${T().blogSlash}`;
+  const csUrl = `${BASE_URL}/blog/${d.slugCs || d.slug}/`;
+  const enDoc = LANG === 'cs' ? EN_DOCS.clanky[d.slug] : null;
+  const enUrl = LANG === 'en' ? url : (enDoc ? `${BASE_URL}/en/blog/${enDoc.slug}` : null);
   const titulek = d.titulek || '';
   const datum = d.datum
-    ? new Date(d.datum.seconds ? d.datum.seconds * 1000 : d.datum).toLocaleDateString('cs-CZ')
+    ? new Date(d.datum.seconds ? d.datum.seconds * 1000 : d.datum).toLocaleDateString(T().locale, LANG === 'en' ? { day: 'numeric', month: 'long', year: 'numeric' } : undefined)
     : '';
   const datumISO = d.datum
     ? new Date(d.datum.seconds ? d.datum.seconds * 1000 : d.datum).toISOString()
@@ -499,8 +532,8 @@ function prerenderClanekDetail(template, d) {
   html = injectJsonLd(html, {
     '@context':'https://schema.org','@type':'BreadcrumbList',
     itemListElement: [
-      {'@type':'ListItem',position:1,name:'Domů',item: BASE_URL + '/'},
-      {'@type':'ListItem',position:2,name:'Blog',item: BASE_URL + '/blog'},
+      {'@type':'ListItem',position:1,name:T().crumbHome,item: BASE_URL + T().home},
+      {'@type':'ListItem',position:2,name:'Blog',item: BASE_URL + T().blogList},
       {'@type':'ListItem',position:3,name:titulek,item:url}
     ]
   }, 'breadcrumb');
@@ -514,13 +547,18 @@ function prerenderClanekDetail(template, d) {
     html = setItemImg(html, 'featured-image', heroPrimary, titulek, 1280, 720, 'high', { srcset: heroSrcset, sizes: heroSizes });
   }
 
+  html = setHreflang(html, csUrl, enUrl);
+  if (enUrl) html = setLangSwitchHref(html, LANG === 'en' ? csUrl.replace(BASE_URL, '') : enUrl.replace(BASE_URL, ''));
   // Označit pre-rendered (cms-loader.js to detekuje)
   html = html.replace(/<html\b/, '<html data-prerendered="true"');
   return html;
 }
 
 function prerenderAkceDetail(template, d) {
-  const url = `${BASE_URL}/akce/${d.slug}`;
+  const url = `${BASE_URL}${T().akceBase}${d.slug}`;
+  const csUrl = `${BASE_URL}/akce/${d.slugCs || d.slug}`;
+  const enDoc = LANG === 'cs' ? EN_DOCS.akce[d.slug] : null;
+  const enUrl = LANG === 'en' ? url : (enDoc ? `${BASE_URL}/en/events/${enDoc.slug}` : null);
   const nazev = d.nazev || '';
   const heroOrig = d.imageUrl;
   const hero = heroOrig ? resolveUrl(heroOrig) : `${BASE_URL}/images/og-image.jpg`;
@@ -581,8 +619,8 @@ function prerenderAkceDetail(template, d) {
   html = injectJsonLd(html, {
     '@context':'https://schema.org','@type':'BreadcrumbList',
     itemListElement: [
-      {'@type':'ListItem',position:1,name:'Domů',item: BASE_URL + '/'},
-      {'@type':'ListItem',position:2,name:'Akce',item: BASE_URL + '/akce-archive'},
+      {'@type':'ListItem',position:1,name:T().crumbHome,item: BASE_URL + T().home},
+      {'@type':'ListItem',position:2,name:T().crumbAkce,item: BASE_URL + T().akceList},
       {'@type':'ListItem',position:3,name:nazev,item:url}
     ]
   }, 'breadcrumb');
@@ -602,7 +640,7 @@ function prerenderAkceDetail(template, d) {
   html = setAcfText(html, 'typ-akce', labelTyp);
   html = setAcfText(html, 'datum', d.datumText || '');
   html = setAcfText(html, 'doba-trvani', labelTyp);
-  html = setAcfText(html, 'price', d.cena ? d.cena.toLocaleString('cs-CZ') : '');
+  html = setAcfText(html, 'price', d.cena ? d.cena.toLocaleString(T().locale) : '');
   html = setAcfText(html, 'riders-number', d.stavLabel || d.stav || '');
   html = setAcfText(html, 'akce-level', d.uroven || '');
   html = setItemElementContent(html, 'h2', 'title', escapeHtml(nazev)).html;
@@ -610,6 +648,8 @@ function prerenderAkceDetail(template, d) {
   if (heroPrimary) {
     html = setItemImg(html, 'featured-image', heroPrimary, nazev, 1280, 720, 'high', { srcset: heroSrcset, sizes: heroSizes });
   }
+  html = setHreflang(html, csUrl, enUrl);
+  if (enUrl) html = setLangSwitchHref(html, LANG === 'en' ? csUrl.replace(BASE_URL, '') : enUrl.replace(BASE_URL, ''));
   html = html.replace(/<html\b/, '<html data-prerendered="true"');
   return html;
 }
@@ -687,6 +727,28 @@ async function main() {
     cnt++;
   }
   console.log(`  ✅ public/akce/<slug>/index.html — ${cnt} detail akcí`);
+
+  // ---------------- EN ----------------
+  LANG = 'en';
+  const clankyEn = clanky.map(d => toEn('clanky', d)).filter(Boolean);
+  const akceEn = akce.map(d => toEn('akce', d)).filter(Boolean);
+  const akceEnListing = akceForListing.map(d => toEn('akce', d)).filter(Boolean);
+  const enDir = path.join(PUBLIC_DIR, 'en');
+  if (fs.existsSync(path.join(enDir, 'blog.html'))) {
+    const p1 = path.join(enDir, 'blog.html');
+    fs.writeFileSync(p1, prerenderBlogListing(fs.readFileSync(p1, 'utf8'), clankyEn));
+    const p2 = path.join(enDir, 'courses-and-events.html');
+    fs.writeFileSync(p2, prerenderAkceListing(fs.readFileSync(p2, 'utf8'), akceEnListing));
+    console.log(`  ✅ public/en/ listingy — ${Math.min(12, clankyEn.length)} článků, ${akceEnListing.length} akcí`);
+    const tplPost = fs.readFileSync(path.join(enDir, 'blog-post.html'), 'utf8');
+    for (const d of clankyEn) { const dir = path.join(enDir, 'blog', d.slug); ensureDir(dir); fs.writeFileSync(path.join(dir, 'index.html'), prerenderClanekDetail(tplPost, d)); }
+    const tplAkce = fs.readFileSync(path.join(enDir, 'event-detail.html'), 'utf8');
+    for (const d of akceEn) { const dir = path.join(enDir, 'events', d.slug); ensureDir(dir); fs.writeFileSync(path.join(dir, 'index.html'), prerenderAkceDetail(tplAkce, d)); }
+    console.log(`  ✅ public/en/blog|events/<slug>/index.html — ${clankyEn.length} článků, ${akceEn.length} akcí`);
+    const missEn = clanky.length - clankyEn.length + akce.length - akceEn.length;
+    if (missEn) console.log(`  ⚠️  ${missEn} položek bez EN překladu (node scripts/i18n/dump-cms.js --fetch)`);
+  } else console.log('  ⚠️  public/en/ chybí — nejdřív node scripts/build-en.js');
+  LANG = 'cs';
 
   console.log('🎉 Prerender hotov.');
   process.exit(0);

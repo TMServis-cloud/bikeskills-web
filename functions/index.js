@@ -94,7 +94,8 @@ exports.sendReservation = functions
     if (req.method === 'OPTIONS') { res.status(204).send(''); return; }
     if (req.method !== 'POST') { res.status(405).json({ error: 'Method Not Allowed' }); return; }
 
-    const { jmenoPrijmeni, email, telefon, termin, typKola, pocet, poznamka, nazevAkce } = req.body || {};
+    const { jmenoPrijmeni, email, telefon, termin, typKola, pocet, poznamka, nazevAkce, lang } = req.body || {};
+    const isEn = lang === 'en';
 
     if (!jmenoPrijmeni || !email) {
       res.status(400).json({ error: 'Chybějí povinné údaje' });
@@ -118,7 +119,7 @@ exports.sendReservation = functions
     });
 
     const adminBody = [
-      `Nová přihláška / dotaz: ${nazevAkce || '(neuvedeno)'}`,
+      `Nová přihláška / dotaz: ${nazevAkce || '(neuvedeno)'}${isEn ? '  [EN web]' : ''}`,
       ``,
       `Jméno a příjmení: ${jmenoPrijmeni}`,
       `E-mail: ${email}`,
@@ -129,7 +130,15 @@ exports.sendReservation = functions
       `Poznámka / dotaz: ${poznamka || '—'}`,
     ].join('\n');
 
-    const clientBody = [
+    const clientBody = isEn ? [
+      `Hello ${jmenoPrijmeni.split(' ')[0]},`,
+      ``,
+      `Your enquiry / registration for „${nazevAkce || 'BikeSkills'}" has been sent successfully.`,
+      `We will get back to you shortly with more information.`,
+      ``,
+      `The BikeSkills team`,
+      `https://bikeskills.cz/en`,
+    ].join('\n') : [
       `Dobrý den ${jmenoPrijmeni.split(' ')[0]},`,
       ``,
       `Váš dotaz / přihláška na akci „${nazevAkce || 'BikeSkills'}" byla úspěšně odeslána.`,
@@ -144,13 +153,13 @@ exports.sendReservation = functions
         transporter.sendMail({
           from: `"BikeSkills rezervace" <${process.env.EMAIL_FROM}>`,
           to: 'cihi@bikeskills.cz',
-          subject: `Přihláška: ${nazevAkce || 'akce'} — ${jmenoPrijmeni}`,
+          subject: `${isEn ? '[EN] ' : ''}Přihláška: ${nazevAkce || 'akce'} — ${jmenoPrijmeni}`,
           text: adminBody,
         }),
         transporter.sendMail({
           from: `"BikeSkills" <${process.env.EMAIL_FROM}>`,
           to: email,
-          subject: `Potvrzení přihlášky: ${nazevAkce || 'BikeSkills'}`,
+          subject: isEn ? `Registration confirmation: ${nazevAkce || 'BikeSkills'}` : `Potvrzení přihlášky: ${nazevAkce || 'BikeSkills'}`,
           text: clientBody,
         }),
       ]);
@@ -172,7 +181,8 @@ exports.sendServisForm = functions
     if (req.method === 'OPTIONS') { res.status(204).send(''); return; }
     if (req.method !== 'POST') { res.status(405).json({ error: 'Method Not Allowed' }); return; }
 
-    const { jmenoPrijmeni, email, telefon, typServisu, zprava } = req.body || {};
+    const { jmenoPrijmeni, email, telefon, typServisu, zprava, lang } = req.body || {};
+    const isEn = lang === 'en';
 
     if (!jmenoPrijmeni || !email) {
       res.status(400).json({ error: 'Chybějí povinné údaje' });
@@ -196,7 +206,7 @@ exports.sendServisForm = functions
     });
 
     const adminBody = [
-      `Nová zpráva z objednávkového formuláře servis.html`,
+      `Nová zpráva z objednávkového formuláře servis.html${isEn ? '  [EN web]' : ''}`,
       ``,
       `Jméno a příjmení: ${jmenoPrijmeni}`,
       `E-mail: ${email}`,
@@ -205,7 +215,14 @@ exports.sendServisForm = functions
       `Zpráva: ${zprava || '—'}`,
     ].join('\n');
 
-    const clientBody = [
+    const clientBody = isEn ? [
+      `Hello ${jmenoPrijmeni.split(' ')[0]},`,
+      ``,
+      `Your enquiry has been sent successfully. We'll get back to you as soon as we're off the bike!`,
+      ``,
+      `The BikeSkills team`,
+      `https://bikeskills.cz/en`,
+    ].join('\n') : [
       `Dobrý den ${jmenoPrijmeni.split(' ')[0]},`,
       ``,
       `Váš dotaz byl úspěšně odeslán. Jak slezeme z kola, ozveme se vám!`,
@@ -219,13 +236,13 @@ exports.sendServisForm = functions
         transporter.sendMail({
           from: `"BikeSkills servis" <${process.env.EMAIL_FROM}>`,
           to: 'cihi@bikeskills.cz',
-          subject: `Objednávkový formulář: ${typServisu || 'dotaz'} — ${jmenoPrijmeni}`,
+          subject: `${isEn ? '[EN] ' : ''}Objednávkový formulář: ${typServisu || 'dotaz'} — ${jmenoPrijmeni}`,
           text: adminBody,
         }),
         transporter.sendMail({
           from: `"BikeSkills" <${process.env.EMAIL_FROM}>`,
           to: email,
-          subject: `Potvrzení dotazu — BikeSkills servis`,
+          subject: isEn ? `Enquiry confirmation — BikeSkills bike service` : `Potvrzení dotazu — BikeSkills servis`,
           text: clientBody,
         }),
       ]);
@@ -251,7 +268,8 @@ exports.sendServisForm = functions
 
 const bucket = admin.storage().bucket();
 // v2 = HTML včetně textu článku (dřív jen meta). Nová cesta = stará cache se automaticky nepoužije.
-const STORAGE_PRERENDER_PATH = (slug) => `prerendered-blog-v2/${slug}/index.html`;
+// v3 = navíc hreflang + přepínač na EN verzi článku
+const STORAGE_PRERENDER_PATH = (slug) => `prerendered-blog-v3/${slug}/index.html`;
 const { prerenderClanekDetail } = require('./lib/clanek-detail');
 const SITE_URL = 'https://bikeskills.cz';
 const DEFAULT_OG_IMAGE = `${SITE_URL}/images/og-image.jpg`;
@@ -266,6 +284,18 @@ async function loadDetailTemplate() {
   _templateCache = await r.text();
   _templateCachedAt = Date.now();
   return _templateCache;
+}
+
+// EN překlady článků (statický soubor z hostingu, generuje scripts/i18n/apply-cms.js)
+let _enIndex = null, _enIndexAt = 0;
+async function loadEnIndex() {
+  if (_enIndex && (Date.now() - _enIndexAt < 10 * 60 * 1000)) return _enIndex;
+  try {
+    const r = await fetch(`${SITE_URL}/en/data/clanky.json`, { cache: 'no-store' });
+    _enIndex = r.ok ? await r.json() : {};
+  } catch (_) { _enIndex = {}; }
+  _enIndexAt = Date.now();
+  return _enIndex;
 }
 
 function _escapeAttr(s)  { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/"/g, '&quot;'); }
@@ -311,8 +341,9 @@ function _setCanonical(html, url) {
 async function buildClanekDetailHtml(d) {
   // Plný detail: meta + JSON-LD + titulek, datum, autor, text a hlavní obrázek přímo v HTML
   // (dřív jen meta – text doplňoval až JavaScript, SeznamBot ho neviděl).
-  const template = await loadDetailTemplate();
-  return prerenderClanekDetail(template, d);
+  const [template, enIndex] = await Promise.all([loadDetailTemplate(), loadEnIndex()]);
+  const en = enIndex[d.slug];
+  return prerenderClanekDetail(template, en ? Object.assign({}, d, { enSlug: en.slug }) : d);
 }
 
 // Firestore trigger: pri zmene clanku smaze Storage cache (lazy regenerate)

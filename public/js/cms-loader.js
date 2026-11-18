@@ -23,6 +23,71 @@ if (!firebase.apps.length) {
 const db = firebase.firestore();
 
 // ============================================================
+// I18N — jazyk podle <html lang>. EN stránky leží v /en/ (scripts/build-en.js),
+// překlady obsahu jsou ve Firestore v poli `en` (titulek/obsah/perex/slug, nazev/popis/…).
+// ============================================================
+const LANG = (document.documentElement.getAttribute('lang') || 'cs').toLowerCase().indexOf('en') === 0 ? 'en' : 'cs';
+const IS_EN = LANG === 'en';
+const LOCALE = IS_EN ? 'en-GB' : 'cs-CZ';
+const SITE_URL = 'https://bikeskills.cz';
+const HOME_PATH = IS_EN ? '/en' : '/';
+const BLOG_BASE = IS_EN ? '/en/blog/' : '/blog/';
+const AKCE_BASE = IS_EN ? '/en/events/' : '/akce/';
+const TEAM_BASE = IS_EN ? '/en/team/' : '/team/';
+const BLOG_LIST = IS_EN ? '/en/blog' : '/blog';
+const AKCE_LIST = IS_EN ? '/en/courses-and-events' : '/akce-archive';
+const TEAM_LIST = IS_EN ? '/en/team' : '/team';
+const SLUG_FIELD = 'slug'; // dotazy jdou vždy na CZ slug; EN slug se převádí v routingu (EN_REV)
+const I18N_EN = {
+  'Camp': 'Camp', 'Kurz': 'Course', 'Trialový kurz': 'Trial course', 'Dětský kurz': 'Kids course', 'Workshop': 'Workshop', 'Jiné': 'Other',
+  'individuální kurzy →': 'individual courses →',
+  'Všechny roky': 'All years', 'Typ akce': 'Event type', 'Jakákoliv cena': 'Any price', 'S cenou': 'Paid', 'Zdarma / ind.': 'Free / individual',
+  'Domů': 'Home', 'Akce': 'Events', 'Blog': 'Blog', 'Tým': 'Team', 'Článek': 'Article', 'Člen týmu': 'Team member',
+  'Člen týmu nenalezen.': 'Team member not found.',
+  'Vyplňte prosím jméno a příjmení.': 'Please enter your full name.',
+  'Zadejte platný e-mail.': 'Please enter a valid e-mail address.',
+  'Pro odeslání je nutný souhlas se zásadami ochrany osobních údajů.': 'You must agree to the privacy policy to send the form.',
+  'Odesílám…': 'Sending…', 'ODESLAT': 'SEND',
+  'Nepodařilo se odeslat. Zkuste to prosím znovu nebo nás kontaktujte na info@bikeskills.cz.': 'Sending failed. Please try again or contact us at info@bikeskills.cz.',
+  'Registrace: ': 'Registration: ', 'akce': 'event',
+};
+function t(s) { return IS_EN && I18N_EN[s] != null ? I18N_EN[s] : s; }
+// Překlady CMS obsahu jsou statické soubory generované scripts/i18n/apply-cms.js:
+//   /en/data/{clanky,akce,team}.json         – { csSlug: { slug, titulek|nazev, perex, … } }
+//   /en/data/{clanky,akce}/<csSlug>.json      – { obsah } / { popis } (detail mimo prerender)
+const EN_MAPS = { clanky: {}, akce: {}, team: {} };
+const EN_REV = { clanky: {}, akce: {}, team: {} };
+async function loadEnMaps() {
+  await Promise.all(Object.keys(EN_MAPS).map(async c => {
+    try {
+      const r = await fetch(`/en/data/${c}.json`, { cache: 'no-cache' });
+      if (!r.ok) return;
+      EN_MAPS[c] = await r.json();
+      for (const [cs, e] of Object.entries(EN_MAPS[c])) EN_REV[c][e.slug || cs] = cs;
+    } catch (_) {}
+  }));
+}
+function colOf(d) { return d.titulek !== undefined ? 'clanky' : d.nazev !== undefined ? 'akce' : d.jmeno !== undefined ? 'team' : null; }
+/** Sloučí EN překlad přes CZ data z Firestore. V EN bez překladu označí _noEn (položka se nezobrazí). */
+function loc(d) {
+  if (!d || !IS_EN) return d;
+  const c = colOf(d); const m = c && EN_MAPS[c][d.slug];
+  if (!m) return Object.assign({}, d, { _noEn: true });
+  return Object.assign({}, d, m, { slugCs: d.slug });
+}
+/** Detail: navíc dotáhne plný EN obsah (obsah/popis), pokud stránka není předgenerovaná. */
+async function locDetail(raw) {
+  const d = loc(raw);
+  if (!IS_EN || !d || d._noEn || PAGE_PRERENDERED) return d;
+  const c = colOf(raw);
+  if (c === 'clanky' || c === 'akce') {
+    try { const r = await fetch(`/en/data/${c}/${encodeURIComponent(raw.slug)}.json`); if (r.ok) Object.assign(d, await r.json()); } catch (_) {}
+  }
+  return d;
+}
+function hasLang(d) { return !d._noEn; }
+
+// ============================================================
 // PROGRESSIVE ENHANCEMENT — pre-rendered (SSG) detection
 // Build-time skript scripts/prerender.js značí pre-renderovaný DOM:
 //   - Listings: <div class="...w-dyn-items..." data-prerendered="true"> kolem karet
@@ -187,9 +252,9 @@ const KATEGORIE_LABELS = {
 
 /** Vrátí zobrazovaný typ akce — primárně z kategorie, pak z typAkce (starý WP import). */
 function resolveAkceLabel(d) {
-  if (d.kategorie && KATEGORIE_LABELS[d.kategorie]) return KATEGORIE_LABELS[d.kategorie];
+  if (d.kategorie && KATEGORIE_LABELS[d.kategorie]) return t(KATEGORIE_LABELS[d.kategorie]);
   const typ = (d.typAkce || '').toLowerCase().trim().normalize('NFD').replace(/[̀-ͯ]/g, '');
-  if (typ === 'pro deti' || typ === 'detsky kurz') return 'Dětský kurz';
+  if (typ === 'pro deti' || typ === 'detsky kurz') return t('Dětský kurz');
   return normalizeTypAkce(d.typAkce || '');
 }
 
@@ -258,6 +323,7 @@ const PATH_TO_SEO_KEY = {
 };
 
 async function applySeoFromSettings(path) {
+  if (IS_EN) return; // SEO nastavení v adminu je české
   const key = PATH_TO_SEO_KEY[path];
   if (!key) return;
   try {
@@ -427,11 +493,23 @@ function externalLinksNewTab(containerEl) {
 // ============================================================
 // PAGE DETECTION
 // ============================================================
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+  if (IS_EN) await loadEnMaps();
   // Globálně: všechny externí linky otevřít v novém okně
   externalLinksNewTab(document.body);
 
-  const path = window.location.pathname;
+  let path = window.location.pathname;
+  if (IS_EN) {
+    // /en/… → interní CZ routa (stejné loadery, jiný jazyk dat)
+    const p = path.replace(/\.html$/, '').replace(/\/$/, '') || '/';
+    const EN_ROUTES = { '/en': '/', '/en/index': '/', '/en/blog': '/blog', '/en/courses-and-events': '/akce-archive', '/en/team': '/team' };
+    if (EN_ROUTES[p]) path = EN_ROUTES[p];
+    else if (p.indexOf('/en/blog/') === 0) { const s = p.slice('/en/blog/'.length); path = '/blog/' + (EN_REV.clanky[s] || s) + '/'; }
+    else if (p.indexOf('/en/events/') === 0) { const s = p.slice('/en/events/'.length); path = '/akce/' + (EN_REV.akce[s] || s); }
+    else if (p.indexOf('/en/team/') === 0) { const s = p.slice('/en/team/'.length); path = '/team/' + (EN_REV.team[s] || s); }
+    else if (p === '/en/event-detail') path = '/detail_akce';
+    else if (p === '/en/team-member') path = '/detail_archive-team';
+  }
 
   // Aplikovat SEO z Firestore (nepřepisuje meta dynamicky generovaná pro detail stránky)
   applySeoFromSettings(path);
@@ -476,7 +554,7 @@ document.addEventListener('DOMContentLoaded', () => {
 function renderAkceItem(template, data) {
   const item = template.cloneNode(true);
 
-  const href = `/akce/${data.slug}`;
+  const href = `${AKCE_BASE}${data.slug}`;
   item.querySelectorAll('[item="permalink"], a.akce-box').forEach(el => { el.href = href; });
 
   const titleEl = item.querySelector('[item="title"], .akce-heading');
@@ -521,7 +599,7 @@ function renderAkceItem(template, data) {
   const cenaEl = item.querySelector('.akce-cena, [acf\\:text="price"]');
   if (cenaEl) {
     if (data.cena) {
-      cenaEl.textContent = data.cena.toLocaleString('cs-CZ');
+      cenaEl.textContent = data.cena.toLocaleString(LOCALE);
       cenaEl.classList.remove('w-dyn-bind-empty');
     } else {
       // Nahraď cenu odkazem na individuální kurzy
@@ -529,7 +607,7 @@ function renderAkceItem(template, data) {
       if (after && after.classList.contains('akce-cena-after')) after.style.display = 'none';
       const popisEl = cenaEl.previousElementSibling;
       if (popisEl && popisEl.classList.contains('akce-popis')) popisEl.style.display = 'none';
-      cenaEl.textContent = 'individuální kurzy →';
+      cenaEl.textContent = t('individuální kurzy →');
       cenaEl.style.cssText = 'font-size:0.8em;letter-spacing:0.03em;opacity:0.85;';
       cenaEl.classList.remove('w-dyn-bind-empty');
     }
@@ -549,7 +627,7 @@ async function loadAkcePreview() {
     const today = new Date();
     const todayStr = `${today.getFullYear()}${String(today.getMonth() + 1).padStart(2, '0')}${String(today.getDate()).padStart(2, '0')}`;
 
-    const all = snapshot.docs.map(d => d.data()).filter(d => d.aktivni !== false);
+    const all = snapshot.docs.map(d => loc(d.data())).filter(hasLang).filter(d => d.aktivni !== false);
     // Nejbližší nadcházející akce seřazené od nejbližšího data
     const upcoming = all
       .filter(d => String(d.datumSort || '0') >= todayStr)
@@ -613,7 +691,7 @@ function makeYearSelect(years, currentYear, onChange) {
   sel.setAttribute('style', SELECT_STYLE);
   const allOpt = document.createElement('option');
   allOpt.value = 'all';
-  allOpt.textContent = 'Všechny roky';
+  allOpt.textContent = t('Všechny roky');
   if (currentYear === 'all') allOpt.selected = true;
   sel.appendChild(allOpt);
   years.forEach(y => {
@@ -660,10 +738,10 @@ function buildAkceFilterBar(bar, years, typy) {
 
   bar.appendChild(makeYearSelect(years, akceYearFilter, v => { akceYearFilter = v; currentAkcePage = 1; renderAkceListPage(); }));
 
-  const zamereniOpts = [['all', 'Typ akce'], ...typy.map(t => [t, t])];
+  const zamereniOpts = [['all', t('Typ akce')], ...typy.map(t => [t, t])];
   bar.appendChild(makeGenericSelect(zamereniOpts, akceZamereniFilter, v => { akceZamereniFilter = v; currentAkcePage = 1; renderAkceListPage(); }));
 
-  const cenaOpts = [['all', 'Jakákoliv cena'], ['scena', 'S cenou'], ['zdarma', 'Zdarma / ind.']];
+  const cenaOpts = [['all', t('Jakákoliv cena')], ['scena', t('S cenou')], ['zdarma', t('Zdarma / ind.')]];
   bar.appendChild(makeGenericSelect(cenaOpts, akceCenaFilter, v => { akceCenaFilter = v; currentAkcePage = 1; renderAkceListPage(); }));
 }
 
@@ -892,7 +970,7 @@ async function loadAkceList() {
   try {
     // Bez orderBy — Firestore vylučuje dokumenty bez indexovaného pole
     const snapshot = await db.collection('akce').get();
-    allAkceData = snapshot.docs.map(d => d.data())
+    allAkceData = snapshot.docs.map(d => loc(d.data())).filter(hasLang)
       .filter(d => d.aktivni !== false)
       .sort((a, b) => String(b.datumSort || '0').localeCompare(String(a.datumSort || '0')));
 
@@ -922,14 +1000,14 @@ async function loadAkceDetail(slug) {
   const { itemsList, template, emptyEl } = wfl;
 
   try {
-    const snapshot = await db.collection('akce').where('slug', '==', slug).limit(1).get();
+    const snapshot = await db.collection('akce').where(SLUG_FIELD, '==', slug).limit(1).get();
     if (snapshot.empty) {
       toggleEmpty(emptyEl, false);
       itemsList.innerHTML = '';
       return;
     }
 
-    const data = snapshot.docs[0].data();
+    const data = await locDetail(snapshot.docs[0].data());
     const galerie = (data.galerie && data.galerie.length)
       ? data.galerie.filter(Boolean)
       : [data.galerie1, data.galerie2, data.galerie3, data.galerie4].filter(Boolean);
@@ -938,7 +1016,7 @@ async function loadAkceDetail(slug) {
     const rezCamp = document.getElementById('rez-modal-camp');
     if (rezCamp) rezCamp.textContent = data.nazev || '';
     const rezMailLink = document.getElementById('rez-mail-link');
-    if (rezMailLink) rezMailLink.href = `mailto:cihi@bikeskills.cz?subject=${encodeURIComponent('Registrace: ' + (data.nazev || 'akce'))}`;
+    if (rezMailLink) rezMailLink.href = `mailto:cihi@bikeskills.cz?subject=${encodeURIComponent(t('Registrace: ') + (data.nazev || t('akce')))}`;
     window._akceNazev = data.nazev || '';
 
     // Pre-rendered režim: pouze doplnit interaktivitu nad existujícím DOMem
@@ -1095,8 +1173,8 @@ async function loadAkceDetail(slug) {
       injectJsonLd(courseSchema);
     }
     injectBreadcrumb([
-      { name: 'Domů', item: 'https://bikeskills.cz/' },
-      { name: 'Akce', item: 'https://bikeskills.cz/akce-archive' },
+      { name: t('Domů'), item: SITE_URL + HOME_PATH },
+      { name: t('Akce'), item: SITE_URL + AKCE_LIST },
       { name: data.nazev || 'Akce', item: window.location.href }
     ]);
 
@@ -1112,7 +1190,7 @@ async function loadAkceDetail(slug) {
 
     const cenaEl = item.querySelector('[acf\\:text="price"]');
     if (cenaEl) {
-      cenaEl.textContent = data.cena ? data.cena.toLocaleString('cs-CZ') : '';
+      cenaEl.textContent = data.cena ? data.cena.toLocaleString(LOCALE) : '';
       cenaEl.classList.remove('w-dyn-bind-empty');
     }
 
@@ -1226,7 +1304,7 @@ async function loadAkceDetail(slug) {
 function renderClanekItem(template, data) {
   const item = template.cloneNode(true);
 
-  const href = `/blog/${data.slug}/`;
+  const href = `${BLOG_BASE}${data.slug}${IS_EN ? '' : '/'}`;
   item.querySelectorAll('[item="permalink"]').forEach(el => { el.href = href; });
 
   const titleEl = item.querySelector('[item="title"], .wrapper--text__title');
@@ -1265,7 +1343,7 @@ async function loadClankyPreview() {
   showSkeleton(itemsList, 4);
   try {
     const snapshot = await db.collection('clanky').orderBy('datum', 'desc').limit(4).get();
-    const docs = snapshot.docs.map(d => d.data()).filter(d => d.publikovano !== false);
+    const docs = snapshot.docs.map(d => loc(d.data())).filter(hasLang).filter(d => d.publikovano !== false);
 
     if (!docs.length) { toggleEmpty(emptyEl, false); itemsList.innerHTML = ''; return; }
 
@@ -1358,7 +1436,7 @@ async function loadClankyList() {
 
   try {
     const snapshot = await db.collection('clanky').orderBy('datum', 'desc').get();
-    allClankyData = snapshot.docs.map(d => d.data()).filter(d => d.publikovano !== false);
+    allClankyData = snapshot.docs.map(d => loc(d.data())).filter(hasLang).filter(d => d.publikovano !== false);
 
     const yearSet = new Set();
     allClankyData.forEach(d => {
@@ -1378,12 +1456,12 @@ async function loadClankyList() {
 
 async function loadClanekDetail(slug) {
   try {
-    const snapshot = await db.collection('clanky').where('slug', '==', slug).limit(1).get();
+    const snapshot = await db.collection('clanky').where(SLUG_FIELD, '==', slug).limit(1).get();
     if (snapshot.empty) return;
 
-    const data = snapshot.docs[0].data();
+    const data = await locDetail(snapshot.docs[0].data());
     const datum = data.datum
-      ? new Date(data.datum.seconds ? data.datum.seconds * 1000 : data.datum).toLocaleDateString('cs-CZ')
+      ? new Date(data.datum.seconds ? data.datum.seconds * 1000 : data.datum).toLocaleDateString(LOCALE, IS_EN ? { day: 'numeric', month: 'long', year: 'numeric' } : undefined)
       : '';
     const galerie = (data.galerie && data.galerie.length)
       ? data.galerie.filter(Boolean)
@@ -1423,9 +1501,9 @@ async function loadClanekDetail(slug) {
       if (postModifiedISO) articleSchema.dateModified = postModifiedISO;
       injectJsonLd(articleSchema);
       injectBreadcrumb([
-        { name: 'Domů', item: 'https://bikeskills.cz/' },
-        { name: 'Blog', item: 'https://bikeskills.cz/blog' },
-        { name: data.titulek || 'Článek', item: window.location.href }
+        { name: t('Domů'), item: SITE_URL + HOME_PATH },
+        { name: 'Blog', item: SITE_URL + BLOG_LIST },
+        { name: data.titulek || t('Článek'), item: window.location.href }
       ]);
 
       const titleEl = document.querySelector('[item="title"].heading-83, .div-block-325 [item="title"]');
@@ -1522,7 +1600,7 @@ async function loadClanekDetail(slug) {
           .limit(5)
           .get();
         const relDocs = relSnapshot.docs
-          .map(d => d.data())
+          .map(d => loc(d.data())).filter(hasLang)
           .filter(d => d.slug !== slug && d.publikovano !== false)
           .slice(0, 4);
 
@@ -1561,7 +1639,7 @@ async function loadClanekDetail(slug) {
 function renderTeamItem(template, data) {
   const item = template.cloneNode(true);
 
-  const href = `/team/${data.slug}`;
+  const href = `${TEAM_BASE}${data.slug}`;
   item.querySelectorAll('[item="permalink"]').forEach(el => { el.href = href; });
 
   const titleEl = item.querySelector('[item="title"], .text-block-135');
@@ -1605,7 +1683,7 @@ async function loadTeamList() {
 
   try {
     const snapshot = await db.collection('team').orderBy('poradi', 'asc').get();
-    const docs = snapshot.docs.map(d => d.data()).filter(d => d.aktivni !== false);
+    const docs = snapshot.docs.map(d => loc(d.data())).filter(hasLang).filter(d => d.aktivni !== false);
 
     if (!docs.length) { toggleEmpty(emptyEl, false); itemsList.innerHTML = ''; return; }
 
@@ -1622,10 +1700,10 @@ async function loadTeamDetail(slug) {
   if (!container) return;
 
   try {
-    const snapshot = await db.collection('team').where('slug', '==', slug).limit(1).get();
-    if (snapshot.empty) { container.innerHTML = '<p>Člen týmu nenalezen.</p>'; return; }
+    const snapshot = await db.collection('team').where(SLUG_FIELD, '==', slug).limit(1).get();
+    if (snapshot.empty) { container.innerHTML = '<p>' + t('Člen týmu nenalezen.') + '</p>'; return; }
 
-    const data = snapshot.docs[0].data();
+    const data = await locDetail(snapshot.docs[0].data());
     const galerie = (data.galerie && data.galerie.length)
       ? data.galerie.filter(Boolean)
       : [];
@@ -1641,9 +1719,9 @@ async function loadTeamDetail(slug) {
       'memberOf': { '@type': 'Organization', 'name': 'BikeSkills', 'url': 'https://bikeskills.cz' }
     });
     injectBreadcrumb([
-      { name: 'Domů', item: 'https://bikeskills.cz/' },
-      { name: 'Tým', item: 'https://bikeskills.cz/team' },
-      { name: data.jmeno || 'Člen týmu', item: window.location.href }
+      { name: t('Domů'), item: SITE_URL + HOME_PATH },
+      { name: t('Tým'), item: SITE_URL + TEAM_LIST },
+      { name: data.jmeno || t('Člen týmu'), item: window.location.href }
     ]);
     const h1El = container.querySelector('h1.page-heading');
     if (h1El) h1El.textContent = data.jmeno || '';
@@ -1796,7 +1874,7 @@ window.addEventListener('load', function() {
     if (wrap) wrap.style.display = '';
     if (dekuji) dekuji.style.display = 'none';
     const btn = document.getElementById('rez-submit');
-    if (btn) { btn.disabled = false; btn.textContent = 'ODESLAT'; }
+    if (btn) { btn.disabled = false; btn.textContent = t('ODESLAT'); }
   }
 
   document.addEventListener('click', function(e) {
@@ -1822,19 +1900,19 @@ window.addEventListener('load', function() {
     const gdpr = checked('rez-gdpr');
     const nazevAkce = window._akceNazev || document.getElementById('rez-modal-camp')?.textContent || '';
 
-    if (!jmenoPrijmeni) { showError('Vyplňte prosím jméno a příjmení.'); return; }
-    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showError('Zadejte platný e-mail.'); return; }
-    if (!gdpr) { showError('Pro odeslání je nutný souhlas se zásadami ochrany osobních údajů.'); return; }
+    if (!jmenoPrijmeni) { showError(t('Vyplňte prosím jméno a příjmení.')); return; }
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showError(t('Zadejte platný e-mail.')); return; }
+    if (!gdpr) { showError(t('Pro odeslání je nutný souhlas se zásadami ochrany osobních údajů.')); return; }
     showError('');
 
     const btn = document.getElementById('rez-submit');
-    if (btn) { btn.disabled = true; btn.textContent = 'Odesílám…'; }
+    if (btn) { btn.disabled = true; btn.textContent = t('Odesílám…'); }
 
     try {
       const resp = await fetch(SEND_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ jmenoPrijmeni, email, telefon, termin, typKola, pocet, poznamka, nazevAkce }),
+        body: JSON.stringify({ jmenoPrijmeni, email, telefon, termin, typKola, pocet, poznamka, nazevAkce, lang: LANG }),
       });
 
       if (!resp.ok) throw new Error('server error');
@@ -1843,7 +1921,13 @@ window.addEventListener('load', function() {
       const dekuji = document.getElementById('rez-dekuji');
       const textEl = document.getElementById('rez-dekuji-text');
 
-      if (textEl) textEl.innerHTML =
+      if (textEl && IS_EN) textEl.innerHTML =
+        `Thank you for signing up for <strong>${escapeHtml(nazevAkce || 'the camp')}</strong>.<br><br>` +
+        `Once we process your registration, we will contact you with the details. ` +
+        `We are also sending a confirmation to the e-mail address you entered. ` +
+        `If you don't receive it, please contact us at ` +
+        `<a href="mailto:info@bikeskills.cz">info@bikeskills.cz</a>.`;
+      else if (textEl) textEl.innerHTML =
         `Děkujeme za přihlášení na <strong>${nazevAkce || 'camp'}</strong>.<br><br>` +
         `Po zpracování přihlášky vás kontaktujeme s detaily. ` +
         `Na zadaný mail vám také posíláme potvrzení. ` +
@@ -1854,8 +1938,8 @@ window.addEventListener('load', function() {
       if (dekuji) dekuji.style.display = 'block';
     } catch (err) {
       console.error('Rezervace error:', err);
-      if (btn) { btn.disabled = false; btn.textContent = 'ODESLAT'; }
-      showError('Nepodařilo se odeslat. Zkuste to prosím znovu nebo nás kontaktujte na info@bikeskills.cz.');
+      if (btn) { btn.disabled = false; btn.textContent = t('ODESLAT'); }
+      showError(t('Nepodařilo se odeslat. Zkuste to prosím znovu nebo nás kontaktujte na info@bikeskills.cz.'));
     }
   });
 })();

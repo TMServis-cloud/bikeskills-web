@@ -2,6 +2,8 @@
  * BIKESKILLS – Generátor sitemap.xml
  *
  * Načte slugy z Firestore (clanky + akce) a vygeneruje public/sitemap.xml.
+ * Obsahuje i anglickou verzi (/en/…) s hreflang alternativami (xhtml:link) –
+ * EN slugy bere z translations/slugs.json, mapu stránek ze scripts/i18n/pages.js.
  *
  * Usage:
  *   node scripts/generate-sitemap.js
@@ -50,8 +52,31 @@ const STATIC_PAGES = [
   { loc: '/zasady-ochrany-osobnich-udaju',   priority: '0.3', changefreq: 'yearly' },
 ];
 
-function urlEntry({ loc, priority, changefreq, lastmod }) {
+// ---- EN / hreflang ----
+const PAGES = require('./i18n/pages');
+const SLUGS_PATH = path.join(__dirname, '../translations/slugs.json');
+const SLUGS = fs.existsSync(SLUGS_PATH) ? JSON.parse(fs.readFileSync(SLUGS_PATH, 'utf8')) : { blog: {}, akce: {} };
+const EN_DATA = (c) => { const p = path.join(__dirname, '../public/en/data', c + '.json'); return fs.existsSync(p) ? JSON.parse(fs.readFileSync(p, 'utf8')) : {}; };
+const EN_TEAM = EN_DATA('team');
+const pageEn = (csLoc) => {
+  const bare = csLoc === '/' ? 'index' : csLoc.replace(/^\//, '');
+  const p = PAGES.find(x => x.cs === bare);
+  return p ? (p.en === 'index' ? '/en' : '/en/' + p.en) : null;
+};
+/** Vrátí 2 záznamy (cs + en) s vzájemnými alternates, nebo 1 bez EN. */
+function pair(entry, enLoc) {
+  if (!enLoc) return [urlEntry(entry)];
+  const alt = { cs: entry.loc, en: enLoc };
+  return [urlEntry(Object.assign({}, entry, { alt })), urlEntry(Object.assign({}, entry, { loc: enLoc, alt }))];
+}
+
+function urlEntry({ loc, priority, changefreq, lastmod, alt }) {
   const parts = [`  <url>`, `    <loc>${BASE}${loc}</loc>`];
+  if (alt) {
+    parts.push(`    <xhtml:link rel="alternate" hreflang="cs" href="${BASE}${alt.cs}"/>`);
+    parts.push(`    <xhtml:link rel="alternate" hreflang="en" href="${BASE}${alt.en}"/>`);
+    parts.push(`    <xhtml:link rel="alternate" hreflang="x-default" href="${BASE}${alt.cs}"/>`);
+  }
   if (lastmod) parts.push(`    <lastmod>${lastmod}</lastmod>`);
   parts.push(`    <priority>${priority}</priority>`);
   parts.push(`    <changefreq>${changefreq}</changefreq>`);
@@ -68,42 +93,42 @@ function toLastmod(ts) {
 async function main() {
   console.log('🗺️  Generuji sitemap.xml...');
 
-  const entries = STATIC_PAGES.map(p => urlEntry(p));
+  const entries = STATIC_PAGES.flatMap(p => pair(p, pageEn(p.loc)));
 
   // Blog
   const clankySnap = await db.collection('clanky').get();
   const clanky = clankySnap.docs.map(d => d.data()).filter(d => d.slug && d.publikovano !== false);
   console.log(`  📝 Články: ${clanky.length}`);
-  clanky.forEach(d => entries.push(urlEntry({
+  clanky.forEach(d => entries.push(...pair({
     loc: `/blog/${d.slug}/`,
     priority: '0.6',
     changefreq: 'yearly',
     lastmod: toLastmod(d.datum || d.updatedAt || d.createdAt),
-  })));
+  }, SLUGS.blog[d.slug] ? `/en/blog/${SLUGS.blog[d.slug]}` : null)));
 
   // Akce
   const akceSnap = await db.collection('akce').get();
   const akce = akceSnap.docs.map(d => d.data()).filter(d => d.slug && d.publikovano !== false);
   console.log(`  🚴 Akce: ${akce.length}`);
-  akce.forEach(d => entries.push(urlEntry({
+  akce.forEach(d => entries.push(...pair({
     loc: `/akce/${d.slug}`,
     priority: '0.7',
     changefreq: 'monthly',
     lastmod: toLastmod(d.datum || d.updatedAt || d.createdAt),
-  })));
+  }, SLUGS.akce[d.slug] ? `/en/events/${SLUGS.akce[d.slug]}` : null)));
 
   // Tým
   const teamSnap = await db.collection('team').get();
   const team = teamSnap.docs.map(d => d.data()).filter(d => d.slug);
   console.log(`  👤 Tým: ${team.length}`);
-  team.forEach(d => entries.push(urlEntry({
+  team.forEach(d => entries.push(...pair({
     loc: `/team/${d.slug}`,
     priority: '0.6',
     changefreq: 'monthly',
-  })));
+  }, EN_TEAM[d.slug] ? `/en/team/${d.slug}` : null)));
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
 
 ${entries.join('\n\n')}
 
