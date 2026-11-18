@@ -17,6 +17,21 @@
     ],
     "redirects": [
       {
+        "source": "/akce/individualni-trialovy-kurz-2026",
+        "destination": "/akce/individualni-trialovy-kurz-2027",
+        "type": 301
+      },
+      {
+        "source": "/akce/individualni-trialovy-kurz-2026/",
+        "destination": "/akce/individualni-trialovy-kurz-2027",
+        "type": 301
+      },
+      {
+        "source": "/en/events/individual-trial-course-2026",
+        "destination": "/en/events/individual-trial-course-2027",
+        "type": 301
+      },
+      {
         "source": "/pojisteni-bikeplan",
         "destination": "/servis",
         "type": 301
