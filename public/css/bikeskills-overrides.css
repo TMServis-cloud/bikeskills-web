@@ -469,8 +469,11 @@ html.cookies-show .cookie .banner-author-wrap .banner-author { display: inline !
 .right-block-topbar .bs-lang .bs-lang-link.is-active { text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; font-weight: 700; }
 .right-block-topbar .bs-lang .bs-lang-sep { color: var(--white, #fff); opacity: .5; font-size: 12px; }
 
-/* Zápatí: GDPR | Design by VKC */
-.footer-link-2.bs-footer-legal { display: flex; align-items: center; gap: 8px; }
-.bs-footer-legal .bs-footer-link { color: inherit; text-decoration: none; }
-.bs-footer-legal .bs-footer-link:hover { text-decoration: underline; }
-.bs-footer-legal .bs-footer-sep { opacity: .5; }
+/* Zápatí: GDPR | Design by VKC – stejné písmo a barva jako levá strana (copyright), zarovnané na stejnou linku */
+.footer-link-2.bs-footer-legal { display: flex; align-items: center; gap: 8px; align-self: center; line-height: 23px; color: var(--white, #fff); }
+.bs-footer-legal .bs-footer-link,
+.bs-footer-legal .bs-footer-sep { font-family: proxima-nova, sans-serif; font-size: 13px; font-weight: 300; line-height: 23px; color: var(--white, #fff); text-decoration: none; }
+.bs-footer-legal .bs-footer-link:hover { color: var(--bílo-seda, #ebe4da); text-decoration: underline; }
+@media screen and (max-width: 767px) {
+  .bs-footer-legal .bs-footer-link, .bs-footer-legal .bs-footer-sep { font-size: 11px; }
+}
