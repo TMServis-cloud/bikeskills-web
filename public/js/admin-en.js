@@ -32,8 +32,8 @@
         { f: 'perex', label: 'Perex (EN)', type: 'textarea', src: 'clanek-perex', fmt: 'text' },
         { f: 'obsah', label: 'Obsah článku (EN)', type: 'quill', src: 'quill:quillEditor', fmt: 'html', folder: 'blog/content' },
         { f: 'slug', label: 'Slug (EN URL)', type: 'text', hint: 'prázdné = vytvoří se z anglického titulku; po zveřejnění raději neměňte' },
-        { f: 'metaTitle', label: 'SEO title (EN)', type: 'text', hint: 'prázdné = titulek', counter: 60 },
-        { f: 'metaDescription', label: 'SEO description (EN)', type: 'textarea', hint: 'prázdné = perex', counter: 160 },
+        { f: 'metaTitle', label: 'SEO title (EN)', type: 'text', hint: 'vyplní se při překladu; max. 60 znaků', counter: 60 },
+        { f: 'metaDescription', label: 'SEO description (EN)', type: 'textarea', hint: 'vyplní se při překladu z perexu; max. 160 znaků', counter: 160 },
       ],
     },
     akce: {
@@ -44,8 +44,8 @@
         { f: 'uroven', label: 'Úroveň (EN)', type: 'text', src: 'akce-uroven', fmt: 'text', half: true },
         { f: 'popis', label: 'Popis akce (EN)', type: 'quill', src: 'quill:quillAkcePopis', fmt: 'html', folder: 'akce/content' },
         { f: 'slug', label: 'Slug (EN URL)', type: 'text', hint: 'prázdné = vytvoří se z anglického názvu + rok; po zveřejnění raději neměňte' },
-        { f: 'metaTitle', label: 'SEO title (EN)', type: 'text', hint: 'prázdné = název akce', counter: 60 },
-        { f: 'metaDescription', label: 'SEO description (EN)', type: 'textarea', hint: 'prázdné = začátek popisu', counter: 160 },
+        { f: 'metaTitle', label: 'SEO title (EN)', type: 'text', hint: 'vyplní se při překladu; max. 60 znaků', counter: 60 },
+        { f: 'metaDescription', label: 'SEO description (EN)', type: 'textarea', hint: 'vyplní se při překladu z popisu; max. 160 znaků', counter: 160 },
       ],
     },
     team: {
@@ -83,6 +83,13 @@
   function slugify(s) {
     return (typeof generateSlug === 'function' ? generateSlug(String(s || '')) : String(s || '').toLowerCase())
       .replace(/[^a-z0-9-]+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '').slice(0, 80).replace(/-+$/, '');
+  }
+  /** Zkrátí text na max znaků na hranici slova (s „…"). */
+  function clip(s, max) {
+    s = String(s || '').replace(/\s+/g, ' ').trim();
+    if (s.length <= max) return s;
+    const cut = s.slice(0, max - 1).replace(/[\s,;:.\-–]+\S*$/, '');
+    return (cut || s.slice(0, max - 1)).replace(/[\s,;:.\-–]+$/, '') + '…';
   }
   function toast(msg, type) { if (typeof showToast === 'function') showToast(msg, type); else console.log(msg); }
 
@@ -196,6 +203,11 @@
     textF.forEach((f, i) => { out[f] = (tt[i] || '').trim(); });
     for (let i = 0; i < htmlF.length; i++) out[htmlF[i]] = await rewriteLinksEn(th[i] || '');
     for (const fd of CFG[col].fields) if (fd.src && !(fd.f in out)) out[fd.f] = '';
+    // SEO title / description (EN) – odvozené z přeloženého titulku a perexu / popisu
+    if (col !== 'team') {
+      out.metaTitle = clip(out[EN_KEY[col]], 60);
+      out.metaDescription = clip(plain(col === 'clanky' ? (out.perex || out.obsah) : out.popis), 160);
+    }
     return out;
   }
   function errMsg(e) {
