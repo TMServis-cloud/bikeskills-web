@@ -211,11 +211,16 @@ function injectJsonLd(html, schemaObj, marker) {
   return html.replace('</head>', `  ${tag}\n</head>`);
 }
 
-function prerenderClanekDetail(template, d) {
-  const url = `${BASE_URL}/blog/${d.slug}/`;
+function prerenderClanekDetail(template, d, lang) {
+  // lang === 'en': d je lokalizovaný dokument (titulek/perex/obsah/slug = EN, slugCs = český slug),
+  // template = /en/blog-post.html. Jinak česká verze; d.enSlug = slug anglického protějšku.
+  const EN = lang === 'en';
+  const url = EN ? `${BASE_URL}/en/blog/${d.slug}` : `${BASE_URL}/blog/${d.slug}/`;
+  const csUrl = EN ? `${BASE_URL}/blog/${d.slugCs}/` : url;
+  const enUrl = EN ? url : (d.enSlug ? `${BASE_URL}/en/blog/${d.enSlug}` : null);
   const titulek = d.titulek || '';
   const datum = d.datum
-    ? new Date(d.datum.seconds ? d.datum.seconds * 1000 : d.datum).toLocaleDateString('cs-CZ')
+    ? new Date(d.datum.seconds ? d.datum.seconds * 1000 : d.datum).toLocaleDateString(EN ? 'en-GB' : 'cs-CZ', EN ? { day: 'numeric', month: 'long', year: 'numeric' } : undefined)
     : '';
   const datumISO = d.datum
     ? new Date(d.datum.seconds ? d.datum.seconds * 1000 : d.datum).toISOString()
@@ -228,18 +233,19 @@ function prerenderClanekDetail(template, d) {
   // Uvodni obrazek je co admin vybere v "Hlavni obrazek" - i tady je videt ve sdileni na FB.
   const heroOrig = d.imageUrl || galerie[0];
   const hero = heroOrig ? resolveUrl(heroOrig) : `${BASE_URL}/images/og-image.jpg`;
-  const desc = plainText(d.popis || d.perex, 160);
+  const desc = d.metaDescription || plainText(d.popis || d.perex, 160);
+  const seoTitle = `${d.metaTitle || titulek} | BikeSkills`;
 
   let html = template;
   // <head>
-  html = setTitle(html, `${titulek} | BikeSkills`);
+  html = setTitle(html, seoTitle);
   html = setMeta(html, 'description', desc, 'name');
-  html = setMeta(html, 'og:title', `${titulek} | BikeSkills`);
+  html = setMeta(html, 'og:title', seoTitle);
   html = setMeta(html, 'og:description', desc);
   html = setMeta(html, 'og:image', hero);
   html = setMeta(html, 'og:url', url);
   html = setMeta(html, 'og:type', 'article');
-  html = setMeta(html, 'twitter:title', `${titulek} | BikeSkills`);
+  html = setMeta(html, 'twitter:title', seoTitle);
   html = setMeta(html, 'twitter:description', desc);
   html = setMeta(html, 'twitter:image', hero);
   html = setCanonical(html, url);
@@ -270,8 +276,8 @@ function prerenderClanekDetail(template, d) {
   html = injectJsonLd(html, {
     '@context':'https://schema.org','@type':'BreadcrumbList',
     itemListElement: [
-      {'@type':'ListItem',position:1,name:'Domů',item: BASE_URL + '/'},
-      {'@type':'ListItem',position:2,name:'Blog',item: BASE_URL + '/blog'},
+      {'@type':'ListItem',position:1,name:EN ? 'Home' : 'Domů',item: BASE_URL + (EN ? '/en' : '/')},
+      {'@type':'ListItem',position:2,name:'Blog',item: BASE_URL + (EN ? '/en/blog' : '/blog')},
       {'@type':'ListItem',position:3,name:titulek,item:url}
     ]
   }, 'breadcrumb');
@@ -285,13 +291,13 @@ function prerenderClanekDetail(template, d) {
     html = setItemImg(html, 'featured-image', heroPrimary, titulek, 1280, 720, 'high', { srcset: heroSrcset, sizes: heroSizes });
   }
 
-  // hreflang + přepínač jazyka na anglický protějšek (enSlug z /en/data/clanky.json)
-  if (d.enSlug) {
-    const enUrl = `${BASE_URL}/en/blog/${d.enSlug}`;
+  // hreflang + přepínač jazyka na protějšek v druhém jazyce (EN slug je ve Firestore v poli slug_en)
+  if (enUrl) {
     html = html.replace(/\s*<!-- hreflang:start -->[\s\S]*?<!-- hreflang:end -->/, '');
-    html = html.replace('</head>', `  <!-- hreflang:start -->\n  <link rel="alternate" hreflang="cs" href="${url}">\n  <link rel="alternate" hreflang="en" href="${enUrl}">\n  <link rel="alternate" hreflang="x-default" href="${url}">\n  <!-- hreflang:end -->\n</head>`);
-    html = html.replace(/(<a\b[^>]*\bhref=")[^"]*("[^>]*\bbs-lang-switch\b)/, `$1/en/blog/${d.enSlug}$2`);
-    html = html.replace(/(<a\b[^>]*\bhref=")[^"]*("[^>]*\bis-active\b)/, `$1/blog/${d.slug}/$2`);
+    html = html.replace('</head>', `  <!-- hreflang:start -->\n  <link rel="alternate" hreflang="cs" href="${csUrl}">\n  <link rel="alternate" hreflang="en" href="${enUrl}">\n  <link rel="alternate" hreflang="x-default" href="${csUrl}">\n  <!-- hreflang:end -->\n</head>`);
+    const other = (EN ? csUrl : enUrl).replace(BASE_URL, '');
+    html = html.replace(/(<a\b[^>]*\bhref=")[^"]*("[^>]*\bbs-lang-switch\b)/, `$1${other}$2`);
+    html = html.replace(/(<a\b[^>]*\bhref=")[^"]*("[^>]*\bbs-lang-link is-active\b)/, `$1${url.replace(BASE_URL, '')}$2`);
   }
 
   // Označit pre-rendered (cms-loader.js to detekuje)

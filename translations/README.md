@@ -1,3 +1,12 @@
+# Překlady (EN verze webu)
+
+> **Od 11/2026 se CMS obsah (články, akce, tým) překládá v administraci.** Anglické texty jsou ve Firestore
+> ve stejném dokumentu jako české, v polích `*_en` (`titulek_en`, `obsah_en`, `slug_en`, `metaTitle_en`, …,
+> viz `functions/lib/en-fields.js`). Při uložení se chybějící EN verze automaticky přeloží přes
+> Google Cloud Translation (Cloud Function `translateContent`), tlačítkem „🌐 Přeložit do AJ" kdykoli ručně.
+> Web je čte přímo z Firestore; build si je stahuje přes `npm run i18n:pull` (součást `deploy:hosting`).
+> Slovník `cms-en.json` + `scripts/i18n/apply-cms.js` níže zůstává jen pro historii / statické stránky.
+
 # Anglická verze bikeskills.cz (`/en/`)
 
 EN verze se **generuje** z české – nic v `public/en/` needituj ručně, přepíše se.

@@ -15,67 +15,19 @@ function setCors(req, res) {
 }
 
 // ============================================================
-// SITEMAP
+// SITEMAP – /sitemap.xml (Hosting rewrite). Statické stránky + články, akce a tým
+// z Firestore v obou jazycích s hreflang alternativami. Nová položka nebo její EN
+// překlad se v sitemapě objeví hned po uložení v adminu (cache 1 h).
 // ============================================================
-const STATIC_PAGES = [
-  { loc: '/', priority: '1.0', changefreq: 'weekly' },
-  { loc: '/akce-archive.html', priority: '0.9', changefreq: 'weekly' },
-  { loc: '/blog.html', priority: '0.8', changefreq: 'weekly' },
-  { loc: '/team.html', priority: '0.7', changefreq: 'monthly' },
-  { loc: '/individualni-kurzy.html', priority: '0.8', changefreq: 'monthly' },
-  { loc: '/campy.html', priority: '0.8', changefreq: 'monthly' },
-  { loc: '/servis.html', priority: '0.7', changefreq: 'monthly' },
-  { loc: '/kontakt.html', priority: '0.6', changefreq: 'yearly' },
-];
-
-const BASE = 'https://bikeskills.cz';
-
-function toDate(val) {
-  if (!val) return null;
-  if (val.toDate) return val.toDate().toISOString().split('T')[0];
-  if (typeof val === 'string') return val.split('T')[0];
-  return null;
-}
-
-function urlEntry(page) {
-  const loc = typeof page === 'string' ? page : page.loc;
-  const priority = typeof page === 'object' ? (page.priority || '0.5') : '0.5';
-  const changefreq = typeof page === 'object' ? (page.changefreq || 'monthly') : 'monthly';
-  const lastmod = typeof page === 'object' ? page.lastmod : null;
-  let xml = `  <url>\n    <loc>${BASE}${loc}</loc>\n`;
-  if (lastmod) xml += `    <lastmod>${lastmod}</lastmod>\n`;
-  xml += `    <changefreq>${changefreq}</changefreq>\n    <priority>${priority}</priority>\n  </url>\n`;
-  return xml;
-}
-
+const { buildSitemapXml } = require('./lib/sitemap');
 exports.sitemap = functions
   .region('europe-west1')
   .runWith({ memory: '256MB', timeoutSeconds: 30 })
   .https.onRequest(async (req, res) => {
     try {
-      const [clankySnap, akceSnap, teamSnap] = await Promise.all([
-        db.collection('clanky').get(),
-        db.collection('akce').get(),
-        db.collection('team').get(),
-      ]);
-
-      const entries = STATIC_PAGES.map(urlEntry);
-
-      clankySnap.docs.map(d => d.data())
-        .filter(d => d.slug && d.publikovano !== false)
-        .forEach(d => entries.push(urlEntry({ loc: `/blog/${d.slug}/`, priority: '0.6', changefreq: 'yearly', lastmod: toDate(d.datum) })));
-
-      akceSnap.docs.map(d => d.data())
-        .filter(d => d.slug && d.aktivni !== false)
-        .forEach(d => entries.push(urlEntry({ loc: `/akce/${d.slug}/`, priority: '0.7', changefreq: 'monthly' })));
-
-      teamSnap.docs.map(d => d.data())
-        .filter(d => d.slug)
-        .forEach(d => entries.push(urlEntry({ loc: `/team/${d.slug}/`, priority: '0.5', changefreq: 'yearly' })));
-
-      const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${entries.join('')}</urlset>`;
+      const xml = await buildSitemapXml(db);
       res.set('Content-Type', 'application/xml; charset=utf-8');
-      res.set('Cache-Control', 'public, max-age=3600');
+      res.set('Cache-Control', 'public, max-age=3600, s-maxage=3600');
       res.status(200).send(xml);
     } catch (err) {
       console.error('Sitemap error:', err);
@@ -269,115 +221,73 @@ exports.sendServisForm = functions
 const bucket = admin.storage().bucket();
 // v2 = HTML včetně textu článku (dřív jen meta). Nová cesta = stará cache se automaticky nepoužije.
 // v12 = mezery v mobilním zápatí
-const STORAGE_PRERENDER_PATH = (slug) => `prerendered-blog-v12/${slug}/index.html`;
+// cs: prerendered-blog-v13/<csSlug>/index.html · en: prerendered-blog-v13/en/<enSlug>/index.html
+const STORAGE_PRERENDER_PATH = (slug, lang) => `prerendered-blog-v13/${lang === 'en' ? 'en/' : ''}${slug}/index.html`;
 const { prerenderClanekDetail } = require('./lib/clanek-detail');
+const { enOf, localize } = require('./lib/en-fields');
 const SITE_URL = 'https://bikeskills.cz';
 const DEFAULT_OG_IMAGE = `${SITE_URL}/images/og-image.jpg`;
 
-let _templateCache = null;
-let _templateCachedAt = 0;
-async function loadDetailTemplate() {
-  // Cache 10 minut v pameti instance — Hosting muze byt re-deployovan.
-  if (_templateCache && (Date.now() - _templateCachedAt < 10 * 60 * 1000)) return _templateCache;
-  const r = await fetch(`${SITE_URL}/detail_post.html`, { cache: 'no-store' });
-  if (!r.ok) throw new Error(`detail_post.html fetch ${r.status}`);
-  _templateCache = await r.text();
-  _templateCachedAt = Date.now();
-  return _templateCache;
+// Šablony detailu z Hostingu (cs: detail_post.html, en: en/blog-post.html).
+// Cache 10 minut v pameti instance — Hosting muze byt re-deployovan.
+const _tpl = {};
+async function loadDetailTemplate(lang) {
+  const key = lang === 'en' ? 'en' : 'cs';
+  const c = _tpl[key];
+  if (c && (Date.now() - c.at < 10 * 60 * 1000)) return c.html;
+  const r = await fetch(`${SITE_URL}/${key === 'en' ? 'en/blog-post.html' : 'detail_post.html'}`, { cache: 'no-store' });
+  if (!r.ok) throw new Error(`detail template (${key}) fetch ${r.status}`);
+  const html = await r.text();
+  _tpl[key] = { html, at: Date.now() };
+  return html;
 }
 
-// EN překlady článků (statický soubor z hostingu, generuje scripts/i18n/apply-cms.js)
-let _enIndex = null, _enIndexAt = 0;
-async function loadEnIndex() {
-  if (_enIndex && (Date.now() - _enIndexAt < 10 * 60 * 1000)) return _enIndex;
-  try {
-    const r = await fetch(`${SITE_URL}/en/data/clanky.json`, { cache: 'no-store' });
-    _enIndex = r.ok ? await r.json() : {};
-  } catch (_) { _enIndex = {}; }
-  _enIndexAt = Date.now();
-  return _enIndex;
-}
-
-function _escapeAttr(s)  { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/"/g, '&quot;'); }
-function _escapeHtml(s)  { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
-function _plainText(html, max) {
-  const text = String(html == null ? '' : html).replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
-  if (!max) return text;
-  return text.length > max ? text.slice(0, max - 1).trim() + '…' : text;
-}
-function _resolveStorageUrl(url) {
-  if (!url) return url;
-  // Odstrani expirujici download token, nech jen ?alt=media (Storage rules public-read).
-  const m = String(url).match(/firebasestorage\.googleapis\.com\/v0\/b\/([^/]+)\/o\/([^?]*)\?/);
-  if (!m) return url;
-  return `https://firebasestorage.googleapis.com/v0/b/${m[1]}/o/${m[2]}?alt=media`;
-}
-function _setMeta(html, prop, value, by) {
-  const attr = by === 'name' ? 'name' : 'property';
-  // Webflow generuje <meta content="..." property="...">, my musime obe poradi prepsat.
-  const tagRe = new RegExp(`<meta\\b[^>]*\\b${attr}="${prop}"[^>]*>`, 'i');
-  const m = html.match(tagRe);
-  if (m) {
-    const oldTag = m[0];
-    let newTag;
-    if (/\bcontent="[^"]*"/.test(oldTag)) {
-      newTag = oldTag.replace(/\bcontent="[^"]*"/, `content="${_escapeAttr(value)}"`);
-    } else {
-      newTag = oldTag.replace(/\s*\/?>$/, ` content="${_escapeAttr(value)}">`);
-    }
-    return html.replace(oldTag, newTag);
-  }
-  return html.replace(/(<title>[^<]*<\/title>)/, `$1\n  <meta ${attr}="${prop}" content="${_escapeAttr(value)}">`);
-}
-function _setTitle(html, title) {
-  return html.replace(/<title>[^<]*<\/title>/, `<title>${_escapeHtml(title)}</title>`);
-}
-function _setCanonical(html, url) {
-  const re = /<link[^>]*\brel="canonical"[^>]*\bhref="[^"]*"[^>]*>/;
-  if (re.test(html)) return html.replace(re, `<link rel="canonical" href="${_escapeAttr(url)}">`);
-  return html.replace('</head>', `  <link rel="canonical" href="${_escapeAttr(url)}">\n</head>`);
-}
-
-async function buildClanekDetailHtml(d) {
+async function buildClanekDetailHtml(d, lang) {
   // Plný detail: meta + JSON-LD + titulek, datum, autor, text a hlavní obrázek přímo v HTML
   // (dřív jen meta – text doplňoval až JavaScript, SeznamBot ho neviděl).
-  const [template, enIndex] = await Promise.all([loadDetailTemplate(), loadEnIndex()]);
-  const en = enIndex[d.slug];
-  return prerenderClanekDetail(template, en ? Object.assign({}, d, { enSlug: en.slug }) : d);
+  const template = await loadDetailTemplate(lang);
+  if (lang === 'en') return prerenderClanekDetail(template, localize('clanky', d), 'en');
+  const en = enOf('clanky', d);
+  return prerenderClanekDetail(template, en ? Object.assign({}, d, { enSlug: en.slug }) : d, 'cs');
 }
 
-// Firestore trigger: pri zmene clanku smaze Storage cache (lazy regenerate)
+// Firestore trigger: pri zmene clanku smaze Storage cache (lazy regenerate) – CZ i EN verzi
 exports.onClanekWrite = functions
   .region('europe-west1')
   .firestore.document('clanky/{docId}')
   .onWrite(async (change) => {
     const after = change.after.exists ? change.after.data() : null;
     const before = change.before.exists ? change.before.data() : null;
-    const slugsToInvalidate = new Set();
-    if (after && after.slug) slugsToInvalidate.add(after.slug);
-    if (before && before.slug) slugsToInvalidate.add(before.slug);
-    for (const slug of slugsToInvalidate) {
+    const paths = new Set();
+    for (const d of [after, before]) {
+      if (!d) continue;
+      if (d.slug) paths.add(STORAGE_PRERENDER_PATH(d.slug, 'cs'));
+      if (d.slug_en) paths.add(STORAGE_PRERENDER_PATH(d.slug_en, 'en'));
+    }
+    for (const p of paths) {
       try {
-        await bucket.file(STORAGE_PRERENDER_PATH(slug)).delete({ ignoreNotFound: true });
-        console.log(`[onClanekWrite] invalidated ${slug}`);
+        await bucket.file(p).delete({ ignoreNotFound: true });
+        console.log(`[onClanekWrite] invalidated ${p}`);
       } catch (e) {
-        console.error(`[onClanekWrite] delete failed for ${slug}:`, e.message);
+        console.error(`[onClanekWrite] delete failed for ${p}:`, e.message);
       }
     }
     return null;
   });
 
 // HTTP: serve detail clanku z Storage cache (s lazy regenerate pri cache miss)
+//   /blog/<csSlug>/  → česká verze
+//   /en/blog/<enSlug> → anglická verze (dokument se hledá podle slug_en)
 exports.serveBlogDetail = functions
   .region('europe-west1')
   .runWith({ memory: '256MB', timeoutSeconds: 30 })
   .https.onRequest(async (req, res) => {
-    // Hosting rewrites smeruji /blog/<slug>/ a /blog/<slug>; obojime extrahujeme slug.
-    const m = req.path.match(/^\/blog\/([^\/]+)\/?$/);
+    const m = req.path.match(/^\/(en\/)?blog\/([^\/]+)\/?$/);
     if (!m) { res.status(404).send('Not found'); return; }
-    const slug = decodeURIComponent(m[1]);
+    const lang = m[1] ? 'en' : 'cs';
+    const slug = decodeURIComponent(m[2]);
 
-    const file = bucket.file(STORAGE_PRERENDER_PATH(slug));
+    const file = bucket.file(STORAGE_PRERENDER_PATH(slug, lang));
     try {
       const [exists] = await file.exists();
       if (exists) {
@@ -394,11 +304,13 @@ exports.serveBlogDetail = functions
 
     // Cache miss → vygeneruj a ulož
     try {
-      const snap = await db.collection('clanky').where('slug', '==', slug).limit(1).get();
-      if (snap.empty) { res.status(404).send('Article not found'); return; }
-      const data = snap.docs[0].data();
-      if (data.publikovano === false) { res.status(404).send('Article not published'); return; }
-      const html = await buildClanekDetailHtml(data);
+      const snap = await db.collection('clanky').where(lang === 'en' ? 'slug_en' : 'slug', '==', slug).limit(1).get();
+      const data = snap.empty ? null : snap.docs[0].data();
+      if (!data || data.publikovano === false || (lang === 'en' && !enOf('clanky', data))) {
+        await send404(res, lang);
+        return;
+      }
+      const html = await buildClanekDetailHtml(data, lang);
       // Ulozeni cache async (nechci blokovat response)
       file.save(html, {
         contentType: 'text/html; charset=utf-8',
@@ -411,6 +323,40 @@ exports.serveBlogDetail = functions
     } catch (e) {
       console.error('[serveBlogDetail] generate failed:', e);
       res.status(500).send('Server error');
+    }
+  });
+
+async function send404(res, lang) {
+  let body = lang === 'en' ? 'Article not found' : 'Článek nenalezen';
+  try {
+    const r = await fetch(`${SITE_URL}/${lang === 'en' ? 'en/404.html' : '404.html'}`);
+    if (r.ok) body = await r.text();
+  } catch (_) {}
+  res.set('Content-Type', 'text/html; charset=utf-8');
+  res.set('Cache-Control', 'public, max-age=60');
+  res.status(404).send(body);
+}
+
+// ============================================================
+// TRANSLATE CONTENT (admin: tlačítko „Přeložit do AJ" a automatický překlad při uložení)
+// ============================================================
+const translate = require('./lib/translate');
+exports.translateContent = functions
+  .region('europe-west1')
+  .runWith({ memory: '256MB', timeoutSeconds: 120 })
+  .https.onCall(async (data, context) => {
+    if (!context.auth) throw new functions.https.HttpsError('unauthenticated', 'Přihlaste se do administrace.');
+    const err = translate.validate(data);
+    if (err) throw new functions.https.HttpsError('invalid-argument', err);
+    try {
+      const translations = await translate.translateTexts(data.texts, data.format === 'text' ? 'text' : 'html');
+      return { translations };
+    } catch (e) {
+      console.error('[translateContent]', e);
+      const msg = /has not been used|is disabled|SERVICE_DISABLED/i.test(e.message || '')
+        ? 'Cloud Translation API není v projektu zapnuté.'
+        : 'Překlad se nepovedl: ' + (e.message || e);
+      throw new functions.https.HttpsError('internal', msg);
     }
   });
 

@@ -923,3 +923,44 @@ textarea {
 .seo-counter.over {
   color: #e85252;
 }
+
+/* ============================================================
+   Anglická verze obsahu (admin-en.js)
+   ============================================================ */
+.en-section {
+  margin: 8px 0 20px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-bg-elevated);
+}
+.en-section > summary {
+  cursor: pointer;
+  list-style: none;
+  padding: 14px 16px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.en-section > summary::-webkit-details-marker { display: none; }
+.en-section > summary::after { content: '▾'; margin-left: auto; color: var(--color-text-muted); transition: transform var(--transition); }
+.en-section[open] > summary::after { transform: rotate(180deg); }
+.en-flag {
+  font-size: 11px; font-weight: 700; letter-spacing: .05em;
+  padding: 2px 6px; border-radius: 4px;
+  background: var(--color-info-muted); color: var(--color-info);
+}
+.en-status { font-size: 12px; font-weight: 400; color: var(--color-text-secondary); }
+.en-status.none { color: var(--color-text-muted); }
+.en-status.auto { color: var(--color-info); }
+.en-status.manual { color: var(--color-success); }
+.en-status.stale { color: var(--color-warning); }
+.en-body { padding: 0 16px 8px; }
+.en-toolbar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
+.en-toolbar .en-view { font-size: 13px; color: var(--color-primary); text-decoration: none; }
+.en-toolbar .en-view:hover { text-decoration: underline; }
+.en-note { font-size: 12px; color: var(--color-text-muted); }
+.quill-editor-en { min-height: 180px; }
+.en-counter { font-size: 11px; font-weight: 400; color: var(--color-text-muted); margin-left: 6px; }
+.en-counter.over { color: var(--color-warning); }

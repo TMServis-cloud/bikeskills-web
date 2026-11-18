@@ -209,6 +209,12 @@ function showDashboard(user) {
   attachHtmlSourceButton(quillAkcePopis);
   attachHtmlSourceButton(quillTeamPopis);
 
+  // Anglická verze obsahu (public/js/admin-en.js)
+  if (window.AdminEN && !window.__adminEnReady) {
+    window.__adminEnReady = true;
+    AdminEN.init({ toolbar: toolbarOptions, imageHandler: makeQuillImageHandler });
+  }
+
   // Load data
   loadAkce();
   loadClanky();
@@ -491,6 +497,7 @@ document.getElementById('btn-new-akce').addEventListener('click', () => {
   document.getElementById('akce-image-preview').innerHTML = '';
   if (quillAkcePopis) quillAkcePopis.setContents([]);
   clearAkceGallery();
+  if (window.AdminEN) AdminEN.reset('akce');
   document.getElementById('modal-akce-title').textContent = 'Nová akce';
   openModal('modal-akce');
 });
@@ -541,6 +548,7 @@ async function editAkce(id) {
       preview.innerHTML = '';
     }
 
+    if (window.AdminEN) AdminEN.fill('akce', data);
     document.getElementById('modal-akce-title').textContent = 'Upravit akci';
     openModal('modal-akce');
   } catch (error) {
@@ -596,6 +604,11 @@ document.getElementById('form-akce').addEventListener('submit', async (e) => {
       aktivni: document.getElementById('akce-aktivni').checked,
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     };
+
+    if (window.AdminEN) {
+      btn.textContent = 'Ukládání (EN)...';
+      Object.assign(data, await AdminEN.collect('akce', data, id));
+    }
 
     if (id) {
       await db.collection('akce').doc(id).update(data);
@@ -678,6 +691,7 @@ document.getElementById('btn-new-clanek').addEventListener('click', () => {
   document.getElementById('clanek-image-preview').innerHTML = '';
   if (quillEditor) quillEditor.setContents([]);
   clearClanekGallery();
+  if (window.AdminEN) AdminEN.reset('clanky');
   document.getElementById('modal-clanek-title').textContent = 'Nový článek';
   openModal('modal-clanek');
 });
@@ -730,6 +744,7 @@ async function editClanek(id) {
       preview.innerHTML = '';
     }
 
+    if (window.AdminEN) AdminEN.fill('clanky', data);
     document.getElementById('modal-clanek-title').textContent = 'Upravit článek';
     openModal('modal-clanek');
   } catch (error) {
@@ -774,6 +789,11 @@ document.getElementById('form-clanek').addEventListener('submit', async (e) => {
       publikovano: document.getElementById('clanek-publikovano').checked,
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     };
+
+    if (window.AdminEN) {
+      btn.textContent = 'Ukládání (EN)...';
+      Object.assign(data, await AdminEN.collect('clanky', data, id));
+    }
 
     if (id) {
       await db.collection('clanky').doc(id).update(data);
@@ -892,6 +912,7 @@ document.getElementById('btn-new-team').addEventListener('click', () => {
   if (quillTeamPopis) quillTeamPopis.setContents([]);
   teamGalerieUrls = [];
   renderGallery('team-gallery-items', teamGalerieUrls);
+  if (window.AdminEN) AdminEN.reset('team');
   document.getElementById('modal-team-title').textContent = 'Nový člen týmu';
   openModal('modal-team');
 });
@@ -930,6 +951,7 @@ async function editTeam(id) {
       preview.innerHTML = '';
     }
 
+    if (window.AdminEN) AdminEN.fill('team', data);
     document.getElementById('modal-team-title').textContent = 'Upravit člena týmu';
     openModal('modal-team');
   } catch (error) {
@@ -972,6 +994,11 @@ document.getElementById('form-team').addEventListener('submit', async (e) => {
       aktivni: document.getElementById('team-aktivni').checked,
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     };
+
+    if (window.AdminEN) {
+      btn.textContent = 'Ukládání (EN)...';
+      Object.assign(data, await AdminEN.collect('team', data, id));
+    }
 
     if (id) {
       await db.collection('team').doc(id).update(data);

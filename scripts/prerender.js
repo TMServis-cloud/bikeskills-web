@@ -491,18 +491,19 @@ function prerenderClanekDetail(template, d) {
   // Uvodni obrazek je co admin vybere v "Hlavni obrazek" - i tady je videt ve sdileni na FB.
   const heroOrig = d.imageUrl || galerie[0];
   const hero = heroOrig ? resolveUrl(heroOrig) : `${BASE_URL}/images/og-image.jpg`;
-  const desc = plainText(d.popis || d.perex, 160);
+  const desc = d.metaDescription || plainText(d.popis || d.perex, 160);
+  const seoTitle = `${d.metaTitle || titulek} | BikeSkills`;
 
   let html = template;
   // <head>
-  html = setTitle(html, `${titulek} | BikeSkills`);
+  html = setTitle(html, seoTitle);
   html = setMeta(html, 'description', desc, 'name');
-  html = setMeta(html, 'og:title', `${titulek} | BikeSkills`);
+  html = setMeta(html, 'og:title', seoTitle);
   html = setMeta(html, 'og:description', desc);
   html = setMeta(html, 'og:image', hero);
   html = setMeta(html, 'og:url', url);
   html = setMeta(html, 'og:type', 'article');
-  html = setMeta(html, 'twitter:title', `${titulek} | BikeSkills`);
+  html = setMeta(html, 'twitter:title', seoTitle);
   html = setMeta(html, 'twitter:description', desc);
   html = setMeta(html, 'twitter:image', hero);
   html = setCanonical(html, url);
@@ -563,19 +564,20 @@ function prerenderAkceDetail(template, d) {
   const nazev = d.nazev || '';
   const heroOrig = d.imageUrl;
   const hero = heroOrig ? resolveUrl(heroOrig) : `${BASE_URL}/images/og-image.jpg`;
-  const desc = plainText(d.popis, 160);
+  const desc = d.metaDescription || plainText(d.popis, 160);
+  const seoTitle = `${d.metaTitle || nazev} | BikeSkills`;
   const labelTyp = resolveAkceLabel(d) || '';
   const akceISOStart = computeAkceISOStart(d);
 
   let html = template;
-  html = setTitle(html, `${nazev} | BikeSkills`);
+  html = setTitle(html, seoTitle);
   html = setMeta(html, 'description', desc, 'name');
-  html = setMeta(html, 'og:title', `${nazev} | BikeSkills`);
+  html = setMeta(html, 'og:title', seoTitle);
   html = setMeta(html, 'og:description', desc);
   html = setMeta(html, 'og:image', hero);
   html = setMeta(html, 'og:url', url);
   html = setMeta(html, 'og:type', 'event');
-  html = setMeta(html, 'twitter:title', `${nazev} | BikeSkills`);
+  html = setMeta(html, 'twitter:title', seoTitle);
   html = setMeta(html, 'twitter:description', desc);
   html = setMeta(html, 'twitter:image', hero);
   html = setCanonical(html, url);

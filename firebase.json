@@ -11,6 +11,8 @@
       "**/node_modules/**",
       "**/*.bak",
       "blog/*/index.html",
+      "en/blog/*/index.html",
+      "sitemap.xml",
       "wp-content/**"
     ],
     "redirects": [
@@ -926,6 +928,20 @@
       }
     ],
     "rewrites": [
+      {
+        "source": "/sitemap.xml",
+        "function": {
+          "functionId": "sitemap",
+          "region": "europe-west1"
+        }
+      },
+      {
+        "source": "/en/blog/*",
+        "function": {
+          "functionId": "serveBlogDetail",
+          "region": "europe-west1"
+        }
+      },
       {
         "source": "/en/blog/**",
         "destination": "/en/blog-post.html"

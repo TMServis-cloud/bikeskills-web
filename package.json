@@ -7,12 +7,14 @@
     "serve": "firebase emulators:start",
     "warm-cache": "node scripts/warm-drive-cache.js",
     "deploy": "npm run warm-cache && firebase deploy",
-    "deploy:hosting": "npm run warm-cache && npm run build:en && node scripts/generate-sitemap.js && node scripts/prerender.js && firebase deploy --only hosting",
+    "deploy:hosting": "npm run warm-cache && npm run i18n:pull && npm run build:en && node scripts/prerender.js && firebase deploy --only hosting",
     "deploy:rules": "npm run warm-cache && firebase deploy --only firestore:rules,storage",
     "import": "node scripts/wp-import.js",
-    "sitemap": "node scripts/generate-sitemap.js",
+    "sitemap": "NODE_PATH=functions/node_modules node scripts/generate-sitemap.js",
+    "i18n:pull": "NODE_PATH=functions/node_modules node scripts/i18n/pull-en.js",
     "prerender": "node scripts/prerender.js",
-    "build:en": "node scripts/i18n/apply-cms.js && node scripts/build-en.js",
+    "build:en": "node scripts/build-en.js",
+    "i18n:apply-dict": "node scripts/i18n/apply-cms.js",
     "i18n:todo": "node scripts/i18n/dump-cms.js --fetch && node scripts/i18n/dump-static.js"
   },
   "dependencies": {

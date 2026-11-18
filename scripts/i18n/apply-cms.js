@@ -1,5 +1,7 @@
 /**
- * Složí EN verze dokumentů clanky/akce/team z translations/cms-en.json.
+ * LEGACY (do 11/2026): složí EN verze z překladového slovníku translations/cms-en.json. Dnes se EN texty
+ * zakládají v adminu do Firestore (pole *_en) a do buildu je stahuje scripts/i18n/pull-en.js.
+ * Výstup tohoto skriptu posloužil jako zdroj jednorázové migrace (migrate-en-to-firestore.js).
  * Do Firestore NIC nezapisuje – výstup jsou statické soubory nasazené s webem:
  *
  *   translations/slugs.json             – CZ slug → EN slug (pro odkazy, build-en.js, prerender.js)

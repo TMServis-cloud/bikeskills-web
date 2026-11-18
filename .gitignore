@@ -27,3 +27,4 @@ scripts/serviceAccountKey.json
 
 # Media (deployed via Firebase CLI, not git)
 public/wp-content/
+sitemap-preview.xml

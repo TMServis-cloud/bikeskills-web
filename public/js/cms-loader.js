@@ -37,7 +37,6 @@ const TEAM_BASE = IS_EN ? '/en/team/' : '/team/';
 const BLOG_LIST = IS_EN ? '/en/blog' : '/blog';
 const AKCE_LIST = IS_EN ? '/en/courses-and-events' : '/akce-archive';
 const TEAM_LIST = IS_EN ? '/en/team' : '/team';
-const SLUG_FIELD = 'slug'; // dotazy jdou vždy na CZ slug; EN slug se převádí v routingu (EN_REV)
 const I18N_EN = {
   'Camp': 'Camp', 'Kurz': 'Course', 'Trialový kurz': 'Trial course', 'Dětský kurz': 'Kids course', 'Workshop': 'Workshop', 'Jiné': 'Other',
   'individuální kurzy →': 'individual courses →',
@@ -52,38 +51,46 @@ const I18N_EN = {
   'Registrace: ': 'Registration: ', 'akce': 'event',
 };
 function t(s) { return IS_EN && I18N_EN[s] != null ? I18N_EN[s] : s; }
-// Překlady CMS obsahu jsou statické soubory generované scripts/i18n/apply-cms.js:
-//   /en/data/{clanky,akce,team}.json         – { csSlug: { slug, titulek|nazev, perex, … } }
-//   /en/data/{clanky,akce}/<csSlug>.json      – { obsah } / { popis } (detail mimo prerender)
-const EN_MAPS = { clanky: {}, akce: {}, team: {} };
-const EN_REV = { clanky: {}, akce: {}, team: {} };
-async function loadEnMaps() {
-  await Promise.all(Object.keys(EN_MAPS).map(async c => {
-    try {
-      const r = await fetch(`/en/data/${c}.json`, { cache: 'no-cache' });
-      if (!r.ok) return;
-      EN_MAPS[c] = await r.json();
-      for (const [cs, e] of Object.entries(EN_MAPS[c])) EN_REV[c][e.slug || cs] = cs;
-    } catch (_) {}
-  }));
-}
+// Anglické verze CMS obsahu jsou ve Firestore ve stejném dokumentu v polích *_en
+// (titulek_en, obsah_en, slug_en, …) – zakládá je administrace (tlačítko „Přeložit do AJ"
+// / automatický překlad při uložení). Definice polí: functions/lib/en-fields.js.
+const EN_FIELDS = {
+  clanky: ['titulek', 'perex', 'obsah', 'slug', 'metaTitle', 'metaDescription'],
+  akce: ['nazev', 'popis', 'uroven', 'datumText', 'dobaTrvani', 'ridersNumberWp', 'stavLabel', 'typAkce', 'slug', 'metaTitle', 'metaDescription'],
+  team: ['popis'],
+};
+const EN_KEY = { clanky: 'titulek', akce: 'nazev', team: 'popis' };
 function colOf(d) { return d.titulek !== undefined ? 'clanky' : d.nazev !== undefined ? 'akce' : d.jmeno !== undefined ? 'team' : null; }
-/** Sloučí EN překlad přes CZ data z Firestore. V EN bez překladu označí _noEn (položka se nezobrazí). */
+/** Přepíše CZ data EN poli. V EN bez překladu označí _noEn (položka se nezobrazí). */
 function loc(d) {
   if (!d || !IS_EN) return d;
-  const c = colOf(d); const m = c && EN_MAPS[c][d.slug];
-  if (!m) return Object.assign({}, d, { _noEn: true });
-  return Object.assign({}, d, m, { slugCs: d.slug });
+  const c = colOf(d);
+  if (!c || !d[EN_KEY[c] + '_en']) return Object.assign({}, d, { _noEn: true });
+  const e = { slugCs: d.slug };
+  for (const f of EN_FIELDS[c]) { const v = d[f + '_en']; if (v != null && v !== '') e[f] = v; }
+  return Object.assign({}, d, e);
 }
-/** Detail: navíc dotáhne plný EN obsah (obsah/popis), pokud stránka není předgenerovaná. */
-async function locDetail(raw) {
-  const d = loc(raw);
-  if (!IS_EN || !d || d._noEn || PAGE_PRERENDERED) return d;
-  const c = colOf(raw);
-  if (c === 'clanky' || c === 'akce') {
-    try { const r = await fetch(`/en/data/${c}/${encodeURIComponent(raw.slug)}.json`); if (r.ok) Object.assign(d, await r.json()); } catch (_) {}
-  }
-  return d;
+async function locDetail(raw) { return loc(raw); }
+/** Detail: najde dokument podle slugu z URL (na /en/ podle slug_en). */
+function findBySlug(col, slug) {
+  const field = IS_EN && col !== 'team' ? 'slug_en' : 'slug';
+  return db.collection(col).where(field, '==', slug).limit(1).get();
+}
+/** Přepínač jazyka na detailu → protějšek v druhém jazyce (nebo výpis, když protějšek není). */
+function setDetailLangSwitch(raw, col) {
+  try {
+    const a = document.querySelector('a.bs-lang-switch');
+    if (!a || !raw) return;
+    const base = { clanky: ['/blog/', '/en/blog/'], akce: ['/akce/', '/en/events/'], team: ['/team/', '/en/team/'] }[col];
+    const list = { clanky: ['/blog', '/en/blog'], akce: ['/akce-archive', '/en/courses-and-events'], team: ['/team', '/en/team'] }[col];
+    let href;
+    if (IS_EN) href = base[0] + raw.slug + (col === 'clanky' ? '/' : '');
+    else {
+      const en = col === 'team' ? (raw.popis_en ? raw.slug : null) : raw.slug_en;
+      href = en ? base[1] + en : list[1];
+    }
+    a.setAttribute('href', href);
+  } catch (_) {}
 }
 function hasLang(d) { return !d._noEn; }
 
@@ -494,7 +501,6 @@ function externalLinksNewTab(containerEl) {
 // PAGE DETECTION
 // ============================================================
 document.addEventListener('DOMContentLoaded', async () => {
-  if (IS_EN) await loadEnMaps();
   // Globálně: všechny externí linky otevřít v novém okně
   externalLinksNewTab(document.body);
 
@@ -504,9 +510,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     const p = path.replace(/\.html$/, '').replace(/\/$/, '') || '/';
     const EN_ROUTES = { '/en': '/', '/en/index': '/', '/en/blog': '/blog', '/en/courses-and-events': '/akce-archive', '/en/team': '/team' };
     if (EN_ROUTES[p]) path = EN_ROUTES[p];
-    else if (p.indexOf('/en/blog/') === 0) { const s = p.slice('/en/blog/'.length); path = '/blog/' + (EN_REV.clanky[s] || s) + '/'; }
-    else if (p.indexOf('/en/events/') === 0) { const s = p.slice('/en/events/'.length); path = '/akce/' + (EN_REV.akce[s] || s); }
-    else if (p.indexOf('/en/team/') === 0) { const s = p.slice('/en/team/'.length); path = '/team/' + (EN_REV.team[s] || s); }
+    else if (p.indexOf('/en/blog/') === 0) { const s = p.slice('/en/blog/'.length); path = '/blog/' + s + '/'; }
+    else if (p.indexOf('/en/events/') === 0) { const s = p.slice('/en/events/'.length); path = '/akce/' + s; }
+    else if (p.indexOf('/en/team/') === 0) { const s = p.slice('/en/team/'.length); path = '/team/' + s; }
     else if (p === '/en/event-detail') path = '/detail_akce';
     else if (p === '/en/team-member') path = '/detail_archive-team';
   }
@@ -1000,7 +1006,7 @@ async function loadAkceDetail(slug) {
   const { itemsList, template, emptyEl } = wfl;
 
   try {
-    const snapshot = await db.collection('akce').where(SLUG_FIELD, '==', slug).limit(1).get();
+    const snapshot = await findBySlug('akce', slug);
     if (snapshot.empty) {
       toggleEmpty(emptyEl, false);
       itemsList.innerHTML = '';
@@ -1008,6 +1014,7 @@ async function loadAkceDetail(slug) {
     }
 
     const data = await locDetail(snapshot.docs[0].data());
+    setDetailLangSwitch(snapshot.docs[0].data(), 'akce');
     const galerie = (data.galerie && data.galerie.length)
       ? data.galerie.filter(Boolean)
       : [data.galerie1, data.galerie2, data.galerie3, data.galerie4].filter(Boolean);
@@ -1094,7 +1101,7 @@ async function loadAkceDetail(slug) {
       pageHeading.classList.remove('w-dyn-bind-empty');
     }
 
-    setPageMeta(`${data.nazev} | BikeSkills`, data.popis, data.imageUrl, 'event');
+    setPageMeta(`${data.metaTitle || data.nazev} | BikeSkills`, data.metaDescription || data.popis, data.imageUrl, 'event');
     // Datum na ISO 8601 (YYYY-MM-DD) pro schema.org (Event vyžaduje startDate)
     const akceISOStart = computeAkceISOStart(data);
     const akceImage = (data.imageUrl ? resolveUrl(data.imageUrl) : 'https://bikeskills.cz/images/og-image.jpg');
@@ -1456,10 +1463,11 @@ async function loadClankyList() {
 
 async function loadClanekDetail(slug) {
   try {
-    const snapshot = await db.collection('clanky').where(SLUG_FIELD, '==', slug).limit(1).get();
+    const snapshot = await findBySlug('clanky', slug);
     if (snapshot.empty) return;
 
     const data = await locDetail(snapshot.docs[0].data());
+    setDetailLangSwitch(snapshot.docs[0].data(), 'clanky');
     const datum = data.datum
       ? new Date(data.datum.seconds ? data.datum.seconds * 1000 : data.datum).toLocaleDateString(LOCALE, IS_EN ? { day: 'numeric', month: 'long', year: 'numeric' } : undefined)
       : '';
@@ -1471,7 +1479,7 @@ async function loadClanekDetail(slug) {
       // Pre-rendered HTML již obsahuje meta + JSON-LD + title/date/author/content/img.
       // Při SSG režimu přeskočíme DOM mutaci hlavičky a hlavního obsahu — jen
       // dotahujeme galerii, video, related-posts (ty pre-renderované nejsou).
-      setPageMeta(`${data.titulek} | BikeSkills`, data.popis || data.perex, galerie[0] || data.imageUrl, 'article');
+      setPageMeta(`${data.metaTitle || data.titulek} | BikeSkills`, data.metaDescription || data.popis || data.perex, galerie[0] || data.imageUrl, 'article');
       const postPublishedISO = data.datum
         ? new Date(data.datum.seconds ? data.datum.seconds * 1000 : data.datum).toISOString()
         : null;
@@ -1700,10 +1708,11 @@ async function loadTeamDetail(slug) {
   if (!container) return;
 
   try {
-    const snapshot = await db.collection('team').where(SLUG_FIELD, '==', slug).limit(1).get();
+    const snapshot = await findBySlug('team', slug);
     if (snapshot.empty) { container.innerHTML = '<p>' + t('Člen týmu nenalezen.') + '</p>'; return; }
 
     const data = await locDetail(snapshot.docs[0].data());
+    setDetailLangSwitch(snapshot.docs[0].data(), 'team');
     const galerie = (data.galerie && data.galerie.length)
       ? data.galerie.filter(Boolean)
       : [];

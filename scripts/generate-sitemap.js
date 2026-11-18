@@ -1,143 +1,28 @@
 /**
- * BIKESKILLS – Generátor sitemap.xml
+ * BIKESKILLS – náhled sitemapy
  *
- * Načte slugy z Firestore (clanky + akce) a vygeneruje public/sitemap.xml.
- * Obsahuje i anglickou verzi (/en/…) s hreflang alternativami (xhtml:link) –
- * EN slugy bere z translations/slugs.json, mapu stránek ze scripts/i18n/pages.js.
+ * Ostrá sitemapa se generuje za běhu Cloud Function `sitemap` (/sitemap.xml → functions/lib/sitemap.js),
+ * aby nové články/akce a jejich EN překlady byly v sitemapě hned po uložení v adminu.
+ * Tento skript jen vypíše stejný výstup lokálně do sitemap-preview.xml (není součástí webu).
  *
  * Usage:
- *   node scripts/generate-sitemap.js
+ *   NODE_PATH=functions/node_modules node scripts/generate-sitemap.js
  */
-
 const fs = require('fs');
 const path = require('path');
 
-const SERVICE_ACCOUNT_PATH = process.env.GOOGLE_APPLICATION_CREDENTIALS
-  || path.join(__dirname, 'serviceAccountKey.json');
-
+const SERVICE_ACCOUNT_PATH = process.env.GOOGLE_APPLICATION_CREDENTIALS || path.join(__dirname, 'serviceAccountKey.json');
 if (!fs.existsSync(SERVICE_ACCOUNT_PATH)) {
-  console.log('⚠️  serviceAccountKey.json nenalezen — sitemap generation přeskočena (CI prostředí)');
+  console.log('⚠️  serviceAccountKey.json nenalezen — náhled sitemapy přeskočen');
   process.exit(0);
 }
-
 const admin = require('firebase-admin');
-try {
-  const serviceAccount = require(SERVICE_ACCOUNT_PATH);
-  admin.initializeApp({ credential: admin.credential.cert(serviceAccount) });
-} catch (error) {
-  console.error('❌ Firebase init error:', error.message);
-  process.exit(1);
-}
+admin.initializeApp({ credential: admin.credential.cert(require(SERVICE_ACCOUNT_PATH)) });
+const { buildSitemapXml } = require('../functions/lib/sitemap');
 
-const db = admin.firestore();
-const BASE = 'https://bikeskills.cz';
-const OUT = path.join(__dirname, '../public/sitemap.xml');
-
-const STATIC_PAGES = [
-  { loc: '/',                                     priority: '1.0', changefreq: 'weekly' },
-  { loc: '/akce-archive',                    priority: '0.9', changefreq: 'weekly' },
-  { loc: '/individualni-kurzy',              priority: '0.9', changefreq: 'monthly' },
-  { loc: '/campy',                           priority: '0.9', changefreq: 'monthly' },
-  { loc: '/specialni-akce',                  priority: '0.8', changefreq: 'monthly' },
-  { loc: '/servis',                          priority: '0.8', changefreq: 'monthly' },
-  { loc: '/standartni-servis-kol',           priority: '0.7', changefreq: 'monthly' },
-  { loc: '/kompletni-servis-hardtail',       priority: '0.7', changefreq: 'monthly' },
-  { loc: '/kompletni-servis-full',           priority: '0.7', changefreq: 'monthly' },
-  { loc: '/kompletni-cenik-servisnich-praci',priority: '0.6', changefreq: 'monthly' },  { loc: '/pujcovna',                        priority: '0.7', changefreq: 'monthly' },
-  { loc: '/blog',                            priority: '0.8', changefreq: 'weekly' },
-  { loc: '/team',                            priority: '0.7', changefreq: 'monthly' },
-  { loc: '/kontakt',                         priority: '0.7', changefreq: 'monthly' },
-  { loc: '/obchodni-podminky',               priority: '0.3', changefreq: 'yearly' },
-  { loc: '/dodaci-podminky',                 priority: '0.3', changefreq: 'yearly' },
-  { loc: '/zasady-ochrany-osobnich-udaju',   priority: '0.3', changefreq: 'yearly' },
-];
-
-// ---- EN / hreflang ----
-const PAGES = require('./i18n/pages');
-const SLUGS_PATH = path.join(__dirname, '../translations/slugs.json');
-const SLUGS = fs.existsSync(SLUGS_PATH) ? JSON.parse(fs.readFileSync(SLUGS_PATH, 'utf8')) : { blog: {}, akce: {} };
-const EN_DATA = (c) => { const p = path.join(__dirname, '../public/en/data', c + '.json'); return fs.existsSync(p) ? JSON.parse(fs.readFileSync(p, 'utf8')) : {}; };
-const EN_TEAM = EN_DATA('team');
-const pageEn = (csLoc) => {
-  const bare = csLoc === '/' ? 'index' : csLoc.replace(/^\//, '');
-  const p = PAGES.find(x => x.cs === bare);
-  return p ? (p.en === 'index' ? '/en' : '/en/' + p.en) : null;
-};
-/** Vrátí 2 záznamy (cs + en) s vzájemnými alternates, nebo 1 bez EN. */
-function pair(entry, enLoc) {
-  if (!enLoc) return [urlEntry(entry)];
-  const alt = { cs: entry.loc, en: enLoc };
-  return [urlEntry(Object.assign({}, entry, { alt })), urlEntry(Object.assign({}, entry, { loc: enLoc, alt }))];
-}
-
-function urlEntry({ loc, priority, changefreq, lastmod, alt }) {
-  const parts = [`  <url>`, `    <loc>${BASE}${loc}</loc>`];
-  if (alt) {
-    parts.push(`    <xhtml:link rel="alternate" hreflang="cs" href="${BASE}${alt.cs}"/>`);
-    parts.push(`    <xhtml:link rel="alternate" hreflang="en" href="${BASE}${alt.en}"/>`);
-    parts.push(`    <xhtml:link rel="alternate" hreflang="x-default" href="${BASE}${alt.cs}"/>`);
-  }
-  if (lastmod) parts.push(`    <lastmod>${lastmod}</lastmod>`);
-  parts.push(`    <priority>${priority}</priority>`);
-  parts.push(`    <changefreq>${changefreq}</changefreq>`);
-  parts.push(`  </url>`);
-  return parts.join('\n');
-}
-
-function toLastmod(ts) {
-  if (!ts) return null;
-  const d = ts.toDate ? ts.toDate() : new Date(ts);
-  return d.toISOString().split('T')[0];
-}
-
-async function main() {
-  console.log('🗺️  Generuji sitemap.xml...');
-
-  const entries = STATIC_PAGES.flatMap(p => pair(p, pageEn(p.loc)));
-
-  // Blog
-  const clankySnap = await db.collection('clanky').get();
-  const clanky = clankySnap.docs.map(d => d.data()).filter(d => d.slug && d.publikovano !== false);
-  console.log(`  📝 Články: ${clanky.length}`);
-  clanky.forEach(d => entries.push(...pair({
-    loc: `/blog/${d.slug}/`,
-    priority: '0.6',
-    changefreq: 'yearly',
-    lastmod: toLastmod(d.datum || d.updatedAt || d.createdAt),
-  }, SLUGS.blog[d.slug] ? `/en/blog/${SLUGS.blog[d.slug]}` : null)));
-
-  // Akce
-  const akceSnap = await db.collection('akce').get();
-  const akce = akceSnap.docs.map(d => d.data()).filter(d => d.slug && d.publikovano !== false);
-  console.log(`  🚴 Akce: ${akce.length}`);
-  akce.forEach(d => entries.push(...pair({
-    loc: `/akce/${d.slug}`,
-    priority: '0.7',
-    changefreq: 'monthly',
-    lastmod: toLastmod(d.datum || d.updatedAt || d.createdAt),
-  }, SLUGS.akce[d.slug] ? `/en/events/${SLUGS.akce[d.slug]}` : null)));
-
-  // Tým
-  const teamSnap = await db.collection('team').get();
-  const team = teamSnap.docs.map(d => d.data()).filter(d => d.slug);
-  console.log(`  👤 Tým: ${team.length}`);
-  team.forEach(d => entries.push(...pair({
-    loc: `/team/${d.slug}`,
-    priority: '0.6',
-    changefreq: 'monthly',
-  }, EN_TEAM[d.slug] ? `/en/team/${d.slug}` : null)));
-
-  const xml = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
-
-${entries.join('\n\n')}
-
-</urlset>
-`;
-
+const OUT = path.join(__dirname, '../sitemap-preview.xml');
+buildSitemapXml(admin.firestore()).then(xml => {
   fs.writeFileSync(OUT, xml, 'utf-8');
-  console.log(`\n✅ Hotovo: ${OUT} (${entries.length} URL)`);
+  console.log(`✅ ${OUT} (${(xml.match(/<url>/g) || []).length} URL)`);
   process.exit(0);
-}
-
-main().catch(err => { console.error('❌', err); process.exit(1); });
+}).catch(err => { console.error('❌', err); process.exit(1); });
