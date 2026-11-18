@@ -277,7 +277,7 @@ function computeAkceISOStart(data) {
   }
   if (data && data.datumSort) {
     var s = String(data.datumSort);
-    var m = s.match(/^(\d{4})(\d{2})(\d{2})$/);
+    var m = s.match(/^(\d{4})-?(\d{2})-?(\d{2})/);
     if (m) return m[1] + '-' + m[2] + '-' + m[3];
   }
   if (data && data.datumText) {
@@ -636,12 +636,12 @@ async function loadAkcePreview() {
     const all = snapshot.docs.map(d => loc(d.data())).filter(hasLang).filter(d => d.aktivni !== false);
     // Nejbližší nadcházející akce seřazené od nejbližšího data
     const upcoming = all
-      .filter(d => String(d.datumSort || '0') >= todayStr)
-      .sort((a, b) => String(a.datumSort || '0').localeCompare(String(b.datumSort || '0')));
+      .filter(d => dsKey(d.datumSort) >= todayStr)
+      .sort((a, b) => dsKey(a.datumSort).localeCompare(dsKey(b.datumSort)));
     // Pokud je málo nadcházejících, doplníme nedávno proběhlé
     const past = all
-      .filter(d => String(d.datumSort || '0') < todayStr)
-      .sort((a, b) => String(b.datumSort || '0').localeCompare(String(a.datumSort || '0')));
+      .filter(d => dsKey(d.datumSort) < todayStr)
+      .sort((a, b) => dsKey(b.datumSort).localeCompare(dsKey(a.datumSort)));
     const docs = [...upcoming, ...past].slice(0, 8);
 
     if (!docs.length) { toggleEmpty(emptyEl, false); itemsList.innerHTML = ''; return; }
@@ -663,6 +663,9 @@ let akceYearFilter = 'all';
 let akceZamereniFilter = 'all';
 let akceCenaFilter = 'all';
 
+/** datumSort je v adminu 'YYYY-MM-DD', u starších akcí mohlo být 'YYYYMMDD' → porovnávací klíč YYYYMMDD. */
+function dsKey(v) { return String(v || '').replace(/\D/g, '').slice(0, 8) || '0'; }
+
 function getYearFromDatumSort(datumSort) {
   if (!datumSort) return null;
   const m = String(datumSort).match(/^(\d{4})/);
@@ -673,7 +676,7 @@ function isAkceOdjeto(data) {
   if (!data.datumSort) return false;
   const today = new Date();
   const todayStr = `${today.getFullYear()}${String(today.getMonth() + 1).padStart(2, '0')}${String(today.getDate()).padStart(2, '0')}`;
-  return String(data.datumSort) < todayStr;
+  return dsKey(data.datumSort) < todayStr;
 }
 
 function injectFilterBar(id, beforeEl) {
@@ -978,7 +981,7 @@ async function loadAkceList() {
     const snapshot = await db.collection('akce').get();
     allAkceData = snapshot.docs.map(d => loc(d.data())).filter(hasLang)
       .filter(d => d.aktivni !== false)
-      .sort((a, b) => String(b.datumSort || '0').localeCompare(String(a.datumSort || '0')));
+      .sort((a, b) => dsKey(b.datumSort).localeCompare(dsKey(a.datumSort)));
 
     const yearSet = new Set();
     const typSet = new Set();

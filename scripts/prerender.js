@@ -118,9 +118,12 @@ function plainText(html, max) {
   return max && stripped.length > max ? stripped.substring(0, max - 1) + '…' : stripped;
 }
 
+/** datumSort je v adminu 'YYYY-MM-DD', u starších akcí mohlo být 'YYYYMMDD' → porovnávací klíč YYYYMMDD. */
+function dsKey(v) { return String(v || '').replace(/\D/g, '').slice(0, 8) || '0'; }
+
 /**
  * Vrátí ISO datum YYYY-MM-DD pro Event.startDate, nebo null když nelze určit.
- * Pořadí zdrojů: d.datum (Timestamp/ISO) → d.datumSort (YYYYMMDD) → parse "D.M.YYYY" z d.datumText.
+ * Pořadí zdrojů: d.datum (Timestamp/ISO) → d.datumSort (YYYY-MM-DD / YYYYMMDD) → parse "D.M.YYYY" z d.datumText.
  */
 function computeAkceISOStart(d) {
   if (d && d.datum) {
@@ -132,7 +135,7 @@ function computeAkceISOStart(d) {
   }
   if (d && d.datumSort) {
     const s = String(d.datumSort);
-    const m = s.match(/^(\d{4})(\d{2})(\d{2})$/);
+    const m = s.match(/^(\d{4})-?(\d{2})-?(\d{2})/);
     if (m) return `${m[1]}-${m[2]}-${m[3]}`;
   }
   if (d && d.datumText) {
@@ -682,10 +685,10 @@ async function main() {
 
   const today = new Date();
   const todayStr = `${today.getFullYear()}${String(today.getMonth()+1).padStart(2,'0')}${String(today.getDate()).padStart(2,'0')}`;
-  const upcoming = akce.filter(d => String(d.datumSort||'0') >= todayStr)
-    .sort((a,b) => String(a.datumSort||'0').localeCompare(String(b.datumSort||'0')));
-  const past = akce.filter(d => String(d.datumSort||'0') < todayStr)
-    .sort((a,b) => String(b.datumSort||'0').localeCompare(String(a.datumSort||'0')));
+  const upcoming = akce.filter(d => dsKey(d.datumSort) >= todayStr)
+    .sort((a,b) => dsKey(a.datumSort).localeCompare(dsKey(b.datumSort)));
+  const past = akce.filter(d => dsKey(d.datumSort) < todayStr)
+    .sort((a,b) => dsKey(b.datumSort).localeCompare(dsKey(a.datumSort)));
   const akceForListing = [...upcoming, ...past].slice(0, 12);
 
   console.log(`  📚 clanky: ${clanky.length} publikovaných, top 12 do listingu`);
