@@ -507,3 +507,16 @@ html.cookies-show .cookie .banner-author-wrap .banner-author { display: inline !
 /* Menu tlačítko: křížek po otevření zůstává tmavý (Lottie animace ho jinak přebarví na modrou) */
 .menu-button .lottie-animation-7 svg path[fill]:not([fill="none"]) { fill: #222528 !important; }
 .menu-button .lottie-animation-7 svg path[stroke]:not([stroke="none"]) { stroke: #222528 !important; }
+
+/* Mobil (do 479 px): větší přepínač jazyka a sociální ikony – dotyková plocha 44×44 px (Apple HIG / WCAG 2.5.5),
+   text 14 px, ikony 22 px; záporné okraje srovnají viditelný obsah s kontakty pod lištou */
+@media screen and (max-width: 479px) {
+  .top-bar { padding-top: 2px; padding-bottom: 2px; }
+  .right-block-topbar .bs-lang { gap: 0; margin-left: -13px; }
+  .right-block-topbar .bs-lang .bs-lang-link { font-size: 14px; line-height: 20px; min-width: 44px; min-height: 44px; display: inline-flex; align-items: center; justify-content: center; }
+  .right-block-topbar .bs-lang .bs-lang-sep { font-size: 14px; }
+  .right-block-topbar .link-block-button { width: 44px; height: 44px; display: inline-flex; align-items: center; justify-content: center; margin: 0; }
+  .right-block-topbar .link-block-button:last-of-type { margin-right: -11px; }
+  .right-block-topbar .lottie-social-icon.small { width: 22px !important; height: 22px !important; max-height: none; }
+  .right-block-topbar .lottie-social-icon.small svg { width: 100% !important; height: 100% !important; }
+}
