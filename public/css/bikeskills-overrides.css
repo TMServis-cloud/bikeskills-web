@@ -481,3 +481,17 @@ html.cookies-show .cookie .banner-author-wrap .banner-author { display: inline !
 @media screen and (max-width: 767px) {
   .bs-footer-legal .bs-footer-link, .bs-footer-legal .bs-footer-sep { font-size: 11px; }
 }
+
+/* Mobil (do 479 px): horní lišta – větší mezera mezi řádkem jazyk/sítě a kontakty */
+@media screen and (max-width: 479px) {
+  .top-bar_wrap { row-gap: 10px !important; }
+}
+/* Mobil (do 479 px): spodní řádek zápatí zarovnaný doleva jako ostatní odkazy, copyright | Trialshow v jednom řádku */
+@media screen and (max-width: 479px) {
+  .copyright-wrap { flex-direction: row !important; flex-wrap: wrap; justify-content: flex-start !important; align-items: center !important; column-gap: 8px; width: 100%; }
+  .copyright-wrap .copyright { text-align: left; flex: 0 0 auto; width: auto; margin: 0 !important; padding: 0 !important; }
+  .copyright-wrap .top-bar_link.footer { flex: none; padding-right: 0; }
+  .copyright-wrap .copyright br { display: none; }
+  .copyright-wrap .text-block-143 { font-size: 11px; line-height: 23px; margin: 0 !important; padding: 0 !important; width: auto; flex: none; }
+  .footer-link-2.bs-footer-legal { justify-self: start !important; align-self: start; justify-content: flex-start; margin-top: 4px; }
+}
