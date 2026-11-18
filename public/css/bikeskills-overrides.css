@@ -520,3 +520,10 @@ html.cookies-show .cookie .banner-author-wrap .banner-author { display: inline !
   .right-block-topbar .lottie-social-icon.small { width: 22px !important; height: 22px !important; max-height: none; }
   .right-block-topbar .lottie-social-icon.small svg { width: 100% !important; height: 100% !important; }
 }
+
+/* Mobil (do 479 px): zápatí – mezera za „Sledujte nás“ (vč. ikon), za „Platební brána“, copyright a těsně pod ním GDPR */
+@media screen and (max-width: 479px) {
+  .footer-heading[id^="w-node-_5e251e9d"] { margin-top: 50px; }   /* Platební brána */
+  .copyright-wrap { margin-top: 50px; }
+  .footer-link-2.bs-footer-legal { margin-top: -10px !important; }
+}
