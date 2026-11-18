@@ -461,3 +461,15 @@ html.cookies-show .cookie .banner-author-wrap .banner-author { display: inline !
   padding: 1.5rem 0;
   background-color: transparent;
 }
+
+/* Přepínač jazyka CZ | EN v horní liště (před sociálními sítěmi), aktivní jazyk podtržený */
+.right-block-topbar .bs-lang { display: inline-flex; align-items: center; gap: 6px; margin-right: 14px; white-space: nowrap; }
+.right-block-topbar .bs-lang .bs-lang-link { padding: 0; margin: 0; display: inline; font-weight: 400; letter-spacing: .04em; }
+.right-block-topbar .bs-lang .bs-lang-link.is-active { text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; font-weight: 700; }
+.right-block-topbar .bs-lang .bs-lang-sep { color: var(--white, #fff); opacity: .5; font-size: 12px; }
+
+/* Zápatí: GDPR | Design by VKC */
+.footer-link-2.bs-footer-legal { display: flex; align-items: center; gap: 8px; }
+.bs-footer-legal .bs-footer-link { color: inherit; text-decoration: none; }
+.bs-footer-legal .bs-footer-link:hover { text-decoration: underline; }
+.bs-footer-legal .bs-footer-sep { opacity: .5; }

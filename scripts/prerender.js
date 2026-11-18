@@ -62,7 +62,8 @@ function setHreflang(html, csUrl, enUrl) {
   return html.replace('</head>', `${block}\n</head>`);
 }
 /** Přepínač jazyka v menu (vložený build-en.js) – nasměruje na protějšek konkrétní položky. */
-function setLangSwitchHref(html, href) {
+function setLangSwitchHref(html, href, selfHref) {
+  if (selfHref) html = html.replace(/(<a\b[^>]*\bhref=")[^"]*("[^>]*\bis-active\b)/, `$1${selfHref}$2`);
   return html.replace(/(<a\b[^>]*\bbs-lang-switch\b[^>]*\bhref=")[^"]*(")|(<a\b[^>]*\bhref=")[^"]*("[^>]*\bbs-lang-switch\b)/, (m, a, b, c, d) => a ? a + href + b : c + href + d);
 }
 
@@ -548,7 +549,7 @@ function prerenderClanekDetail(template, d) {
   }
 
   html = setHreflang(html, csUrl, enUrl);
-  if (enUrl) html = setLangSwitchHref(html, LANG === 'en' ? csUrl.replace(BASE_URL, '') : enUrl.replace(BASE_URL, ''));
+  if (enUrl) html = setLangSwitchHref(html, LANG === 'en' ? csUrl.replace(BASE_URL, '') : enUrl.replace(BASE_URL, ''), url.replace(BASE_URL, ''));
   // Označit pre-rendered (cms-loader.js to detekuje)
   html = html.replace(/<html\b/, '<html data-prerendered="true"');
   return html;
@@ -649,7 +650,7 @@ function prerenderAkceDetail(template, d) {
     html = setItemImg(html, 'featured-image', heroPrimary, nazev, 1280, 720, 'high', { srcset: heroSrcset, sizes: heroSizes });
   }
   html = setHreflang(html, csUrl, enUrl);
-  if (enUrl) html = setLangSwitchHref(html, LANG === 'en' ? csUrl.replace(BASE_URL, '') : enUrl.replace(BASE_URL, ''));
+  if (enUrl) html = setLangSwitchHref(html, LANG === 'en' ? csUrl.replace(BASE_URL, '') : enUrl.replace(BASE_URL, ''), url.replace(BASE_URL, ''));
   html = html.replace(/<html\b/, '<html data-prerendered="true"');
   return html;
 }

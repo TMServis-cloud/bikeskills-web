@@ -291,6 +291,7 @@ function prerenderClanekDetail(template, d) {
     html = html.replace(/\s*<!-- hreflang:start -->[\s\S]*?<!-- hreflang:end -->/, '');
     html = html.replace('</head>', `  <!-- hreflang:start -->\n  <link rel="alternate" hreflang="cs" href="${url}">\n  <link rel="alternate" hreflang="en" href="${enUrl}">\n  <link rel="alternate" hreflang="x-default" href="${url}">\n  <!-- hreflang:end -->\n</head>`);
     html = html.replace(/(<a\b[^>]*\bhref=")[^"]*("[^>]*\bbs-lang-switch\b)/, `$1/en/blog/${d.enSlug}$2`);
+    html = html.replace(/(<a\b[^>]*\bhref=")[^"]*("[^>]*\bis-active\b)/, `$1/blog/${d.slug}/$2`);
   }
 
   // Označit pre-rendered (cms-loader.js to detekuje)

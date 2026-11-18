@@ -102,19 +102,27 @@ function findElementEnd(html, startIdx, tag) {
   return -1;
 }
 
-const SWITCH_CSS = `<style id="bs-lang-css">.bs-lang-switch{display:inline-flex;align-items:center;gap:.35em;font-weight:700;letter-spacing:.05em}.bs-lang-switch img{display:none}@media (max-width:991px){.bs-lang-switch{justify-content:center}}</style>`;
-function setLangSwitch(html, targetHref, targetLang) {
-  html = html.replace(/\s*<a\b[^>]*\bbs-lang-switch\b[^>]*>[\s\S]*?<\/a>/g, '');
-  html = html.replace(/\s*<style id="bs-lang-css">[\s\S]*?<\/style>/, '');
-  const label = targetLang === 'en' ? 'EN' : 'CZ';
-  const title = targetLang === 'en' ? 'English version' : 'Česká verze';
-  const link = `<a href="${targetHref}" hreflang="${targetLang}" lang="${targetLang}" title="${title}" data-lang-switch="${targetLang}" class="nav-link white hover-black w-nav-link bs-lang-switch">${label}</a>`;
-  const navStart = html.search(/<nav\b[^>]*\bclass="[^"]*\bnav1-menu\b[^"]*"/);
-  if (navStart < 0) return html;
-  const end = findElementEnd(html, navStart, 'nav');
-  if (end < 0) return html;
-  html = html.slice(0, end) + '\n            ' + link + '\n          ' + html.slice(end);
-  return html.replace('</head>', `  ${SWITCH_CSS}\n</head>`);
+/** Odstraní přepínač jazyka (starý v menu i nový v horní liště) – idempotence. */
+function stripLangSwitch(html) {
+  return html
+    .replace(/\s*<div class="bs-lang"[\s\S]*?<\/div><!-- \/bs-lang -->/g, '')
+    .replace(/\s*<a\b[^>]*\bbs-lang-switch\b[^>]*>[\s\S]*?<\/a>/g, '')
+    .replace(/\s*<style id="bs-lang-css">[\s\S]*?<\/style>/, '');
+}
+/**
+ * Přepínač CZ | EN v horní liště před ikonami sociálních sítí, aktivní jazyk podtržený (CSS v bikeskills-overrides.css).
+ * Neaktivní odkaz nese třídu bs-lang-switch – prerender.js a Cloud Function mu přepisují href na protějšek položky.
+ */
+function setLangSwitch(html, csHref, enHref, current) {
+  html = stripLangSwitch(html);
+  const link = (lang, href, label) => current === lang
+    ? `<a href="${href}" hreflang="${lang}" lang="${lang}" aria-current="true" class="top-bar_link bs-lang-link is-active">${label}</a>`
+    : `<a href="${href}" hreflang="${lang}" lang="${lang}" title="${lang === 'en' ? 'English version' : 'Česká verze'}" data-lang-switch="${lang}" class="top-bar_link bs-lang-link bs-lang-switch">${label}</a>`;
+  const block = `<div class="bs-lang" role="navigation" aria-label="${current === 'en' ? 'Language' : 'Jazyk'}">${link('cs', csHref, 'CZ')}<span class="bs-lang-sep" aria-hidden="true">|</span>${link('en', enHref, 'EN')}</div><!-- /bs-lang -->`;
+  const m = html.match(/<div\b[^>]*\bclass="right-block-topbar"[^>]*>/);
+  if (!m) return html;
+  const at = m.index + m[0].length;
+  return html.slice(0, at) + '\n          ' + block + html.slice(at);
 }
 
 // Řetězce v inline <script> (validace formulářů apod.) – přesná shoda
@@ -144,7 +152,7 @@ function buildPage(p) {
   const page = p.cs;
 
   // odstranit přepínač/hreflang vložený do CZ stránky předchozím během
-  let h = csHtml.replace(/\s*<a\b[^>]*\bbs-lang-switch\b[^>]*>[\s\S]*?<\/a>/g, '').replace(/\s*<style id="bs-lang-css">[\s\S]*?<\/style>/, '');
+  let h = stripLangSwitch(csHtml);
   // head
   h = h.replace(/<html\b([^>]*)\blang="[^"]*"/, '<html$1lang="en"');
   h = h.replace(/<title>([^<]*)<\/title>/, (m, t) => `<title>${trPlain(t, page)}</title>`);
@@ -166,7 +174,10 @@ function buildPage(p) {
   if (!p.template) { h = setCanonical(h, enUrl); h = setHreflang(h, csUrl, enUrl); }
   else { h = setCanonical(h, enUrl); h = h.replace(/\s*<!-- hreflang:start -->[\s\S]*?<!-- hreflang:end -->/, ''); } // šablona: prerender canonical přepíše
   // přepínač jazyka
-  h = setLangSwitch(h, p.template ? (p.cs === 'detail_post' ? '/blog' : p.cs === 'detail_akce' ? '/akce-archive' : p.cs === 'detail_archive-team' ? '/team' : '/') : L.csPagePath(p), 'cs');
+  const [csSw, enSw] = p.template
+    ? ({ detail_post: ['/blog', '/en/blog'], detail_akce: ['/akce-archive', '/en/courses-and-events'], 'detail_archive-team': ['/team', '/en/team'] }[p.cs] || ['/', '/en'])
+    : [L.csPagePath(p), L.enPagePath(p)];
+  h = setLangSwitch(h, csSw, enSw, 'en');
   // poznámka u právních textů
   if (LEGAL.has(p.cs)) {
     const note = LEGAL_NOTE.replace('{CS}', L.csPagePath(p));
@@ -182,7 +193,7 @@ function buildPage(p) {
     // CZ stránka: hreflang + přepínač
     let c = csHtml;
     if (!p.template) c = setHreflang(c, csUrl, enUrl);
-    c = setLangSwitch(c, p.template ? (p.cs === 'detail_post' ? '/en/blog' : p.cs === 'detail_akce' ? '/en/courses-and-events' : p.cs === 'detail_archive-team' ? '/en/team' : '/en') : L.enPagePath(p), 'en');
+    c = setLangSwitch(c, csSw, enSw, 'cs');
     if (c !== csHtml) fs.writeFileSync(csFile, c);
   }
 }
