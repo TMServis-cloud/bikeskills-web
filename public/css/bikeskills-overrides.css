@@ -495,3 +495,14 @@ html.cookies-show .cookie .banner-author-wrap .banner-author { display: inline !
   .copyright-wrap .text-block-143 { font-size: 11px; line-height: 23px; margin: 0 !important; padding: 0 !important; width: auto; flex: none; }
   .footer-link-2.bs-footer-legal { justify-self: start !important; align-self: start; justify-content: flex-start; margin-top: 4px; }
 }
+
+/* Mobil (do 479 px): černá lišta jen jazyk + sociální sítě, e-mail a telefon ve žluté liště pod menu */
+.bs-nav-contact { display: none; }
+@media screen and (max-width: 479px) {
+  .top-bar .left-block-topbar { display: none !important; }
+  .nav1-wrap > .bs-nav-contact { display: flex; grid-column: 1 / -1; justify-content: space-between; align-items: center; margin-top: -10px; padding: 0 10px; }
+  .bs-nav-contact .bs-nav-contact-link { color: #222528; font-family: proxima-nova, sans-serif; font-size: 13px; font-weight: 400; line-height: 20px; text-transform: none; text-decoration: none; white-space: nowrap; }
+}
+/* Menu tlačítko: křížek po otevření zůstává tmavý (Lottie animace ho jinak přebarví na modrou) */
+.menu-button .lottie-animation-7 svg path[fill]:not([fill="none"]) { fill: #222528 !important; }
+.menu-button .lottie-animation-7 svg path[stroke]:not([stroke="none"]) { stroke: #222528 !important; }
