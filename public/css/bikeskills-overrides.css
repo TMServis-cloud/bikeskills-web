@@ -530,7 +530,7 @@ html.cookies-show .cookie .banner-author-wrap .banner-author { display: inline !
 
 /* Filtr výpisů Campy (/akce-archive) a Novinky (/blog) – pilulky nahoře, pod nimi počet a řazení (varianta B), generuje js/cms-loader.js */
 .bs-filter { padding: 1rem 0 20px; font-family: proxima-nova, sans-serif; }
-.bs-filter button { margin: 0; box-shadow: none; text-transform: none; letter-spacing: normal; }  /* zrušení globálních stylů tlačítek ze šablony */
+.bs-filter button { margin: 0; height: auto; box-shadow: none; text-transform: none; letter-spacing: normal; }  /* šablona dává všem button height/min-height 3rem */  /* zrušení globálních stylů tlačítek ze šablony */
 .bs-filter__pills { display: flex; flex-wrap: wrap; align-items: center; gap: .6rem; padding-bottom: 1rem; border-bottom: 1px solid #3a3e40; }
 .bs-filter__foot { display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding-top: .9rem; font-size: .9rem; color: #9aa093; }
 .bs-filter__count strong { color: #fff; font-weight: 700; }
@@ -587,3 +587,10 @@ html.cookies-show .cookie .banner-author-wrap .banner-author { display: inline !
   .bs-filter__foot .bs-dd__label { font-size: .85rem; }
 }
 .w-dyn-empty.bs-empty { background: transparent; border: 1px dashed #3a3e40; border-radius: 12px; color: #9aa093; font-family: proxima-nova, sans-serif; font-size: .95rem; text-align: center; padding: 2.5rem 1rem; }
+
+/* Novinky: „Číst dále“ jako nevýrazné tlačítko (obrysová pilulka ve stylu filtru) */
+.collection-list-blog .secondary-link { display: inline-flex; align-items: center; gap: .4rem; border: 1.5px solid #4a4f4c; border-radius: 999px; padding: .4rem 1.1rem; font-size: .85rem; font-weight: 500; line-height: 1.2; color: #d0d3c9 !important; transition: border-color .15s, background .15s, color .15s; }
+.collection-list-blog .secondary-link::after { content: "→"; font-size: .9em; transition: transform .15s; }
+.collection-list-blog .secondary-link:hover { border-color: #ebe4da; background: #ebe4da; color: #1e2021 !important; }
+.collection-list-blog .secondary-link:hover::after { transform: translateX(2px); }
+.collection-list-blog .secondary-link:focus-visible { outline: 2px solid #efc101; outline-offset: 2px; }
