@@ -527,3 +527,63 @@ html.cookies-show .cookie .banner-author-wrap .banner-author { display: inline !
   .copyright-wrap { margin-top: 50px; }
   .footer-link-2.bs-footer-legal { margin-top: -10px !important; }
 }
+
+/* Filtr výpisů Campy (/akce-archive) a Novinky (/blog) – pilulky nahoře, pod nimi počet a řazení (varianta B), generuje js/cms-loader.js */
+.bs-filter { padding: 1rem 0 20px; font-family: proxima-nova, sans-serif; }
+.bs-filter button { margin: 0; box-shadow: none; text-transform: none; letter-spacing: normal; }  /* zrušení globálních stylů tlačítek ze šablony */
+.bs-filter__pills { display: flex; flex-wrap: wrap; align-items: center; gap: .6rem; padding-bottom: 1rem; border-bottom: 1px solid #3a3e40; }
+.bs-filter__foot { display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding-top: .9rem; font-size: .9rem; color: #9aa093; }
+.bs-filter__count strong { color: #fff; font-weight: 700; }
+.bs-filter__reset { background: none; border: 0; padding: .4rem .2rem; color: #9aa093; font: inherit; font-size: .85rem; cursor: pointer; text-decoration: underline; }
+.bs-filter__reset:hover { color: #efc101; }
+
+/* pilulka */
+.bs-pill { position: relative; display: inline-flex; align-items: center; border: 1.5px solid #4a4f4c; border-radius: 999px; background: transparent; color: #f0ece4; transition: border-color .15s, background .15s; }
+.bs-pill:hover, .bs-pill.is-open { border-color: #9aa093; }
+.bs-pill.is-set { background: #ebe4da; border-color: #ebe4da; color: #1e2021; }
+.bs-pill--toggle { font: inherit; font-size: .95rem; padding: .55rem 1.15rem; min-height: 44px; cursor: pointer; gap: .5rem; }
+.bs-pill--toggle.is-set { font-weight: 600; }
+.bs-pill .bs-dd__btn { display: inline-flex; align-items: center; gap: .5rem; background: none; border: 0; border-radius: 999px; color: inherit; font: inherit; font-size: .95rem; padding: .55rem 1.15rem; min-height: 44px; cursor: pointer; }
+.bs-pill.is-set .bs-dd__btn { padding-right: .1rem; }
+.bs-pill.is-set .bs-dd__prefix { color: #1e2021; font-weight: 400; }
+.bs-pill.is-set .bs-dd__label strong { color: #1e2021; font-weight: 700; }
+.bs-pill__clear { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; margin-right: 6px !important; padding: 0; border: 0; border-radius: 50%; background: none; color: #1e2021; cursor: pointer; }
+.bs-pill__clear:hover { background: rgba(0,0,0,.08); }
+.bs-pill__x { flex-shrink: 0; }
+
+/* řazení – textový odkaz */
+.bs-dd--sort .bs-dd__btn { display: inline-flex; align-items: center; gap: .45rem; background: none; border: 0; color: #f0ece4; font: inherit; font-size: .9rem; padding: .5rem 0; min-height: 40px; cursor: pointer; }
+.bs-dd--sort .bs-dd__prefix { color: #f0ece4; }
+.bs-dd--sort .bs-dd__label strong { color: #fff; font-weight: 700; }
+.bs-dd--sort .bs-dd__btn:hover strong { color: #efc101; }
+
+/* rozbalovací panel */
+.bs-dd { position: relative; }
+.bs-dd__chev { transition: transform .15s; flex-shrink: 0; }
+.bs-dd.is-open .bs-dd__chev { transform: rotate(180deg); }
+.bs-dd__panel { display: none; position: absolute; top: calc(100% + 6px); left: 0; z-index: 60; min-width: 220px; width: max-content; max-width: min(320px, calc(100vw - 2rem)); max-height: 340px; overflow-y: auto; background: #2a2d2f; border: 1px solid #3a3e40; border-radius: 12px; box-shadow: 0 14px 30px rgba(0,0,0,.5); padding: .4rem 0; color: #d0d3c9; }
+.bs-dd--right .bs-dd__panel { left: auto; right: 0; }
+.bs-dd.is-open .bs-dd__panel { display: block; }
+.bs-dd__opt { display: flex; align-items: center; gap: .7rem; width: 100%; background: none; border: 0; border-radius: 0; color: #d0d3c9; font: inherit; font-size: .92rem; text-align: left; padding: .6rem 1rem; min-height: 42px; cursor: pointer; }
+.bs-dd__opt:hover:not([disabled]) { background: #34382f; color: #fff; }
+.bs-dd__opt.is-selected { color: #fff; font-weight: 600; }
+.bs-dd__opt[disabled] { opacity: .4; cursor: default; }
+.bs-dd__text { flex: 1; white-space: nowrap; }
+.bs-dd__count { font-size: .78rem; color: #9aa093; }
+.bs-dd__check, .bs-dd__radio { flex-shrink: 0; width: 18px; height: 18px; border: 1.5px solid #6b7166; border-radius: 4px; position: relative; }
+.bs-dd__radio { border-radius: 50%; }
+.bs-dd__opt.is-selected .bs-dd__check { background: #ebe4da; border-color: #ebe4da; }
+.bs-dd__opt.is-selected .bs-dd__check::after { content: ""; position: absolute; left: 5px; top: 1px; width: 5px; height: 10px; border: solid #1e2021; border-width: 0 2px 2px 0; transform: rotate(45deg); }
+.bs-dd__opt.is-selected .bs-dd__radio { border-color: #ebe4da; }
+.bs-dd__opt.is-selected .bs-dd__radio::after { content: ""; position: absolute; inset: 3px; border-radius: 50%; background: #ebe4da; }
+
+.bs-dd__btn:focus-visible, .bs-dd__opt:focus-visible, .bs-pill--toggle:focus-visible, .bs-pill__clear:focus-visible, .bs-filter__reset:focus-visible { outline: 2px solid #efc101; outline-offset: 2px; }
+.bs-dd__opt:focus-visible { outline-offset: -2px; }
+
+@media screen and (max-width: 767px) {
+  .bs-filter__pills { gap: .5rem; }
+  .bs-pill .bs-dd__btn, .bs-pill--toggle { font-size: .9rem; padding: .5rem .95rem; }
+  .bs-dd__panel { min-width: 200px; }
+  .bs-filter__foot .bs-dd__label { font-size: .85rem; }
+}
+.w-dyn-empty.bs-empty { background: transparent; border: 1px dashed #3a3e40; border-radius: 12px; color: #9aa093; font-family: proxima-nova, sans-serif; font-size: .95rem; text-align: center; padding: 2.5rem 1rem; }

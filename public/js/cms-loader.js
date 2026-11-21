@@ -40,7 +40,7 @@ const TEAM_LIST = IS_EN ? '/en/team' : '/team';
 const I18N_EN = {
   'Camp': 'Camp', 'Kurz': 'Course', 'Trialový kurz': 'Trial course', 'Dětský kurz': 'Kids course', 'Workshop': 'Workshop', 'Jiné': 'Other',
   'individuální kurzy →': 'individual courses →',
-  'Všechny roky': 'All years', 'Typ akce': 'Event type', 'Jakákoliv cena': 'Any price', 'S cenou': 'Paid', 'Zdarma / ind.': 'Free / individual',
+  'Všechny roky': 'All years', 'Vše': 'All', 'Rok': 'Year', 'Cena': 'Price', 'Zrušit filtry': 'Clear filters', 'Žádná akce neodpovídá vybraným filtrům.': 'No events match the selected filters.', 'Žádný článek neodpovídá vybranému roku.': 'No articles match the selected year.', 'Řadit': 'Sort', 'Termín': 'Date', 'Nadcházející': 'Upcoming', 'Proběhlé': 'Past', 'Odebrat filtr': 'Remove filter', 'Od nejnovějších': 'Newest first', 'Od nejbližšího termínu': 'Soonest first', 'Od nejlevnějších': 'Price: low to high', 'Od nejdražších': 'Price: high to low', 'Zdarma / individuální': 'Free / individual', 'do 2 000 Kč': 'up to CZK 2,000', '2 000 – 3 500 Kč': 'CZK 2,000 – 3,500', 'nad 3 500 Kč': 'over CZK 3,500', 'Typ akce': 'Event type', 'Jakákoliv cena': 'Any price', 'S cenou': 'Paid', 'Zdarma / ind.': 'Free / individual',
   'Domů': 'Home', 'Akce': 'Events', 'Blog': 'Blog', 'Tým': 'Team', 'Článek': 'Article', 'Člen týmu': 'Team member',
   'Člen týmu nenalezen.': 'Team member not found.',
   'Vyplňte prosím jméno a příjmení.': 'Please enter your full name.',
@@ -228,6 +228,13 @@ function getWebflowList(containerSelector) {
   if (!template) return null;
   const emptyEl = list.querySelector('.w-dyn-empty');
   return { itemsList, template, emptyEl };
+}
+
+/** Prázdný stav výpisu s filtrem – česká hláška místo Webflow „No items found.“ (styl .bs-empty v overrides.css) */
+function setFilterEmptyText(emptyEl, text) {
+  if (!emptyEl) return;
+  emptyEl.classList.add('bs-empty');
+  emptyEl.textContent = text;
 }
 
 function toggleEmpty(emptyEl, hasItems) {
@@ -659,9 +666,30 @@ async function loadAkcePreview() {
 // ============================================================
 let allAkceData = [];
 let currentAkcePage = 1;
-let akceYearFilter = 'all';
-let akceZamereniFilter = 'all';
-let akceCenaFilter = 'all';
+let akceTermFilter = 'all';        // all | upcoming | past
+const akceYearSel = new Set();      // vybrané roky
+const akceTypSel = new Set();       // vybrané typy akce
+let akceCenaFilter = 'all';         // all | ind | do2000 | 2000-3500 | nad3500
+let akceSort = 'newest';            // newest | nearest | cheap | expensive
+const AKCE_SORTS = [['newest', 'Od nejnovějších'], ['nearest', 'Od nejbližšího termínu'], ['cheap', 'Od nejlevnějších'], ['expensive', 'Od nejdražších']];
+const AKCE_CENY = [['ind', 'Zdarma / individuální'], ['do2000', 'do 2 000 Kč'], ['2000-3500', '2 000 – 3 500 Kč'], ['nad3500', 'nad 3 500 Kč']];
+
+function akceCenaBucket(d) {
+  const c = Number(d.cena) || 0;
+  if (!c) return 'ind';
+  if (c < 2000) return 'do2000';
+  if (c <= 3500) return '2000-3500';
+  return 'nad3500';
+}
+
+/** skip = název filtru, který se při výpočtu ignoruje (pro počty v nabídkách) */
+function akceMatches(d, skip) {
+  if (skip !== 'term' && akceTermFilter !== 'all' && (akceTermFilter === 'past') !== isAkceOdjeto(d)) return false;
+  if (skip !== 'year' && akceYearSel.size && !akceYearSel.has(getYearFromDatumSort(d.datumSort))) return false;
+  if (skip !== 'typ' && akceTypSel.size && !akceTypSel.has(resolveAkceLabel(d))) return false;
+  if (skip !== 'cena' && akceCenaFilter !== 'all' && akceCenaBucket(d) !== akceCenaFilter) return false;
+  return true;
+}
 
 /** datumSort je v adminu 'YYYY-MM-DD', u starších akcí mohlo být 'YYYYMMDD' → porovnávací klíč YYYYMMDD. */
 function dsKey(v) { return String(v || '').replace(/\D/g, '').slice(0, 8) || '0'; }
@@ -684,79 +712,235 @@ function injectFilterBar(id, beforeEl) {
   if (!bar) {
     bar = document.createElement('div');
     bar.id = id;
-    bar.style.cssText = 'display:flex;flex-wrap:wrap;gap:0.5rem;align-items:center;padding:1rem 0 15px;';
+    bar.className = 'bs-filter';
     beforeEl.parentNode.insertBefore(bar, beforeEl);
   }
   return bar;
 }
 
-const SELECT_STYLE = 'background:#1e2021;color:#d0d3c9;border:1.5px solid #545a4f;padding:0.4rem 0.8rem;font-family:inherit;font-size:0.85rem;cursor:pointer;margin-right:0.75rem;';
-const BTN_STYLE = 'padding:0.35rem 1.1rem;border:1.5px solid #545a4f;background:transparent;color:#d0d3c9;cursor:pointer;font-size:0.85rem;font-family:inherit;letter-spacing:0.03em;transition:background 0.2s,color 0.2s;';
-const BTN_ACTIVE_STYLE = 'padding:0.35rem 1.1rem;border:1.5px solid #545a4f;background:#545a4f;color:#fff;cursor:pointer;font-size:0.85rem;font-family:inherit;letter-spacing:0.03em;transition:background 0.2s,color 0.2s;';
-const SEP_STYLE = 'width:1px;height:1.25rem;background:#545a4f;margin:0 0.25rem;align-self:center;flex-shrink:0;';
+// Filtr ve stylu „pruh se záložkami“ (inspirace mtbrzdy.cz) – styly v css/bikeskills-overrides.css (.bs-filter, .bs-tabs, .bs-tab, .bs-select)
 
-function makeYearSelect(years, currentYear, onChange) {
-  const sel = document.createElement('select');
-  sel.setAttribute('style', SELECT_STYLE);
-  const allOpt = document.createElement('option');
-  allOpt.value = 'all';
-  allOpt.textContent = t('Všechny roky');
-  if (currentYear === 'all') allOpt.selected = true;
-  sel.appendChild(allOpt);
-  years.forEach(y => {
-    const opt = document.createElement('option');
-    opt.value = y;
-    opt.textContent = y;
-    if (y === currentYear) opt.selected = true;
-    sel.appendChild(opt);
-  });
-  sel.addEventListener('change', () => onChange(sel.value));
-  return sel;
+/** Skloňování počtu: [1, 2–4, 5+] (CZ) / [1, více] (EN) */
+function pluralLabel(n, cz, en) {
+  if (IS_EN) return n === 1 ? en[0] : en[1];
+  if (n === 1) return cz[0];
+  if (n >= 2 && n <= 4) return cz[1];
+  return cz[2];
 }
 
-function makeBtn(label, isActive, onClick) {
-  const btn = document.createElement('button');
-  btn.textContent = label;
-  btn.setAttribute('style', isActive ? BTN_ACTIVE_STYLE : BTN_STYLE);
-  btn.addEventListener('click', onClick);
-  return btn;
+// ---------- Filtr výpisů: pilulky nahoře + počet a řazení pod nimi (varianta B) ----------
+// Styly: css/bikeskills-overrides.css (.bs-filter, .bs-pill, .bs-dd, .bs-sort)
+
+function makeFilterFoot(count, cz, en, sortEl) {
+  const foot = document.createElement('div');
+  foot.className = 'bs-filter__foot';
+  const c = document.createElement('span');
+  c.className = 'bs-filter__count';
+  c.setAttribute('aria-live', 'polite');
+  const strong = document.createElement('strong');
+  strong.textContent = count;
+  c.appendChild(strong);
+  c.appendChild(document.createTextNode(' ' + pluralLabel(count, cz, en)));
+  foot.appendChild(c);
+  if (sortEl) foot.appendChild(sortEl);
+  return foot;
 }
 
-function makeSep() {
-  const s = document.createElement('span');
-  s.setAttribute('style', SEP_STYLE);
-  return s;
+/** Přepínací pilulka (zap/vyp), např. „Nadcházející“ */
+function makeTogglePill(label, active, onToggle) {
+  const b = document.createElement('button');
+  b.type = 'button';
+  b.className = 'bs-pill bs-pill--toggle' + (active ? ' is-set' : '');
+  b.setAttribute('aria-pressed', active ? 'true' : 'false');
+  b.textContent = label;
+  if (active) b.insertAdjacentHTML('beforeend', BS_X_ICON);
+  b.addEventListener('click', onToggle);
+  return b;
 }
 
-function makeGenericSelect(options, currentVal, onChange) {
-  const sel = document.createElement('select');
-  sel.setAttribute('style', SELECT_STYLE);
-  options.forEach(([val, label]) => {
-    const opt = document.createElement('option');
-    opt.value = val;
-    opt.textContent = label;
-    if (val === currentVal) opt.selected = true;
-    sel.appendChild(opt);
-  });
-  sel.addEventListener('change', () => onChange(sel.value));
-  return sel;
-}
+const BS_X_ICON = '<svg class="bs-pill__x" width="11" height="11" viewBox="0 0 10 10" aria-hidden="true"><path d="M1 1l8 8M9 1l-8 8" stroke="currentColor" stroke-width="1.6"/></svg>';
+const BS_CHEV_ICON = '<svg class="bs-dd__chev" width="10" height="6" viewBox="0 0 10 6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>';
 
 function buildAkceFilterBar(bar, years, typy) {
   bar.innerHTML = '';
+  const rerender = () => { currentAkcePage = 1; renderAkceListPage({ noScroll: true }); };
+  const cnt = (skip, pred) => allAkceData.filter(d => akceMatches(d, skip) && pred(d)).length;
+  const toggleSet = (set, v) => { set.has(v) ? set.delete(v) : set.add(v); rerender(); };
 
-  bar.appendChild(makeYearSelect(years, akceYearFilter, v => { akceYearFilter = v; currentAkcePage = 1; renderAkceListPage(); }));
+  const pills = document.createElement('div');
+  pills.className = 'bs-filter__pills';
 
-  const zamereniOpts = [['all', t('Typ akce')], ...typy.map(t => [t, t])];
-  bar.appendChild(makeGenericSelect(zamereniOpts, akceZamereniFilter, v => { akceZamereniFilter = v; currentAkcePage = 1; renderAkceListPage(); }));
+  pills.appendChild(makeDropdown('typ', t('Typ akce'), typy.map(x => ({ val: x, label: x, count: cnt('typ', d => resolveAkceLabel(d) === x) })), {
+    multi: true, selected: akceTypSel, onPick: v => toggleSet(akceTypSel, v),
+    onClear: () => { akceTypSel.clear(); rerender(); },
+  }));
+  pills.appendChild(makeDropdown('rok', t('Rok'), years.map(y => ({ val: y, label: y, count: cnt('year', d => getYearFromDatumSort(d.datumSort) === y) })), {
+    multi: true, selected: akceYearSel, onPick: v => toggleSet(akceYearSel, v),
+    onClear: () => { akceYearSel.clear(); rerender(); },
+  }));
+  pills.appendChild(makeDropdown('cena', t('Cena'), AKCE_CENY.map(([v, l]) => ({ val: v, label: t(l), count: cnt('cena', d => akceCenaBucket(d) === v) })), {
+    selected: akceCenaFilter, onPick: v => { akceCenaFilter = akceCenaFilter === v ? 'all' : v; rerender(); },
+    onClear: () => { akceCenaFilter = 'all'; rerender(); },
+  }));
+  pills.appendChild(makeTogglePill(t('Nadcházející'), akceTermFilter === 'upcoming', () => {
+    akceTermFilter = akceTermFilter === 'upcoming' ? 'all' : 'upcoming'; rerender();
+  }));
+  pills.appendChild(makeTogglePill(t('Proběhlé'), akceTermFilter === 'past', () => {
+    akceTermFilter = akceTermFilter === 'past' ? 'all' : 'past'; rerender();
+  }));
+  if (akceTypSel.size || akceYearSel.size || akceCenaFilter !== 'all' || akceTermFilter !== 'all') {
+    const reset = document.createElement('button');
+    reset.type = 'button';
+    reset.className = 'bs-filter__reset';
+    reset.textContent = t('Zrušit filtry');
+    reset.addEventListener('click', () => { akceTypSel.clear(); akceYearSel.clear(); akceCenaFilter = 'all'; akceTermFilter = 'all'; rerender(); });
+    pills.appendChild(reset);
+  }
+  bar.appendChild(pills);
 
-  const cenaOpts = [['all', t('Jakákoliv cena')], ['scena', t('S cenou')], ['zdarma', t('Zdarma / ind.')]];
-  bar.appendChild(makeGenericSelect(cenaOpts, akceCenaFilter, v => { akceCenaFilter = v; currentAkcePage = 1; renderAkceListPage(); }));
+  const sort = makeDropdown('sort', t('Řadit'), AKCE_SORTS.map(([v, l]) => ({ val: v, label: t(l) })), {
+    selected: akceSort, sort: true, align: 'right',
+    onPick: v => { akceSort = v; rerender(); },
+  });
+  bar.appendChild(makeFilterFoot(getFilteredAkce().length, ['akce', 'akce', 'akcí'], ['event', 'events'], sort));
 }
 
 function buildClankyFilterBar(bar, years) {
   bar.innerHTML = '';
-  bar.appendChild(makeYearSelect(years, clankyYearFilter, v => { clankyYearFilter = v; currentClankyPage = 1; renderClankyListPage(); }));
+  const rerender = () => { currentClankyPage = 1; renderClankyListPage({ noScroll: true }); };
+  const pills = document.createElement('div');
+  pills.className = 'bs-filter__pills';
+  pills.appendChild(makeDropdown('clanky-rok', t('Rok'), years.map(y => ({
+    val: y, label: y, count: allClankyData.filter(d => getYearFromTimestamp(d.datum) === y).length,
+  })), {
+    selected: clankyYearFilter, onPick: v => { clankyYearFilter = clankyYearFilter === v ? 'all' : v; rerender(); },
+    onClear: () => { clankyYearFilter = 'all'; rerender(); },
+  }));
+  bar.appendChild(pills);
+  bar.appendChild(makeFilterFoot(getFilteredClanky().length, ['článek', 'články', 'článků'], ['article', 'articles']));
+}
+
+// ---------- Rozbalovací nabídka v designu webu (náhrada nativního <select>) ----------
+let _bsOpenDd = null;
+
+function closeAllDropdowns(except) {
+  document.querySelectorAll('.bs-dd.is-open').forEach(dd => {
+    if (dd === except) return;
+    dd.classList.remove('is-open');
+    const b = dd.querySelector('.bs-dd__btn');
+    if (b) b.setAttribute('aria-expanded', 'false');
+  });
+  if (!except) _bsOpenDd = null;
+}
+
+if (!window.__bsDdListeners) {
+  window.__bsDdListeners = true;
+  document.addEventListener('click', e => { if (!e.target.closest || !e.target.closest('.bs-dd')) closeAllDropdowns(); });
+  document.addEventListener('keydown', e => {
+    if (e.key !== 'Escape' || !_bsOpenDd) return;
+    const open = document.querySelector('.bs-dd.is-open .bs-dd__btn');
+    closeAllDropdowns();
+    if (open) open.focus();
+  });
+}
+
+/**
+ * options: [{ val, label, count? }]
+ * opts: { multi, selected (Set u multi, jinak hodnota, 'all' = nic), onPick(val), onClear(), sort, align: 'right' }
+ * Bez výběru: obrysová pilulka „Typ akce ⌄“. S výběrem: světlá pilulka „Typ akce: Camp ✕“ (✕ zruší výběr).
+ * sort: true → textový odkaz „Řadit: Od nejnovějších ⌄“.
+ */
+function makeDropdown(key, label, options, opts) {
+  const multi = !!opts.multi;
+  const isSel = v => multi ? opts.selected.has(v) : opts.selected === v;
+  const chosen = options.filter(o => isSel(o.val));
+  const hasValue = !opts.sort && chosen.length > 0;
+
+  const dd = document.createElement('div');
+  dd.className = 'bs-dd' + (opts.sort ? ' bs-dd--sort' : ' bs-pill') + (hasValue ? ' is-set' : '') + (opts.align === 'right' ? ' bs-dd--right' : '');
+  const open = _bsOpenDd === key;
+  if (open) dd.classList.add('is-open');
+
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'bs-dd__btn';
+  btn.setAttribute('aria-haspopup', 'true');
+  btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+  const lab = document.createElement('span');
+  lab.className = 'bs-dd__label';
+  if (opts.sort || hasValue) {
+    const vals = chosen.map(o => o.label);
+    const valText = vals.length > 2 ? vals.slice(0, 2).join(', ') + ' +' + (vals.length - 2) : vals.join(', ');
+    lab.innerHTML = '<span class="bs-dd__prefix"></span> <strong></strong>';
+    lab.firstChild.textContent = label + ':';
+    lab.lastChild.textContent = valText;
+  } else {
+    lab.textContent = label;
+  }
+  btn.appendChild(lab);
+  if (!hasValue) btn.insertAdjacentHTML('beforeend', BS_CHEV_ICON);
+  btn.addEventListener('click', () => {
+    const willOpen = !dd.classList.contains('is-open');
+    closeAllDropdowns(dd);
+    dd.classList.toggle('is-open', willOpen);
+    btn.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+    _bsOpenDd = willOpen ? key : null;
+    if (willOpen) { fitPanel(); const f = panel.querySelector('.bs-dd__opt:not([disabled])'); if (f) f.focus(); }
+  });
+  // Panel nesmí přetéct přes pravý okraj obrazovky (mobil) → případně zarovnat doprava
+  const fitPanel = () => {
+    if (opts.align === 'right') return;
+    dd.classList.remove('bs-dd--right');
+    const r = panel.getBoundingClientRect();
+    if (r.right > window.innerWidth - 8) dd.classList.add('bs-dd--right');
+  };
+  if (open) requestAnimationFrame(fitPanel);
+  dd.appendChild(btn);
+
+  if (hasValue && opts.onClear) {
+    const x = document.createElement('button');
+    x.type = 'button';
+    x.className = 'bs-pill__clear';
+    x.setAttribute('aria-label', t('Odebrat filtr') + ': ' + label);
+    x.innerHTML = BS_X_ICON;
+    x.addEventListener('click', e => { e.stopPropagation(); _bsOpenDd = null; opts.onClear(); });
+    dd.appendChild(x);
+  }
+
+  const panel = document.createElement('div');
+  panel.className = 'bs-dd__panel';
+  panel.setAttribute('role', 'group');
+  panel.setAttribute('aria-label', label);
+  options.forEach((o, i) => {
+    const sel = isSel(o.val);
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'bs-dd__opt' + (sel ? ' is-selected' : '');
+    b.setAttribute(multi ? 'aria-pressed' : 'aria-current', sel ? 'true' : 'false');
+    if (o.count === 0 && !sel) b.disabled = true;
+    const mark = document.createElement('span');
+    mark.className = multi ? 'bs-dd__check' : 'bs-dd__radio';
+    b.appendChild(mark);
+    const txt = document.createElement('span');
+    txt.className = 'bs-dd__text';
+    txt.textContent = o.label;
+    b.appendChild(txt);
+    if (o.count != null) {
+      const c = document.createElement('span');
+      c.className = 'bs-dd__count';
+      c.textContent = o.count;
+      b.appendChild(c);
+    }
+    b.addEventListener('click', e => {
+      e.stopPropagation();
+      _bsOpenDd = multi ? key : null;   // vícenásobný výběr nechá nabídku otevřenou
+      opts.onPick(o.val);
+      if (multi) { const again = document.querySelector('.bs-dd.is-open .bs-dd__opt:nth-child(' + (i + 1) + ')'); if (again) again.focus(); }
+    });
+    panel.appendChild(b);
+  });
+  dd.appendChild(panel);
+  return dd;
 }
 
 /**
@@ -917,17 +1101,25 @@ let _akceTemplate = null;
 let _akceEmptyEl = null;
 
 function getFilteredAkce() {
-  return allAkceData.filter(d => {
-    const year = getYearFromDatumSort(d.datumSort);
-    if (akceYearFilter !== 'all' && year !== akceYearFilter) return false;
-    if (akceZamereniFilter !== 'all' && resolveAkceLabel(d) !== akceZamereniFilter) return false;
-    if (akceCenaFilter === 'scena' && !d.cena) return false;
-    if (akceCenaFilter === 'zdarma' && d.cena) return false;
-    return true;
-  });
+  const list = allAkceData.filter(d => akceMatches(d));   // allAkceData je seřazené od nejnovějšího data
+  const k = d => dsKey(d.datumSort);
+  if (akceSort === 'nearest') {
+    const up = list.filter(d => !isAkceOdjeto(d)).sort((a, b) => k(a).localeCompare(k(b)));
+    const past = list.filter(d => isAkceOdjeto(d));
+    return [...up, ...past];
+  }
+  if (akceSort === 'cheap' || akceSort === 'expensive') {
+    const dir = akceSort === 'cheap' ? 1 : -1;
+    return list.slice().sort((a, b) => {
+      const ca = Number(a.cena) || 0, cb = Number(b.cena) || 0;
+      if (!ca !== !cb) return ca ? -1 : 1;              // akce bez ceny vždy na konec
+      return (ca - cb) * dir || k(b).localeCompare(k(a));
+    });
+  }
+  return list;
 }
 
-function renderAkceListPage() {
+function renderAkceListPage(opts) {
   if (!_akceItemsList || !_akceTemplate) return;
 
   buildAkceFilterBar(_akceFilterBar, _akceYears, _akceTypy);
@@ -937,6 +1129,7 @@ function renderAkceListPage() {
   const page = filtered.slice(start, start + PAGE_SIZE);
 
   if (!page.length) {
+    setFilterEmptyText(_akceEmptyEl, t('Žádná akce neodpovídá vybraným filtrům.'));
     toggleEmpty(_akceEmptyEl, false);
     _akceItemsList.innerHTML = '';
   } else {
@@ -946,7 +1139,7 @@ function renderAkceListPage() {
   }
 
   updatePaginationState(_akcePrevBtn, _akceNextBtn, currentAkcePage, filtered.length);
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  if (!(opts && opts.noScroll)) window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 async function loadAkceList() {
@@ -1395,7 +1588,7 @@ function getFilteredClanky() {
   });
 }
 
-function renderClankyListPage() {
+function renderClankyListPage(opts) {
   if (!_clankyItemsList || !_clankyTemplate) return;
 
   buildClankyFilterBar(_clankyFilterBar, _clankyYears);
@@ -1405,6 +1598,7 @@ function renderClankyListPage() {
   const page = filtered.slice(start, start + PAGE_SIZE);
 
   if (!page.length) {
+    setFilterEmptyText(_clankyEmptyEl, t('Žádný článek neodpovídá vybranému roku.'));
     toggleEmpty(_clankyEmptyEl, false);
     _clankyItemsList.innerHTML = '';
   } else {
@@ -1414,7 +1608,7 @@ function renderClankyListPage() {
   }
 
   updatePaginationState(_clankyPrevBtn, _clankyNextBtn, currentClankyPage, filtered.length);
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  if (!(opts && opts.noScroll)) window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 async function loadClankyList() {
