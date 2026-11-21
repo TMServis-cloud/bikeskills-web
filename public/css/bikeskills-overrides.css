@@ -647,20 +647,27 @@ html.cookies-show .cookie .banner-author-wrap .banner-author { display: inline !
   outline: 2px solid #fff200; outline-offset: 3px;
 }
 
-/* Hover „Záře" (11/2026) – stejný efekt i na shop.bikeskills.cz */
+/* Hover „Přelití" (11/2026) – nová barva nateče zleva přes celé tlačítko vč. rámečku
+   (background-origin/clip: border-box, rámeček průhledný). Stejně i na shop.bikeskills.cz. */
 .banner-button, .banner-button.left, .main-button.rezervace, .main-button.yellow, .button-8,
 .banner-button.right, .cta-button-black, .categories-button, .servis-button,
 .white-button.kontakt, .backtoshop-button, .main-button.error {
-  transition: background-color .3s ease-in-out, border-color .3s ease-in-out, color .3s ease-in-out, box-shadow .3s ease-in-out;
+  background-size: 200% 100%; background-repeat: no-repeat; background-position: 100% 0;
+  background-origin: border-box; background-clip: border-box;
+  box-shadow: none;
+  transition: background-position .45s ease, border-color .3s ease-in-out, color .3s ease-in-out;
 }
+.banner-button, .banner-button.left, .main-button.rezervace, .main-button.yellow, .button-8 { background-color: #efc101; background-image: linear-gradient(90deg, #fff200 50%, #efc101 50%); border-color: transparent; }
 .banner-button:hover, .banner-button.left:hover, .main-button.rezervace:hover,
-.main-button.yellow:hover, .button-8:hover {
-  box-shadow: 0 0 0 4px rgba(255,242,0,.18), 0 0 22px rgba(255,242,0,.45);
-}
+.main-button.yellow:hover, .button-8:hover { background-color: #efc101; background-position: 0 0; border-color: transparent; color: #000; box-shadow: none; }
+.banner-button.right, .cta-button-black, .categories-button, .servis-button,
+.white-button.kontakt, .backtoshop-button, .main-button.error { background-color: transparent; background-image: linear-gradient(90deg, #383b36 50%, transparent 50%); }
 .banner-button.right:hover, .cta-button-black:hover, .categories-button:hover, .servis-button:hover,
-.white-button.kontakt:hover, .backtoshop-button:hover, .main-button.error:hover {
-  box-shadow: 0 0 0 4px rgba(255,255,255,.08), 0 0 18px rgba(255,255,255,.12);
-}
+.white-button.kontakt:hover, .backtoshop-button:hover, .main-button.error:hover { background-color: transparent; background-position: 0 0; border-color: transparent; color: #fff; box-shadow: none; }
+.cta-button-black { background-color: #000; background-image: linear-gradient(90deg, #383b36 50%, #000 50%); border-color: transparent; }
+.cta-button-black:hover { background-color: #000; background-position: 0 0; }
 @media (prefers-reduced-motion: reduce) {
-  .banner-button, .main-button, .button-8, .cta-button-black, .categories-button, .servis-button, .white-button.kontakt, .backtoshop-button { transition: none; }
+  .banner-button, .banner-button.left, .main-button.rezervace, .main-button.yellow, .button-8,
+  .banner-button.right, .cta-button-black, .categories-button, .servis-button,
+.white-button.kontakt, .backtoshop-button, .main-button.error { transition: none; }
 }
