@@ -537,15 +537,14 @@ html.cookies-show .cookie .banner-author-wrap .banner-author { display: inline !
 .bs-filter__reset { background: none; border: 0; padding: .4rem .2rem; color: #9aa093; font: inherit; font-size: .85rem; cursor: pointer; text-decoration: underline; }
 .bs-filter__reset:hover { color: #efc101; }
 
-/* pilulka */
+/* pilulka – proxima-nova má velký horní přesah (ascent 13 / descent 3 px), proto o 3 px víc odsazení nahoře než dole (9,5 / 6,5 px, změřeno): velká písmena pak sedí přesně uprostřed */
 .bs-pill { position: relative; display: inline-flex; align-items: center; border: 1.5px solid #4a4f4c; border-radius: 999px; background: transparent; color: #f0ece4; transition: border-color .15s, background .15s; }
 .bs-pill:hover, .bs-pill.is-open { border-color: #9aa093; }
 .bs-pill.is-set { background: #ebe4da; border-color: #ebe4da; color: #1e2021; }
-.bs-pill--toggle { font: inherit; font-size: .9rem; line-height: 1.25; padding: calc(.3rem - 1px) 1rem calc(.3rem + 1px); min-height: 34px; cursor: pointer; gap: .5rem; }
+.bs-pill--toggle { font: inherit; font-size: .9rem; line-height: 1.25; padding: 9.5px 1rem 6.5px; min-height: 0; cursor: pointer; gap: .5rem; }
 .bs-pill--toggle.is-set { font-weight: 600; }
-.bs-pill .bs-dd__btn { display: inline-flex; align-items: center; gap: .5rem; background: none; border: 0; border-radius: 999px; color: inherit; font: inherit; font-size: .9rem; line-height: 1.25; padding: calc(.3rem - 1px) 1rem calc(.3rem + 1px); min-height: 34px; cursor: pointer; }
+.bs-pill .bs-dd__btn { display: inline-flex; align-items: center; gap: .5rem; background: none; border: 0; border-radius: 999px; color: inherit; font: inherit; font-size: .9rem; line-height: 1.25; padding: 9.5px 1rem 6.5px; min-height: 0; cursor: pointer; }
 .bs-pill.is-set .bs-dd__btn { padding-right: .1rem; }
-.bs-dd__chev, .bs-pill__x { position: relative; top: 1px; }  /* ikony srovnat s opticky posunutým textem */
 .bs-pill.is-set .bs-dd__prefix { color: #1e2021; font-weight: 400; }
 .bs-pill.is-set .bs-dd__label strong { color: #1e2021; font-weight: 700; }
 .bs-pill__clear { display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; margin-right: 5px !important; padding: 0; border: 0; border-radius: 50%; background: none; color: #1e2021; cursor: pointer; }
@@ -583,14 +582,14 @@ html.cookies-show .cookie .banner-author-wrap .banner-author { display: inline !
 
 @media screen and (max-width: 767px) {
   .bs-filter__pills { gap: .5rem; }
-  .bs-pill .bs-dd__btn, .bs-pill--toggle { font-size: .88rem; padding: calc(.3rem - 1px) .9rem calc(.3rem + 1px); }
+  .bs-pill .bs-dd__btn, .bs-pill--toggle { font-size: .88rem; padding: 9.5px .9rem 6.5px; }
   .bs-dd__panel { min-width: 200px; }
   .bs-filter__foot .bs-dd__label { font-size: .85rem; }
 }
 .w-dyn-empty.bs-empty { background: transparent; border: 1px dashed #3a3e40; border-radius: 12px; color: #9aa093; font-family: proxima-nova, sans-serif; font-size: .95rem; text-align: center; padding: 2.5rem 1rem; }
 
 /* Novinky: „Číst dále“ jako nevýrazné tlačítko (obrysová pilulka ve stylu filtru) */
-.collection-list-blog .secondary-link-block .secondary-link { display: inline-flex; align-items: center; gap: .4rem; border: 1.5px solid #4a4f4c; border-radius: 999px; padding: calc(.4rem - 1px) 1.1rem calc(.4rem + 1px); font-size: .85rem; font-weight: 500; line-height: 1.25; color: #d0d3c9 !important; text-decoration: none !important; transition: border-color .15s, background .15s, color .15s; }
+.collection-list-blog .secondary-link-block .secondary-link { display: inline-flex; align-items: center; gap: .4rem; border: 1.5px solid #4a4f4c; border-radius: 999px; padding: calc(.4rem + .6px) 1.1rem calc(.4rem - .6px); font-size: .85rem; font-weight: 500; line-height: 1.25; color: #d0d3c9 !important; text-decoration: none !important; transition: border-color .15s, background .15s, color .15s; }
 .collection-list-blog .secondary-link-block .secondary-link::after { content: "→"; font-size: .9em; transition: transform .15s; }
 .collection-list-blog .secondary-link-block .secondary-button-line { display: none !important; }  /* animovaná čára šablony pod odkazem */
 /* šablona při najetí na kartu barví odkaz žlutě (!important) → přebít; tlačítko se rozsvítí při najetí na kartu i na něj */
