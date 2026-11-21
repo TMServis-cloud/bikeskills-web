@@ -646,3 +646,21 @@ html.cookies-show .cookie .banner-author-wrap .banner-author { display: inline !
 .white-button.kontakt:focus-visible, .backtoshop-button:focus-visible {
   outline: 2px solid #fff200; outline-offset: 3px;
 }
+
+/* Hover „Záře" (11/2026) – stejný efekt i na shop.bikeskills.cz */
+.banner-button, .banner-button.left, .main-button.rezervace, .main-button.yellow, .button-8,
+.banner-button.right, .cta-button-black, .categories-button, .servis-button,
+.white-button.kontakt, .backtoshop-button, .main-button.error {
+  transition: background-color .3s ease-in-out, border-color .3s ease-in-out, color .3s ease-in-out, box-shadow .3s ease-in-out;
+}
+.banner-button:hover, .banner-button.left:hover, .main-button.rezervace:hover,
+.main-button.yellow:hover, .button-8:hover {
+  box-shadow: 0 0 0 4px rgba(255,242,0,.18), 0 0 22px rgba(255,242,0,.45);
+}
+.banner-button.right:hover, .cta-button-black:hover, .categories-button:hover, .servis-button:hover,
+.white-button.kontakt:hover, .backtoshop-button:hover, .main-button.error:hover {
+  box-shadow: 0 0 0 4px rgba(255,255,255,.08), 0 0 18px rgba(255,255,255,.12);
+}
+@media (prefers-reduced-motion: reduce) {
+  .banner-button, .main-button, .button-8, .cta-button-black, .categories-button, .servis-button, .white-button.kontakt, .backtoshop-button { transition: none; }
+}
