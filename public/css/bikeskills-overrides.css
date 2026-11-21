@@ -691,7 +691,11 @@ html.cookies-show .cookie .banner-author-wrap .banner-author { display: inline !
 .collection-list-blog .secondary-link-block.blog:hover .secondary-link,
 .collection-list-blog .w-dyn-item:hover .secondary-link-block .secondary-link,
 .collection-list-blog .secondary-link-block .secondary-link:hover,
-.collection-list-blog .secondary-link-block .secondary-link:focus-visible { background-color: transparent; background-position: 0 0; border-color: transparent; color: #1e2021 !important; }
+.collection-list-blog .secondary-link-block .secondary-link:focus-visible {
+  background-color: transparent; background-image: linear-gradient(90deg, #ebe4da 50%, transparent 50%);
+  background-size: 200% 100%; background-repeat: no-repeat; background-origin: border-box; background-clip: border-box;
+  background-position: 0 0; border-color: transparent; color: #1e2021 !important;
+}  /* image/size znovu: starší hover pravidlo používá zkratku background, která je jinak vynuluje */
 .w-pagination-wrapper .w-pagination-next, .w-pagination-wrapper .w-pagination-previous {
   background-color: transparent; background-image: linear-gradient(90deg, #383b36 50%, transparent 50%);
   border: 2px solid rgba(255,255,255,.6); border-radius: 999px; color: #fff;
