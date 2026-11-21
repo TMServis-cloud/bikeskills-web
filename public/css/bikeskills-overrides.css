@@ -671,3 +671,34 @@ html.cookies-show .cookie .banner-author-wrap .banner-author { display: inline !
   .banner-button.right, .cta-button-black, .categories-button, .servis-button,
 .white-button.kontakt, .backtoshop-button, .main-button.error { transition: none; }
 }
+
+/* „Přelití" i na další zaoblená tlačítka: SHOP v menu (desktop), Číst dále, stránkování blogu */
+@media (min-width: 992px) {
+  .nav-link.white.shop {
+    background-color: #2d60ab; background-image: linear-gradient(90deg, #222528 50%, #2d60ab 50%);
+    background-size: 200% 100%; background-repeat: no-repeat; background-position: 100% 0; background-origin: border-box;
+    transition: background-position .45s ease, color .3s ease-in-out;
+  }
+  .nav-link.white.shop:hover, .nav-link.white.shop:focus-visible { background-color: #2d60ab; background-position: 0 0; color: #fff; }
+}
+.collection-list-blog .secondary-link-block .secondary-link,
+.w-pagination-wrapper .w-pagination-next, .w-pagination-wrapper .w-pagination-previous {
+  background-size: 200% 100%; background-repeat: no-repeat; background-position: 100% 0;
+  background-origin: border-box; background-clip: border-box;
+  transition: background-position .45s ease, border-color .3s ease-in-out, color .3s ease-in-out;
+}
+.collection-list-blog .secondary-link-block .secondary-link { background-color: transparent; background-image: linear-gradient(90deg, #ebe4da 50%, transparent 50%); }
+.collection-list-blog .secondary-link-block.blog:hover .secondary-link,
+.collection-list-blog .w-dyn-item:hover .secondary-link-block .secondary-link,
+.collection-list-blog .secondary-link-block .secondary-link:hover,
+.collection-list-blog .secondary-link-block .secondary-link:focus-visible { background-color: transparent; background-position: 0 0; border-color: transparent; color: #1e2021 !important; }
+.w-pagination-wrapper .w-pagination-next, .w-pagination-wrapper .w-pagination-previous {
+  background-color: transparent; background-image: linear-gradient(90deg, #383b36 50%, transparent 50%);
+  border: 2px solid rgba(255,255,255,.6); border-radius: 999px; color: #fff;
+}
+.w-pagination-wrapper .w-pagination-next:hover, .w-pagination-wrapper .w-pagination-previous:hover,
+.w-pagination-wrapper .w-pagination-next:focus-visible, .w-pagination-wrapper .w-pagination-previous:focus-visible { background-color: transparent; background-position: 0 0; border-color: transparent; color: #fff; }
+@media (prefers-reduced-motion: reduce) {
+  .nav-link.white.shop, .collection-list-blog .secondary-link-block .secondary-link,
+  .w-pagination-wrapper .w-pagination-next, .w-pagination-wrapper .w-pagination-previous { transition: none; }
+}
