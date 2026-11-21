@@ -599,3 +599,50 @@ html.cookies-show .cookie .banner-author-wrap .banner-author { display: inline !
 .collection-list-blog .secondary-link-block .secondary-link:focus-visible { border-color: #ebe4da; background: #ebe4da; color: #1e2021 !important; text-decoration: none !important; }
 .collection-list-blog .secondary-link-block .secondary-link:hover::after { transform: translateX(2px); }
 .collection-list-blog .secondary-link-block .secondary-link:focus-visible { outline: 2px solid #efc101; outline-offset: 2px; }
+
+/* ==========================================================================
+   TLAČÍTKA – sjednocení vzhledu se shop.bikeskills.cz (11/2026)
+   Primární = žlutá pilulka (jako „Kurzy a kempy" na shopu),
+   hover = #fff200 (stejná žlutá jako dřívější hover u INDIVIDUÁLNÍ KURZY).
+   Sekundární = obrysová pilulka (jako sekundární tlačítka shopu).
+   Rozměry/typografie podle shopu: výška 44px, padding 0 24px, 15px, 700, verzálky.
+   ========================================================================== */
+.banner-button, .banner-button.left, .main-button.rezervace, .main-button.yellow, .button-8,
+.banner-button.right, .cta-button-black, .categories-button, .servis-button,
+.white-button.kontakt, .backtoshop-button, .main-button.error {
+  height: 44px; min-height: 44px; max-height: none;
+  padding: 0 24px; line-height: 40px;
+  border-radius: 999px; border-width: 2px; border-style: solid;
+  font-size: 15px; font-weight: 700; letter-spacing: normal; text-transform: uppercase;
+  text-align: center; box-shadow: none; transform: none;
+  transition: background-color .3s ease-in-out, border-color .3s ease-in-out, color .3s ease-in-out;
+}
+
+/* Primární – žlutá */
+.banner-button, .banner-button.left, .main-button.rezervace, .main-button.yellow, .button-8 {
+  background-color: #efc101; border-color: #efc101; color: #000;
+}
+.banner-button:hover, .banner-button.left:hover, .main-button.rezervace:hover,
+.main-button.yellow:hover, .button-8:hover {
+  background-color: #fff200; border-color: #fff200; color: #000;
+}
+
+/* Sekundární – obrys */
+.banner-button.right, .cta-button-black, .categories-button, .servis-button,
+.white-button.kontakt, .backtoshop-button, .main-button.error {
+  background-color: transparent; border-color: rgba(255,255,255,.6); color: #fff;
+}
+.banner-button.right:hover, .cta-button-black:hover, .categories-button:hover, .servis-button:hover,
+.white-button.kontakt:hover, .backtoshop-button:hover, .main-button.error:hover {
+  background-color: #000; border-color: #fff; color: #fff;
+}
+
+/* Černá plná na barevném podkladu (modrý pruh na HP) – jako „Servis kol" na shopu */
+.cta-button-black { background-color: #000; border-color: transparent; color: #fff; }
+.cta-button-black:hover { background-color: #000; border-color: #fff; color: #fff; }
+
+.banner-button:focus-visible, .main-button:focus-visible, .button-8:focus-visible,
+.cta-button-black:focus-visible, .categories-button:focus-visible, .servis-button:focus-visible,
+.white-button.kontakt:focus-visible, .backtoshop-button:focus-visible {
+  outline: 2px solid #fff200; outline-offset: 3px;
+}
