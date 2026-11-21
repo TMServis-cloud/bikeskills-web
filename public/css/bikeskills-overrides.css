@@ -639,7 +639,7 @@ html.cookies-show .cookie .banner-author-wrap .banner-author { display: inline !
 
 /* Černá plná na barevném podkladu (modrý pruh na HP) – jako „Servis kol" na shopu */
 .cta-button-black { background-color: #000; border-color: transparent; color: #fff; }
-.cta-button-black:hover { background-color: #000; border-color: #fff; color: #fff; }
+.cta-button-black:hover { background-color: #383b36; border-color: transparent; color: #fff; }  /* jako shop (--bs-surface-2) */
 
 .banner-button:focus-visible, .main-button:focus-visible, .button-8:focus-visible,
 .cta-button-black:focus-visible, .categories-button:focus-visible, .servis-button:focus-visible,
