@@ -820,8 +820,9 @@ a.banner-button:focus-visible::after, a.cta-button-black:focus-visible::after, a
 .form-contact-us .checkbox-servis:focus-visible,
 .form-contact-us .w-checkbox-input:focus-visible { outline: 2px solid #222528; outline-offset: 2px; }
 .form-contact-us .checkbox-labels { margin: 0; font-size: 13px; line-height: 1.5; color: #222528; }
+.form-contact-us .w-checkbox::before, .form-contact-us .w-checkbox::after { display: none; }  /* clearfix z Webflow by ve flexu odsadil checkbox */
 /* tlačítko Odeslat: řádek přes celou šířku, černá pilulka s přelitím */
-.form-contact-us > div:last-child { grid-column: 1 / -1; margin-bottom: 0; text-align: left; }
+.form-contact-us > div:last-child { grid-column: 1 / -1 !important; justify-self: start !important; margin-bottom: 0; text-align: left; }  /* Webflow #w-node… ho jinak centruje */
 .form-contact-us input.white-button.kontakt[type="submit"] {
   display: inline-block; width: auto; min-width: 160px; height: 46px; min-height: 0; margin: 0; padding: 0 32px;
   border: 0; border-radius: 999px; color: #fff; cursor: pointer;
