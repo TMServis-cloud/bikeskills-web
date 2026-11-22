@@ -839,3 +839,28 @@ a.banner-button:focus-visible::after, a.cta-button-black:focus-visible::after, a
 @media (prefers-reduced-motion: reduce) {
   .form-contact-us input.white-button.kontakt[type="submit"], .form-contact-us .text-field-contact, .form-contact-us .textarea-contact { transition: none; }
 }
+
+/* Dotyková zařízení (bez hoveru): přelití by po klepnutí nestihlo doběhnout, než se načte další stránka.
+   Proto rychlý přechod a okamžitá odezva při stisku (vybarvení + mírné zmáčknutí). */
+@media (hover: none) {
+  .banner-button, .main-button, .button-8, .cta-button-black, .categories-button, .servis-button,
+  .white-button.kontakt, .backtoshop-button, .nav-link.white.shop,
+  .collection-list-blog .secondary-link-block .secondary-link,
+  .w-pagination-wrapper .w-pagination-next, .w-pagination-wrapper .w-pagination-previous,
+  .form-contact-us input.white-button.kontakt[type="submit"] {
+    transition-duration: .15s !important;
+  }
+  a.banner-button::after, button.banner-button::after, a.cta-button-black::after, a.main-button::after,
+  a.button-8::after, a.categories-button::after, a.servis-button::after, a.white-button.kontakt::after, a.backtoshop-button::after {
+    transition-duration: .15s;
+  }
+  .banner-button:active, .main-button:active, .button-8:active, .cta-button-black:active, .categories-button:active,
+  .servis-button:active, .white-button.kontakt:active, .backtoshop-button:active,
+  .collection-list-blog .secondary-link-block .secondary-link:active,
+  .w-pagination-wrapper .w-pagination-next:active,
+  .form-contact-us input.white-button.kontakt[type="submit"]:active {
+    background-position: 0 0 !important; transform: scale(.97); transition-duration: 0s !important;
+  }
+  .w-pagination-wrapper .w-pagination-previous:active { background-position: 100% 0 !important; transform: scale(.97); transition-duration: 0s !important; }
+  .nav-link.white.shop:active { background-position: 0 0; }
+}
