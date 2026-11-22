@@ -772,3 +772,69 @@ a.banner-button:focus-visible::after, a.cta-button-black:focus-visible::after, a
 .footer-link[href*="obnova-hesla"],.footer-link[href*="password-recovery"]{--bs-fi:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z'/%3E%3C/svg%3E")}
 .footer-link[href*="muj-ucet"],.footer-link[href*="my-account"]{--bs-fi:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/%3E%3C/svg%3E")}
 .footer-link#bs-cc-footer-link{--bs-fi:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M3 17v2h6v-2H3zM3 5v2h10V5H3zm10 16v-2h8v-2h-8v-2h-2v6h2zM7 9v2H3v2h4v2h2V9H7zm14 4v-2H11v2h10zm-6-4h2V7h4V5h-4V3h-2v6z'/%3E%3C/svg%3E")}
+
+/* Formuláře servis / půjčovna (.form-contact-us, CZ i EN) – styl webu (11/2026):
+   zaoblená bílá pole s tmavým fokusem, bílý výběr s tmavou šipkou, souhlas přes celou šířku
+   s vlastním checkboxem, ODESLAT = černá pilulka s přelitím (akce → bez šipky). */
+.form-contact-us > div { margin-bottom: 18px; }
+.form-contact-us .form-item-header { font-size: 12px; font-weight: 700; letter-spacing: .06em; line-height: 1.3; color: #222528; margin-bottom: 6px; }
+.form-contact-us .text-field-contact,
+.form-contact-us .textarea-contact {
+  height: 46px; margin: 0; padding: 0 16px;
+  background-color: #fff; color: #222528;
+  border: 2px solid transparent; border-radius: 12px; box-shadow: none;
+  font-family: proxima-nova, sans-serif; font-size: 15px; font-weight: 400;
+  transition: border-color .2s ease, box-shadow .2s ease;
+}
+.form-contact-us textarea.textarea-contact { height: auto; min-height: 128px; padding: 12px 16px; line-height: 1.5; resize: vertical; }
+.form-contact-us .text-field-contact::placeholder,
+.form-contact-us .textarea-contact::placeholder { color: #8a8f86; font-weight: 400; }
+.form-contact-us .text-field-contact:focus,
+.form-contact-us .textarea-contact:focus { outline: none; border-color: #222528; box-shadow: 0 0 0 3px rgba(34,37,40,.15); color: #222528; font-weight: 400; }
+.form-contact-us select.textarea-contact.vyber {
+  -webkit-appearance: none; appearance: none; cursor: pointer;
+  background-color: #fff; color: #222528; font-weight: 400; padding-right: 46px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23222528' d='M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 14px center; background-size: 22px;
+}
+.form-contact-us select.textarea-contact.vyber option { color: #222528; background: #fff; }
+/* souhlas přes celou šířku */
+.form-contact-us .servis-gdpr-label,
+.form-contact-us .w-checkbox {
+  grid-column: 1 / -1; display: flex; align-items: flex-start; gap: 12px;
+  margin: 2px 0 20px; padding: 0; cursor: pointer;
+  font-size: 13px; font-weight: 400; line-height: 1.5; color: #222528; text-transform: none;
+}
+.form-contact-us .checkbox-servis,
+.form-contact-us .w-checkbox-input {
+  -webkit-appearance: none; appearance: none; flex: 0 0 20px; width: 20px; height: 20px; margin: 1px 0 0; float: none;
+  border: 2px solid #222528; border-radius: 5px; background: #fff center/14px no-repeat; cursor: pointer;
+  transition: background-color .15s ease;
+}
+.form-contact-us .checkbox-servis:checked,
+.form-contact-us .w-checkbox-input:checked,
+.form-contact-us .w-checkbox-input.w--redirected-checked {
+  background-color: #222528;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23efc101' d='M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z'/%3E%3C/svg%3E");
+}
+.form-contact-us .checkbox-servis:focus-visible,
+.form-contact-us .w-checkbox-input:focus-visible { outline: 2px solid #222528; outline-offset: 2px; }
+.form-contact-us .checkbox-labels { margin: 0; font-size: 13px; line-height: 1.5; color: #222528; }
+/* tlačítko Odeslat: řádek přes celou šířku, černá pilulka s přelitím */
+.form-contact-us > div:last-child { grid-column: 1 / -1; margin-bottom: 0; text-align: left; }
+.form-contact-us input.white-button.kontakt[type="submit"] {
+  display: inline-block; width: auto; min-width: 160px; height: 46px; min-height: 0; margin: 0; padding: 0 32px;
+  border: 0; border-radius: 999px; color: #fff; cursor: pointer;
+  font-family: proxima-nova, sans-serif; font-size: 15px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase;
+  background-color: #000; background-image: linear-gradient(90deg, #383b36 50%, #000 50%);
+  background-size: 200% 100%; background-repeat: no-repeat; background-position: 100% 0;
+  transition: background-position .45s ease, box-shadow .2s ease;
+}
+.form-contact-us input.white-button.kontakt[type="submit"]:hover,
+.form-contact-us input.white-button.kontakt[type="submit"]:focus-visible {
+  background-color: #000; background-position: 0 0; color: #fff; box-shadow: none;
+}
+.form-contact-us input.white-button.kontakt[type="submit"]:focus-visible { outline: 2px solid #222528; outline-offset: 3px; }
+@media (prefers-reduced-motion: reduce) {
+  .form-contact-us input.white-button.kontakt[type="submit"], .form-contact-us .text-field-contact, .form-contact-us .textarea-contact { transition: none; }
+}
