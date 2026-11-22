@@ -23,7 +23,7 @@
   <link href="/css/normalize.css" rel="stylesheet" type="text/css">
   <link href="/css/webflow.css" rel="stylesheet" type="text/css">
   <link href="/css/multy-webflow-to-wordpres-ea5f0e3d27991.webflow.css" rel="stylesheet" type="text/css">
-  <link href="/css/bikeskills-overrides.css?v=20261122form5" rel="stylesheet" type="text/css">
+  <link href="/css/bikeskills-overrides.css?v=20261122legal" rel="stylesheet" type="text/css">
   <link href="https://fonts.googleapis.com" rel="preconnect">
   <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin="anonymous">
   <link rel="preconnect" href="https://firebasestorage.googleapis.com">
@@ -774,8 +774,8 @@ button:hover {
                 <div class="form-item-header">phone number *</div><input class="text-field-contact w-input" maxlength="256" name="Telefon-2" data-name="Telefon 2" placeholder="+420" type="tel" id="Telefon-2" required="">
               </div>
               <div id="w-node-_6cb39172-713d-ca50-3b0e-981cdeea8c4a-deea8c21">
-                <div class="form-item-header">what is your question about?</div><select id="typ-servisu-2" name="typ-servisu-2" data-name="Typ Servisu 2" class="textarea-contact vyber w-select">
-                  <option value="Kompletní servis kola">Choose one of the options</option>
+                <div class="form-item-header">what is your question about? *</div><select id="typ-servisu-2" name="typ-servisu-2" data-name="Typ Servisu 2" class="textarea-contact vyber w-select">
+                  <option value="">Choose one of the options</option>
                   <option value="Kompletní servis kola">Complete bike service</option>
                   <option value="Problém na kole">Problem with my bike</option>
                   <option value="Obecný dotaz">General question</option>
@@ -786,7 +786,7 @@ button:hover {
               </div>
               <label class="servis-gdpr-label">
                 <input type="checkbox" id="servis-gdpr" class="checkbox-servis">
-                <span>*I consent to the management, processing and storage of my personal data in accordance with Section 5(2)(a) of Act No. 101/2000 Coll., on the protection of personal data, as amended.</span>
+                <span>*I consent to the processing of my personal data for the purpose of handling my enquiry in accordance with Regulation (EU) 2016/679 (GDPR) and Act No. 110/2019 Coll., on the processing of personal data.</span>
               </label>
               <p id="servis-form-error"></p>
               <div id="w-node-_6cb39172-713d-ca50-3b0e-981cdeea8c56-deea8c21"><input type="submit" id="servis-submit" data-wait="Sending ..." class="white-button kontakt w-button" value="send"></div>
@@ -920,6 +920,7 @@ button:hover {
       var gdpr = document.getElementById('servis-gdpr');
       if (!jmenoPrijmeni) { showError('Please enter your full name.'); return; }
       if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showError('Please enter a valid e-mail address.'); return; }
+      if (!typServisu) { showError('Please choose what your question is about.'); return; }
       if (!gdpr || !gdpr.checked) { showError('You must agree to the privacy policy to send the form.'); return; }
       showError('');
       var btn = document.getElementById('servis-submit');

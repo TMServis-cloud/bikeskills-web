@@ -132,6 +132,7 @@ const SCRIPT_STRINGS = {
   'Pro odeslání je nutný souhlas se zásadami ochrany osobních údajů.': 'You must agree to the privacy policy to send the form.',
   'Vyplňte prosím jméno a příjmení.': 'Please enter your full name.',
   'Zadejte platný e-mail.': 'Please enter a valid e-mail address.',
+  'Vyberte prosím, na co se ptáte.': 'Please choose what your question is about.',
 };
 function translateInlineScripts(html) {
   return html.replace(/(<script(?![^>]*ld\+json)[^>]*>)([\s\S]*?)(<\/script>)/g, (m, a, js, b) => {

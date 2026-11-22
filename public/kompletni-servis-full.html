@@ -21,7 +21,7 @@
   <link href="css/normalize.css" rel="stylesheet" type="text/css">
   <link href="css/webflow.css" rel="stylesheet" type="text/css">
   <link href="css/multy-webflow-to-wordpres-ea5f0e3d27991.webflow.css" rel="stylesheet" type="text/css">
-  <link href="css/bikeskills-overrides.css?v=20261122form5" rel="stylesheet" type="text/css">
+  <link href="css/bikeskills-overrides.css?v=20261122legal" rel="stylesheet" type="text/css">
   <link href="https://fonts.googleapis.com" rel="preconnect">
   <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin="anonymous">
   <link rel="preconnect" href="https://firebasestorage.googleapis.com">
@@ -783,8 +783,8 @@ button:hover {
                 <div class="form-item-header">telefonní číslo *</div><input class="text-field-contact w-input" maxlength="256" name="Telefon-2" data-name="Telefon 2" placeholder="+420" type="tel" id="Telefon-2" required="">
               </div>
               <div id="w-node-_6cb39172-713d-ca50-3b0e-981cdeea8c4a-deea8c21">
-                <div class="form-item-header">na co se ptáte?</div><select id="typ-servisu-2" name="typ-servisu-2" data-name="Typ Servisu 2" class="textarea-contact vyber w-select">
-                  <option value="Kompletní servis kola">Vyberte jednu z možností</option>
+                <div class="form-item-header">na co se ptáte? *</div><select id="typ-servisu-2" name="typ-servisu-2" data-name="Typ Servisu 2" class="textarea-contact vyber w-select">
+                  <option value="">Vyberte jednu z možností</option>
                   <option value="Kompletní servis kola">Kompletní servis kola</option>
                   <option value="Problém na kole">Problém na kole</option>
                   <option value="Obecný dotaz">Obecný dotaz</option>
@@ -795,7 +795,7 @@ button:hover {
               </div>
               <label class="servis-gdpr-label">
                 <input type="checkbox" id="servis-gdpr" class="checkbox-servis">
-                <span>*Souhlasím se správou, zpracováním a uchováním svých osobních údajů, ve smyslu ustanovení §5 odst. 2 písm. a) zákona č. 101/200 Sb. o ochraně osobních údajů, ve znění pozdějších předpisů.</span>
+                <span>*Souhlasím se zpracováním osobních údajů za účelem vyřízení mého dotazu v souladu s nařízením (EU) 2016/679 (GDPR) a zákonem č. 110/2019 Sb., o zpracování osobních údajů.</span>
               </label>
               <p id="servis-form-error"></p>
               <div id="w-node-_6cb39172-713d-ca50-3b0e-981cdeea8c56-deea8c21"><input type="submit" id="servis-submit" data-wait="Odesíláme ..." class="white-button kontakt w-button" value="odeslat"></div>
@@ -938,6 +938,7 @@ button:hover {
       var gdpr = document.getElementById('servis-gdpr');
       if (!jmenoPrijmeni) { showError('Vyplňte prosím jméno a příjmení.'); return; }
       if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showError('Zadejte platný e-mail.'); return; }
+      if (!typServisu) { showError('Vyberte prosím, na co se ptáte.'); return; }
       if (!gdpr || !gdpr.checked) { showError('Pro odeslání je nutný souhlas se zásadami ochrany osobních údajů.'); return; }
       showError('');
       var btn = document.getElementById('servis-submit');
