@@ -681,8 +681,7 @@ html.cookies-show .cookie .banner-author-wrap .banner-author { display: inline !
   }
   .nav-link.white.shop:hover, .nav-link.white.shop:focus-visible { background-color: #2d60ab; background-position: 0 0; color: #fff; }
 }
-.collection-list-blog .secondary-link-block .secondary-link,
-.w-pagination-wrapper .w-pagination-next, .w-pagination-wrapper .w-pagination-previous {
+.collection-list-blog .secondary-link-block .secondary-link {
   background-size: 200% 100%; background-repeat: no-repeat; background-position: 100% 0;
   background-origin: border-box; background-clip: border-box;
   transition: background-position .45s ease, border-color .3s ease-in-out, color .3s ease-in-out;
@@ -696,15 +695,8 @@ html.cookies-show .cookie .banner-author-wrap .banner-author { display: inline !
   background-size: 200% 100%; background-repeat: no-repeat; background-origin: border-box; background-clip: border-box;
   background-position: 0 0; border-color: transparent; color: #1e2021 !important;
 }  /* image/size znovu: starší hover pravidlo používá zkratku background, která je jinak vynuluje */
-.w-pagination-wrapper .w-pagination-next, .w-pagination-wrapper .w-pagination-previous {
-  background-color: transparent; background-image: linear-gradient(90deg, #383b36 50%, transparent 50%);
-  border: 2px solid rgba(255,255,255,.6); border-radius: 999px; color: #fff;
-}
-.w-pagination-wrapper .w-pagination-next:hover, .w-pagination-wrapper .w-pagination-previous:hover,
-.w-pagination-wrapper .w-pagination-next:focus-visible, .w-pagination-wrapper .w-pagination-previous:focus-visible { background-color: transparent; background-position: 0 0; border-color: transparent; color: #fff; }
 @media (prefers-reduced-motion: reduce) {
-  .nav-link.white.shop, .collection-list-blog .secondary-link-block .secondary-link,
-  .w-pagination-wrapper .w-pagination-next, .w-pagination-wrapper .w-pagination-previous { transition: none; }
+  .nav-link.white.shop, .collection-list-blog .secondary-link-block .secondary-link { transition: none; }
 }
 
 /* Varianta B (11/2026): Přelití + šipka. Šipka jen u tlačítek, která někam vedou (odkazy);
@@ -731,5 +723,34 @@ a.banner-button:focus-visible::after, a.cta-button-black:focus-visible::after, a
 /* Typy kurzů (HP): bloky stejně vysoké, odkaz vždy vpravo dole; bez zvětšování odkazu při hoveru
    (Webflow interakce nastavuje inline scale 1.2 na .secondary-link-button) */
 .main-grid > .kurz-camp-block { display: flex; flex-direction: column; align-self: stretch; }
-.main-grid > .kurz-camp-block > .secondary-link-block { margin-top: auto; justify-content: flex-end; align-self: stretch; }
+.main-grid > .kurz-camp-block > .secondary-link-block { margin-top: auto; padding-top: 1.25rem; justify-content: flex-end; align-self: stretch; }
 .kurz-camp-block .secondary-link-button { transform: none !important; }
+
+/* Stránkování (blog, archiv akcí): vzhled jako „Číst dále" – obrysová pilulka, šipka textem
+   (Další →, ← Předešlé), krémová výplň při hoveru (u Předešlé zprava). Původní obrázková šipka skrytá.
+   !important kvůli inline background-color z Webflow. */
+.w-pagination-wrapper .w-pagination-previous, .w-pagination-wrapper .w-pagination-next {
+  display: inline-flex !important; align-items: center; gap: .4rem;
+  width: auto !important; height: auto !important; min-height: 0 !important; max-width: none !important;
+  border: 1.5px solid #4a4f4c !important; border-radius: 999px !important;
+  padding: calc(.4rem + .6px) 1.1rem calc(.4rem - .6px) !important;
+  font-family: proxima-nova, sans-serif; font-size: .85rem; font-weight: 500; line-height: 1.25; letter-spacing: normal;
+  text-transform: none; text-decoration: none !important; color: #d0d3c9 !important;
+  background-color: transparent !important;
+  background-image: linear-gradient(90deg, #ebe4da 50%, transparent 50%) !important;
+  background-size: 200% 100% !important; background-repeat: no-repeat !important;
+  background-position: 100% 0 !important; background-origin: border-box !important; background-clip: border-box !important;
+  transition: background-position .45s ease, border-color .3s ease-in-out, color .3s ease-in-out !important;
+}
+.w-pagination-wrapper .w-pagination-previous { background-image: linear-gradient(270deg, #ebe4da 50%, transparent 50%) !important; background-position: 0 0 !important; }
+.w-pagination-wrapper .w-pagination-next:hover, .w-pagination-wrapper .w-pagination-next:focus-visible { background-position: 0 0 !important; border-color: transparent !important; color: #1e2021 !important; }
+.w-pagination-wrapper .w-pagination-previous:hover, .w-pagination-wrapper .w-pagination-previous:focus-visible { background-position: 100% 0 !important; border-color: transparent !important; color: #1e2021 !important; }
+.w-pagination-wrapper .predesly-arrow { display: none !important; }
+.w-pagination-wrapper .text-pagination, .w-pagination-wrapper .text-block-138 { color: inherit !important; font: inherit !important; text-transform: none !important; margin: 0 !important; padding: 0 !important; }
+.w-pagination-wrapper .text-block-138::first-letter { text-transform: uppercase; }
+.w-pagination-wrapper .w-pagination-next::after { content: "→"; font-size: .9em; transition: transform .15s; }
+.w-pagination-wrapper .w-pagination-previous::before { content: "←"; font-size: .9em; transition: transform .15s; }
+.w-pagination-wrapper .w-pagination-next:hover::after { transform: translateX(2px); }
+.w-pagination-wrapper .w-pagination-previous:hover::before { transform: translateX(-2px); }
+.w-pagination-wrapper .w-pagination-previous:focus-visible, .w-pagination-wrapper .w-pagination-next:focus-visible { outline: 2px solid #efc101; outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) { .w-pagination-wrapper .w-pagination-previous, .w-pagination-wrapper .w-pagination-next { transition: none !important; } }
