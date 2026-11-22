@@ -727,3 +727,9 @@ a.banner-button:focus-visible::after, a.cta-button-black:focus-visible::after, a
   a.main-button.yellow::after, a.button-8::after, a.categories-button::after, a.servis-button::after,
   a.white-button.kontakt::after, a.backtoshop-button::after, a.main-button.error::after { transition: none; }
 }
+
+/* Typy kurzů (HP): bloky stejně vysoké, odkaz vždy vpravo dole; bez zvětšování odkazu při hoveru
+   (Webflow interakce nastavuje inline scale 1.2 na .secondary-link-button) */
+.main-grid > .kurz-camp-block { display: flex; flex-direction: column; align-self: stretch; }
+.main-grid > .kurz-camp-block > .secondary-link-block { margin-top: auto; justify-content: flex-end; align-self: stretch; }
+.kurz-camp-block .secondary-link-button { transform: none !important; }
