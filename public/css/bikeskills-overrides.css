@@ -706,3 +706,24 @@ html.cookies-show .cookie .banner-author-wrap .banner-author { display: inline !
   .nav-link.white.shop, .collection-list-blog .secondary-link-block .secondary-link,
   .w-pagination-wrapper .w-pagination-next, .w-pagination-wrapper .w-pagination-previous { transition: none; }
 }
+
+/* Varianta B (11/2026): Přelití + šipka. Šipka jen u tlačítek, která někam vedou (odkazy);
+   tlačítka s akcí na místě (odeslání formuláře, filtry) a stránkování jsou bez šipky. */
+a.banner-button::after, button.banner-button::after, a.cta-button-black::after, a.main-button.rezervace::after,
+a.main-button.yellow::after, a.button-8::after, a.categories-button::after, a.servis-button::after,
+a.white-button.kontakt::after, a.backtoshop-button::after, a.main-button.error::after {
+  content: "→"; display: inline-block; width: 0; margin-left: 0; opacity: 0; overflow: hidden;
+  transform: translateX(-8px); vertical-align: top;
+  transition: width .35s ease, margin-left .35s ease, opacity .3s ease, transform .35s ease;
+}
+a.banner-button:hover::after, button.banner-button:hover::after, a.cta-button-black:hover::after, a.main-button.rezervace:hover::after,
+a.main-button.yellow:hover::after, a.button-8:hover::after, a.categories-button:hover::after, a.servis-button:hover::after,
+a.white-button.kontakt:hover::after, a.backtoshop-button:hover::after, a.main-button.error:hover::after,
+a.banner-button:focus-visible::after, a.cta-button-black:focus-visible::after, a.servis-button:focus-visible::after {
+  width: 1em; margin-left: .45em; opacity: 1; transform: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  a.banner-button::after, button.banner-button::after, a.cta-button-black::after, a.main-button.rezervace::after,
+  a.main-button.yellow::after, a.button-8::after, a.categories-button::after, a.servis-button::after,
+  a.white-button.kontakt::after, a.backtoshop-button::after, a.main-button.error::after { transition: none; }
+}
