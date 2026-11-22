@@ -725,6 +725,7 @@ a.banner-button:focus-visible::after, a.cta-button-black:focus-visible::after, a
 .main-grid > .kurz-camp-block { display: flex; flex-direction: column; align-self: stretch; }
 .main-grid > .kurz-camp-block > .secondary-link-block { margin-top: auto; padding-top: 1.25rem; justify-content: flex-end; align-self: stretch; }
 .kurz-camp-block .secondary-link-button { transform: none !important; }
+.main-grid > .kurz-camp-block > .text-block { margin-top: 8px; }
 
 /* Stránkování (blog, archiv akcí): vzhled jako „Číst dále" – obrysová pilulka, šipka textem
    (Další →, ← Předešlé), krémová výplň při hoveru (u Předešlé zprava). Původní obrázková šipka skrytá.
@@ -746,6 +747,7 @@ a.banner-button:focus-visible::after, a.cta-button-black:focus-visible::after, a
 .w-pagination-wrapper .w-pagination-next:hover, .w-pagination-wrapper .w-pagination-next:focus-visible { background-position: 0 0 !important; border-color: transparent !important; color: #1e2021 !important; }
 .w-pagination-wrapper .w-pagination-previous:hover, .w-pagination-wrapper .w-pagination-previous:focus-visible { background-position: 100% 0 !important; border-color: transparent !important; color: #1e2021 !important; }
 .w-pagination-wrapper .predesly-arrow { display: none !important; }
+.w-pagination-wrapper .w-pagination-previous[style*="display: none"], .w-pagination-wrapper .w-pagination-next[style*="display: none"] { display: none !important; }  /* 1. / poslední stránka */
 .w-pagination-wrapper .text-pagination, .w-pagination-wrapper .text-block-138 { color: inherit !important; font: inherit !important; text-transform: none !important; margin: 0 !important; padding: 0 !important; }
 .w-pagination-wrapper .text-block-138::first-letter { text-transform: uppercase; }
 .w-pagination-wrapper .w-pagination-next::after { content: "→"; font-size: .9em; transition: transform .15s; }
@@ -782,11 +784,11 @@ a.banner-button:focus-visible::after, a.cta-button-black:focus-visible::after, a
 .form-contact-us .textarea-contact {
   height: 46px; margin: 0; padding: 0 16px;
   background-color: #fff; color: #222528;
-  border: 2px solid transparent; border-radius: 12px; box-shadow: none;
+  border: 2px solid transparent; border-radius: 999px; box-shadow: none; padding: 0 20px;
   font-family: proxima-nova, sans-serif; font-size: 15px; font-weight: 400;
   transition: border-color .2s ease, box-shadow .2s ease;
 }
-.form-contact-us textarea.textarea-contact { height: auto; min-height: 128px; padding: 12px 16px; line-height: 1.5; resize: vertical; }
+.form-contact-us textarea.textarea-contact { height: auto; min-height: 128px; padding: 13px 20px; border-radius: 23px; line-height: 1.5; resize: vertical; }
 .form-contact-us .text-field-contact::placeholder,
 .form-contact-us .textarea-contact::placeholder { color: #8a8f86; font-weight: 400; }
 .form-contact-us .text-field-contact:focus,
@@ -807,7 +809,8 @@ a.banner-button:focus-visible::after, a.cta-button-black:focus-visible::after, a
 }
 .form-contact-us .checkbox-servis,
 .form-contact-us .w-checkbox-input {
-  -webkit-appearance: none; appearance: none; flex: 0 0 20px; width: 20px; height: 20px; margin: 1px 0 0; float: none;
+  -webkit-appearance: none; appearance: none; flex: 0 0 20px; width: 20px !important; height: 20px !important;
+  min-width: 20px; max-width: 20px; min-height: 20px; max-height: 20px; aspect-ratio: 1 / 1; box-sizing: border-box; padding: 0; margin: 1px 0 0; float: none; align-self: flex-start;
   border: 2px solid #222528; border-radius: 5px; background: #fff center/14px no-repeat; cursor: pointer;
   transition: background-color .15s ease;
 }
@@ -864,3 +867,20 @@ a.banner-button:focus-visible::after, a.cta-button-black:focus-visible::after, a
   .w-pagination-wrapper .w-pagination-previous:active { background-position: 100% 0 !important; transform: scale(.97); transition-duration: 0s !important; }
   .nav-link.white.shop:active { background-position: 0 0; }
 }
+
+/* Výběr ve formuláři (bs-select.js): tlačítko jako ostatní pole, panel jako filtry na blogu */
+.form-contact-us .bs-fsel__native { position: absolute !important; width: 1px !important; height: 1px !important; padding: 0 !important; margin: -1px !important; overflow: hidden !important; clip: rect(0 0 0 0) !important; white-space: nowrap !important; border: 0 !important; opacity: 0 !important; pointer-events: none !important; }
+.form-contact-us .bs-fsel { position: relative; width: 100%; }
+.form-contact-us .bs-fsel__btn {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; height: 46px; margin: 0; padding: 0 20px;
+  background: #fff; color: #222528; border: 2px solid transparent; border-radius: 999px; cursor: pointer; text-align: left;
+  font-family: proxima-nova, sans-serif; font-size: 15px; font-weight: 400; line-height: 1.2;
+  transition: border-color .2s ease, box-shadow .2s ease;
+}
+.form-contact-us .bs-fsel.is-placeholder .bs-fsel__label { color: #8a8f86; }
+.form-contact-us .bs-fsel__label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.form-contact-us .bs-fsel__btn .bs-dd__chev { color: #222528; }
+.form-contact-us .bs-fsel__btn:hover { border-color: rgba(34,37,40,.35); }
+.form-contact-us .bs-fsel__btn:focus-visible, .form-contact-us .bs-fsel.is-open .bs-fsel__btn { outline: none; border-color: #222528; box-shadow: 0 0 0 3px rgba(34,37,40,.15); }
+.form-contact-us .bs-fsel__panel { left: 0; right: 0; width: auto; min-width: 0; max-width: none; text-transform: none; letter-spacing: normal; }
+.form-contact-us .bs-fsel .bs-dd__opt { font-family: proxima-nova, sans-serif; }
